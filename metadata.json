@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Kod Akademi",
+  "description": "Dart, Python, C++, Rust, JavaScript, Kotlin ve Flutter programlama dillerini adım adım, interaktif quizler ve kodlama egzersizleriyle öğreten platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
