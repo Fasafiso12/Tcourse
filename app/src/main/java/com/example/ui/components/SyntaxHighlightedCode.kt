@@ -20,11 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
@@ -35,111 +32,42 @@ fun SyntaxHighlightedCode(
     modifier: Modifier = Modifier,
     language: String = "code",
     showLineNumbers: Boolean = true,
-    allowCopy: Boolean = true
+    allowCopy: Boolean = true,
+    fontSizeSp: Int = 13
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val editorTheme = LocalEditorTheme.current
 
-    val annotatedCode = remember(code) {
-        buildAnnotatedString {
-            val lines = code.lines()
-            lines.forEachIndexed { index, line ->
-                // Token parsing for syntax highlights
-                var remaining = line
-                while (remaining.isNotEmpty()) {
-                    when {
-                        // Comments
-                        remaining.startsWith("//") || remaining.startsWith("#") -> {
-                            withStyle(SpanStyle(color = CodeComment)) {
-                                append(remaining)
-                            }
-                            remaining = ""
-                        }
-                        // Strings (single or double quoted or backticks)
-                        remaining.startsWith("\"") || remaining.startsWith("'") || remaining.startsWith("`") -> {
-                            val quote = remaining[0]
-                            val nextQuote = remaining.indexOf(quote, startIndex = 1)
-                            if (nextQuote != -1) {
-                                val str = remaining.substring(0, nextQuote + 1)
-                                withStyle(SpanStyle(color = CodeString)) {
-                                    append(str)
-                                }
-                                remaining = remaining.substring(nextQuote + 1)
-                            } else {
-                                withStyle(SpanStyle(color = CodeString)) {
-                                    append(remaining)
-                                }
-                                remaining = ""
-                            }
-                        }
-                        // Keywords
-                        isKeywordMatch(remaining) != null -> {
-                            val kw = isKeywordMatch(remaining)!!
-                            withStyle(SpanStyle(color = CodeKeyword, fontWeight = FontWeight.Bold)) {
-                                append(kw)
-                            }
-                            remaining = remaining.substring(kw.length)
-                        }
-                        // Types
-                        isTypeMatch(remaining) != null -> {
-                            val type = isTypeMatch(remaining)!!
-                            withStyle(SpanStyle(color = CodeType, fontWeight = FontWeight.SemiBold)) {
-                                append(type)
-                            }
-                            remaining = remaining.substring(type.length)
-                        }
-                        // Numbers
-                        remaining.firstOrNull()?.isDigit() == true -> {
-                            val numMatch = Regex("""^\d+(\.\d+)?""").find(remaining)
-                            if (numMatch != null) {
-                                withStyle(SpanStyle(color = CodeNumber)) {
-                                    append(numMatch.value)
-                                }
-                                remaining = remaining.substring(numMatch.value.length)
-                            } else {
-                                append(remaining.first())
-                                remaining = remaining.substring(1)
-                            }
-                        }
-                        else -> {
-                            // Plain character
-                            append(remaining.first())
-                            remaining = remaining.substring(1)
-                        }
-                    }
-                }
-                if (index < lines.size - 1) {
-                    append("\n")
-                }
-            }
-        }
+    val annotatedCode = remember(code, language, editorTheme) {
+        SyntaxHighlightingTransformation.buildSyntaxHighlightedString(code, language, editorTheme)
     }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(CodeBg)
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
+            .background(editorTheme.bg)
+            .border(1.dp, editorTheme.border, RoundedCornerShape(14.dp))
     ) {
         Column {
             // Header bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(CodeHeader)
+                    .background(editorTheme.header)
                     .padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFFFF5F56)))
-                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFFFFBD2E)))
-                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFF27C93F)))
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Box(modifier = Modifier.size(9.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFFFF5F56)))
+                    Box(modifier = Modifier.size(9.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFFFFBD2E)))
+                    Box(modifier = Modifier.size(9.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFF27C93F)))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = language.uppercase(),
-                        color = Color(0xFF94A3B8),
+                        color = editorTheme.keywordColor,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace
@@ -152,21 +80,22 @@ fun SyntaxHighlightedCode(
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             val clip = ClipData.newPlainText("Code", code)
                             clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "Kod kopyalandı!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Kod panoya kopyalandı!", Toast.LENGTH_SHORT).show()
                         },
-                        modifier = Modifier.size(28.dp).testTag("copy_code_button")
+                        modifier = Modifier.size(26.dp).testTag("copy_code_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.ContentCopy,
                             contentDescription = "Kodu Kopyala",
-                            tint = Color(0xFF94A3B8),
-                            modifier = Modifier.size(16.dp)
+                            tint = editorTheme.gutterText,
+                            modifier = Modifier.size(15.dp)
                         )
                     }
                 }
             }
 
-            // Code Content
+            // Code Content with Line Numbers
+            val lineHeightVal = (fontSizeSp + 7).sp
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,10 +106,10 @@ fun SyntaxHighlightedCode(
                     val lineNums = (1..lineCount).joinToString("\n")
                     Text(
                         text = lineNums,
-                        color = Color(0xFF64748B),
-                        fontSize = 13.sp,
+                        color = editorTheme.gutterText,
+                        fontSize = fontSizeSp.sp,
                         fontFamily = FontFamily.Monospace,
-                        lineHeight = 20.sp,
+                        lineHeight = lineHeightVal,
                         modifier = Modifier.padding(end = 12.dp)
                     )
                 }
@@ -188,50 +117,13 @@ fun SyntaxHighlightedCode(
                 Box(modifier = Modifier.horizontalScroll(scrollState)) {
                     Text(
                         text = annotatedCode,
-                        fontSize = 13.sp,
+                        fontSize = fontSizeSp.sp,
                         fontFamily = FontFamily.Monospace,
-                        lineHeight = 20.sp,
-                        color = Color(0xFFF8FAFC)
+                        lineHeight = lineHeightVal,
+                        color = editorTheme.textPrimary
                     )
                 }
             }
         }
     }
-}
-
-private val KEYWORDS = listOf(
-    "var", "val", "const", "final", "void", "fun", "fn", "def", "let", "mut",
-    "if", "else", "elif", "switch", "case", "for", "while", "do", "break", "continue",
-    "return", "class", "struct", "import", "package", "public", "private", "protected",
-    "async", "await", "Future", "print", "cout", "cin", "println", "console", "log",
-    "true", "false", "null", "nil", "new", "this", "self", "super", "yield", "try", "catch"
-)
-
-private val TYPES = listOf(
-    "int", "double", "float", "String", "str", "bool", "boolean", "char", "List", "Map", "Set",
-    "vector", "usize", "i32", "i64", "f64", "Widget", "BuildContext", "dynamic", "auto"
-)
-
-private fun isKeywordMatch(text: String): String? {
-    for (kw in KEYWORDS) {
-        if (text.startsWith(kw)) {
-            val after = text.getOrNull(kw.length)
-            if (after == null || !after.isLetterOrDigit() && after != '_') {
-                return kw
-            }
-        }
-    }
-    return null
-}
-
-private fun isTypeMatch(text: String): String? {
-    for (type in TYPES) {
-        if (text.startsWith(type)) {
-            val after = text.getOrNull(type.length)
-            if (after == null || !after.isLetterOrDigit() && after != '_') {
-                return type
-            }
-        }
-    }
-    return null
 }

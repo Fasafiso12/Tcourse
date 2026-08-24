@@ -34,6 +34,7 @@ fun SearchScreen(
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
+    val strings = com.example.data.util.LocalAppStrings.current
 
     Column(
         modifier = Modifier
@@ -50,7 +51,7 @@ fun SearchScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { viewModel.setSearchQuery(it) },
-                placeholder = { Text("Konu, kod veya kavram ara... (örn: döngü, async, class)", color = TextMuted, fontSize = 13.sp) },
+                placeholder = { Text(strings.searchPlaceholder, color = TextMuted, fontSize = 13.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
                 modifier = Modifier
                     .weight(1f)
@@ -68,7 +69,7 @@ fun SearchScreen(
             )
 
             IconButton(onClick = onClose, modifier = Modifier.testTag("close_search_btn")) {
-                Icon(Icons.Default.Close, contentDescription = "Kapat", tint = TextPrimary)
+                Icon(Icons.Default.Close, contentDescription = strings.closeText, tint = TextPrimary)
             }
         }
 

@@ -1,15 +1,45 @@
 package com.example.repository
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.data.catalog.CourseCatalog
 import com.example.data.db.*
+import com.example.data.engine.GamificationService
 import com.example.model.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AppRepository(private val database: AppDatabase) {
+class AppRepository(
+    private val database: AppDatabase,
+    private val context: Context? = null
+) {
+
+    private val prefs: SharedPreferences? = context?.getSharedPreferences("app_settings_prefs", Context.MODE_PRIVATE)
+
+    private val _appLanguageFlow = MutableStateFlow(loadInitialLanguage())
+    val appLanguageFlow: Flow<AppLanguage> = _appLanguageFlow.asStateFlow()
+
+    private fun loadInitialLanguage(): AppLanguage {
+        val code = prefs?.getString("pref_app_language", null)
+        return AppLanguage.fromCode(code)
+    }
+
+    fun getAppLanguage(): AppLanguage = _appLanguageFlow.value
+
+    fun setAppLanguage(language: AppLanguage) {
+        _appLanguageFlow.value = language
+        prefs?.edit()?.putString("pref_app_language", language.code)?.apply()
+    }
+
+    fun hasCompletedInitialLanguageSelection(): Boolean {
+        return prefs?.getBoolean("pref_has_chosen_initial_lang", false) ?: false
+    }
+
+    fun setCompletedInitialLanguageSelection(completed: Boolean) {
+        prefs?.edit()?.putBoolean("pref_has_chosen_initial_lang", completed)?.apply()
+    }
 
     private val progressDao = database.progressDao()
     private val statsDao = database.userStatsDao()
@@ -17,6 +47,30 @@ class AppRepository(private val database: AppDatabase) {
     private val favoritesDao = database.favoritesDao()
     private val mistakeDao = database.mistakeDao()
     private val achievementDao = database.achievementDao()
+
+    // ----------------------------------------------------
+    // Shared Event Flows for Real-time Micro-Animations
+    // ----------------------------------------------------
+    private val _xpGainEvent = MutableSharedFlow<XpGainEvent>(
+        replay = 0,
+        extraBufferCapacity = 5,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val xpGainEvent: SharedFlow<XpGainEvent> = _xpGainEvent.asSharedFlow()
+
+    private val _levelUpEvent = MutableSharedFlow<LevelUpEvent>(
+        replay = 0,
+        extraBufferCapacity = 2,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val levelUpEvent: SharedFlow<LevelUpEvent> = _levelUpEvent.asSharedFlow()
+
+    private val _achievementUnlockedEvent = MutableSharedFlow<AppAchievement>(
+        replay = 0,
+        extraBufferCapacity = 3,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val achievementUnlockedEvent: SharedFlow<AppAchievement> = _achievementUnlockedEvent.asSharedFlow()
 
     // ----------------------------------------------------
     // User Stats & Profile
@@ -27,9 +81,9 @@ class AppRepository(private val database: AppDatabase) {
             username = "Geliştirici",
             xp = 240,
             streak = 7,
-            lastActiveDate = getTodayDateString(),
+            lastActiveDate = GamificationService.getTodayDateString(),
             isPremium = false,
-            studyMinutes = 35,
+            studyMinutes = 45,
             solvedQuestions = 14,
             completedLessons = 4,
             completedChallenges = 2,
@@ -39,16 +93,15 @@ class AppRepository(private val database: AppDatabase) {
     }
 
     val userProfileDataFlow: Flow<UserProfileData> = userStatsFlow.map { stats ->
-        val level = calculateLevel(stats.xp)
-        val levelTitle = getLevelTitle(level)
-        val xpForNext = getXpForNextLevel(level)
+        val tier = GamificationService.getLevelTier(stats.xp)
+        val (_, xpRequiredInTier) = GamificationService.getXpProgressInCurrentLevel(stats.xp)
 
         UserProfileData(
             username = stats.username,
-            level = level,
-            levelTitle = levelTitle,
+            level = tier.level,
+            levelTitle = "Level ${tier.level} – ${tier.titleTr} (${tier.titleEn})",
             currentXp = stats.xp,
-            xpForNextLevel = xpForNext,
+            xpForNextLevel = tier.maxXp,
             streakDays = stats.streak,
             isPremium = stats.isPremium,
             totalStudyMinutes = stats.studyMinutes,
@@ -57,6 +110,51 @@ class AppRepository(private val database: AppDatabase) {
             quizAccuracyPercentage = 88,
             codingSuccessPercentage = 92
         )
+    }
+
+    // ----------------------------------------------------
+    // Rich Achievements Stream
+    // ----------------------------------------------------
+    val richAchievementsFlow: Flow<List<AppAchievement>> = combine(
+        achievementDao.getAllUnlocked(),
+        userStatsFlow,
+        progressDao.getAllProgress()
+    ) { unlockedList, stats, progressList ->
+        val unlockedMap = unlockedList.associate { it.achievementId to it.unlockedAt }
+        val completedCount = progressList.count { it.status == LessonStatus.COMPLETED.name }
+
+        GamificationService.allAchievements.map { ach ->
+            val isUnlocked = unlockedMap.containsKey(ach.id)
+            val currentProg = when (ach.id) {
+                "first_step" -> if (completedCount >= 1) 1 else 0
+                "getting_started" -> completedCount.coerceAtMost(10)
+                "quiz_master" -> (stats.solvedQuestions / 3).coerceAtMost(10)
+                "perfect_score" -> if (isUnlocked) 1 else 0
+                "first_code" -> stats.completedChallenges.coerceAtMost(1)
+                "coder_50" -> stats.completedChallenges.coerceAtMost(10)
+                "streak_7" -> stats.streak.coerceAtMost(7)
+                "dedicated_30" -> stats.streak.coerceAtMost(30)
+                "scholar" -> if (isUnlocked) 1 else 0
+                "night_owl", "early_bird" -> if (isUnlocked) 1 else 0
+                else -> if (isUnlocked) 1 else 0
+            }
+
+            ach.copy(
+                isUnlocked = isUnlocked,
+                unlockedAt = unlockedMap[ach.id],
+                currentProgress = currentProg
+            )
+        }
+    }
+
+    // ----------------------------------------------------
+    // Weekly Stats Flow
+    // ----------------------------------------------------
+    val weeklyStatsFlow: Flow<WeeklyStatsSummary> = combine(
+        userStatsFlow,
+        progressDao.getAllProgress()
+    ) { stats, progressList ->
+        GamificationService.buildWeeklySummary(stats, progressList)
     }
 
     // ----------------------------------------------------
@@ -70,15 +168,12 @@ class AppRepository(private val database: AppDatabase) {
 
     fun getProjects() = CourseCatalog.projects
 
-    fun getAchievements() = CourseCatalog.defaultAchievements
-
     fun getCourseProgressFlow(courseId: String): Flow<CourseProgressInfo> {
         val totalLessons = CourseCatalog.getLessonsForCourse(courseId)
         return progressDao.getProgressByCourse(courseId).map { progressList ->
             val completedCount = progressList.count { it.status == LessonStatus.COMPLETED.name }
             val pct = if (totalLessons.isNotEmpty()) (completedCount.toFloat() / totalLessons.size.toFloat()) else 0f
             
-            // Find next uncompleted lesson
             val completedIds = progressList.filter { it.status == LessonStatus.COMPLETED.name }.map { it.lessonId }.toSet()
             val nextLesson = totalLessons.firstOrNull { !completedIds.contains(it.id) }
             val lastCompleted = totalLessons.lastOrNull { completedIds.contains(it.id) }
@@ -97,9 +192,12 @@ class AppRepository(private val database: AppDatabase) {
     fun getAllProgressFlow() = progressDao.getAllProgress()
 
     // ----------------------------------------------------
-    // Actions & Rewards
+    // Actions & Rewards (with Anti-Exploit)
     // ----------------------------------------------------
     suspend fun completeLesson(lessonId: String, courseId: String, score: Int = 100) {
+        val existingProgress = progressDao.getProgressForLesson(lessonId)
+        val isFirstTime = existingProgress == null || existingProgress.status != LessonStatus.COMPLETED.name
+
         progressDao.upsertProgress(
             UserProgressEntity(
                 lessonId = lessonId,
@@ -109,22 +207,58 @@ class AppRepository(private val database: AppDatabase) {
                 completedAt = System.currentTimeMillis()
             )
         )
-        addXp(20)
-        incrementCompletedLessons()
-        checkAndUnlockAchievement("first_lesson")
+
+        // Only grant full XP if completed for the first time (Anti-Exploit)
+        if (isFirstTime) {
+            addXp(GamificationService.XP_LESSON_COMPLETE, "Ders Tamamlandı: +${GamificationService.XP_LESSON_COMPLETE} XP")
+            incrementCompletedLessons()
+            updateActivityStreak()
+            checkAndUnlockAchievement("first_step")
+
+            val stats = getOrCreateStats()
+            if (stats.completedLessons >= 10) {
+                checkAndUnlockAchievement("getting_started")
+            }
+
+            // Time-based special achievements
+            val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+            if (hour in 22..23 || hour in 0..5) {
+                checkAndUnlockAchievement("night_owl")
+            } else if (hour in 5..8) {
+                checkAndUnlockAchievement("early_bird")
+            }
+
+            // Check if course completely finished
+            val allCourseLessons = CourseCatalog.getLessonsForCourse(courseId)
+            val currentCourseCompleted = progressDao.getProgressForLesson(lessonId)
+            // If all done, award course bonus
+            val allProg = database.progressDao().getProgressForLesson(lessonId)
+        }
     }
 
     suspend fun recordQuizFinished(lessonId: String, correctCount: Int, totalCount: Int) {
         val score = if (totalCount > 0) ((correctCount.toFloat() / totalCount.toFloat()) * 100).toInt() else 100
         progressDao.updateQuizScore(lessonId, score)
-        addXp(10 * correctCount)
+
+        val xpAmount = if (score == 100) GamificationService.XP_QUIZ_PERFECT else GamificationService.XP_QUIZ_COMPLETE
+        addXp(xpAmount, "Quiz Tamamlandı: +$xpAmount XP")
         incrementSolvedQuestions(correctCount)
-        if (correctCount >= 5) {
+        updateActivityStreak()
+
+        if (score == 100) {
+            checkAndUnlockAchievement("perfect_score")
+        }
+
+        val stats = getOrCreateStats()
+        if (stats.solvedQuestions >= 30) {
             checkAndUnlockAchievement("quiz_master")
         }
     }
 
     suspend fun recordCodingChallengeFinished(lessonId: String, courseId: String) {
+        val existingProgress = progressDao.getProgressForLesson(lessonId)
+        val isFirstTime = existingProgress?.codingChallengeCompleted != true
+
         progressDao.upsertProgress(
             UserProgressEntity(
                 lessonId = lessonId,
@@ -134,9 +268,29 @@ class AppRepository(private val database: AppDatabase) {
                 completedAt = System.currentTimeMillis()
             )
         )
-        addXp(30)
-        incrementCompletedChallenges()
-        checkAndUnlockAchievement("first_code")
+
+        if (isFirstTime) {
+            addXp(GamificationService.XP_CODING_CHALLENGE, "Kodlama Görevi: +${GamificationService.XP_CODING_CHALLENGE} XP")
+            incrementCompletedChallenges()
+            updateActivityStreak()
+            checkAndUnlockAchievement("first_code")
+
+            val stats = getOrCreateStats()
+            if (stats.completedChallenges >= 10) {
+                checkAndUnlockAchievement("coder_50")
+            }
+        }
+    }
+
+    suspend fun completeDailyChallenge(challenge: DailyChallengeItem) {
+        addXp(challenge.xpReward, "Günün Meydan Okuması: +${challenge.xpReward} XP")
+        updateActivityStreak()
+        prefs?.edit()?.putString("pref_daily_challenge_done_date", GamificationService.getTodayDateString())?.apply()
+    }
+
+    fun isDailyChallengeCompletedToday(): Boolean {
+        val lastDone = prefs?.getString("pref_daily_challenge_done_date", "")
+        return lastDone == GamificationService.getTodayDateString()
     }
 
     suspend fun setPremium(isPremium: Boolean) {
@@ -189,7 +343,7 @@ class AppRepository(private val database: AppDatabase) {
     }
 
     // ----------------------------------------------------
-    // Mistakes & Personalized Review
+    // Mistakes & Personalized Smart Review
     // ----------------------------------------------------
     val allMistakesFlow: Flow<List<MistakeEntity>> = mistakeDao.getAllMistakes()
 
@@ -226,12 +380,20 @@ class AppRepository(private val database: AppDatabase) {
     }
 
     // ----------------------------------------------------
-    // Achievements
+    // Achievements Unlocking
     // ----------------------------------------------------
     val unlockedAchievementsFlow: Flow<List<UnlockedAchievementEntity>> = achievementDao.getAllUnlocked()
 
     private suspend fun checkAndUnlockAchievement(id: String) {
-        achievementDao.unlock(UnlockedAchievementEntity(id))
+        val isAlready = achievementDao.getAllUnlocked().firstOrNull()?.any { it.achievementId == id } ?: false
+        if (!isAlready) {
+            achievementDao.unlock(UnlockedAchievementEntity(id))
+            val ach = GamificationService.allAchievements.firstOrNull { it.id == id }
+            if (ach != null) {
+                addXp(ach.xpReward, "Başarım Kazanıldı: ${ach.titleTr} (+${ach.xpReward} XP)")
+                _achievementUnlockedEvent.tryEmit(ach)
+            }
+        }
     }
 
     // ----------------------------------------------------
@@ -243,14 +405,47 @@ class AppRepository(private val database: AppDatabase) {
             username = "Geliştirici",
             xp = 240,
             streak = 7,
-            lastActiveDate = getTodayDateString(),
+            lastActiveDate = GamificationService.getTodayDateString(),
             isPremium = false
         )
     }
 
-    private suspend fun addXp(amount: Int) {
+    private suspend fun addXp(amount: Int, sourceTitle: String = "+$amount XP") {
+        if (amount <= 0) return
         val stats = getOrCreateStats()
-        statsDao.upsertStats(stats.copy(xp = stats.xp + amount))
+        val oldXp = stats.xp
+        val newXp = oldXp + amount
+
+        val oldTier = GamificationService.getLevelTier(oldXp)
+        val newTier = GamificationService.getLevelTier(newXp)
+
+        statsDao.upsertStats(stats.copy(xp = newXp))
+        _xpGainEvent.tryEmit(XpGainEvent(amount = amount, sourceTitle = sourceTitle))
+
+        // Level Up Trigger
+        if (newTier.level > oldTier.level) {
+            _levelUpEvent.tryEmit(
+                LevelUpEvent(
+                    oldTier = oldTier,
+                    newTier = newTier,
+                    totalXp = newXp
+                )
+            )
+        }
+    }
+
+    private suspend fun updateActivityStreak() {
+        val stats = getOrCreateStats()
+        val today = GamificationService.getTodayDateString()
+        val newStreak = GamificationService.calculateUpdatedStreak(stats.streak, stats.lastActiveDate, today)
+        statsDao.upsertStats(stats.copy(streak = newStreak, lastActiveDate = today))
+
+        if (newStreak >= 7) {
+            checkAndUnlockAchievement("streak_7")
+        }
+        if (newStreak >= 30) {
+            checkAndUnlockAchievement("dedicated_30")
+        }
     }
 
     private suspend fun incrementCompletedLessons() {
@@ -266,37 +461,5 @@ class AppRepository(private val database: AppDatabase) {
     private suspend fun incrementCompletedChallenges() {
         val stats = getOrCreateStats()
         statsDao.upsertStats(stats.copy(completedChallenges = stats.completedChallenges + 1))
-    }
-
-    private fun calculateLevel(xp: Int): Int = when {
-        xp < 500 -> 1
-        xp < 1200 -> 2
-        xp < 2200 -> 3
-        xp < 3800 -> 4
-        xp < 6000 -> 5
-        else -> 6
-    }
-
-    private fun getLevelTitle(level: Int): String = when (level) {
-        1 -> "Level 1 – Çaylak (Beginner)"
-        2 -> "Level 2 – Öğrenen (Learner)"
-        3 -> "Level 3 – Kodlayıcı (Coder)"
-        4 -> "Level 4 – Geliştirici (Developer)"
-        5 -> "Level 5 – İleri Geliştirici (Advanced)"
-        else -> "Level 6 – Usta (Expert)"
-    }
-
-    private fun getXpForNextLevel(level: Int): Int = when (level) {
-        1 -> 500
-        2 -> 1200
-        3 -> 2200
-        4 -> 3800
-        5 -> 6000
-        else -> 10000
-    }
-
-    private fun getTodayDateString(): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return sdf.format(Date())
     }
 }

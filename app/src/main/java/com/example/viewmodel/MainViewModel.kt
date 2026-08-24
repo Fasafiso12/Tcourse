@@ -2,13 +2,16 @@ package com.example.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.api.GeminiApiClient
 import com.example.data.catalog.CourseCatalog
 import com.example.data.db.*
 import com.example.data.engine.CodeExecutionEngine
+import com.example.data.engine.GamificationService
 import com.example.model.*
 import com.example.repository.AppRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 enum class AppNavTab(val title: String, val iconTag: String) {
     HOME("Ana Sayfa", "home"),
@@ -116,19 +119,196 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     val allMistakes: StateFlow<List<MistakeEntity>> = repository.allMistakesFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val unlockedAchievements: StateFlow<List<UnlockedAchievementEntity>> = repository.unlockedAchievementsFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val richAchievements: StateFlow<List<AppAchievement>> = repository.richAchievementsFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), GamificationService.allAchievements)
 
-    // Theme Mode (Default to true: Koyu Tema)
-    private val _isDarkTheme = MutableStateFlow(true)
-    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
+    val weeklyStats: StateFlow<WeeklyStatsSummary> = repository.weeklyStatsFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), WeeklyStatsSummary())
+
+    // ----------------------------------------------------
+    // Micro-Animation & Real-Time Event Notification State
+    // ----------------------------------------------------
+    private val _currentXpGain = MutableStateFlow<XpGainEvent?>(null)
+    val currentXpGain: StateFlow<XpGainEvent?> = _currentXpGain.asStateFlow()
+
+    private val _currentLevelUp = MutableStateFlow<LevelUpEvent?>(null)
+    val currentLevelUp: StateFlow<LevelUpEvent?> = _currentLevelUp.asStateFlow()
+
+    private val _unlockedAchievementBanner = MutableStateFlow<AppAchievement?>(null)
+    val unlockedAchievementBanner: StateFlow<AppAchievement?> = _unlockedAchievementBanner.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.xpGainEvent.collect { event ->
+                _currentXpGain.value = event
+            }
+        }
+        viewModelScope.launch {
+            repository.levelUpEvent.collect { event ->
+                _currentLevelUp.value = event
+            }
+        }
+        viewModelScope.launch {
+            repository.achievementUnlockedEvent.collect { event ->
+                _unlockedAchievementBanner.value = event
+            }
+        }
+    }
+
+    fun dismissXpGain() {
+        _currentXpGain.value = null
+    }
+
+    fun dismissLevelUp() {
+        _currentLevelUp.value = null
+    }
+
+    fun dismissAchievementBanner() {
+        _unlockedAchievementBanner.value = null
+    }
+
+    // ----------------------------------------------------
+    // Skill Tree & Course Journey Map
+    // ----------------------------------------------------
+    val skillTreeNodes: StateFlow<List<SkillNode>> = combine(
+        _selectedLanguageId,
+        allProgress
+    ) { langId, progressList ->
+        val completedIds = progressList.filter { it.courseId == langId && it.status == LessonStatus.COMPLETED.name }
+            .map { it.lessonId }
+            .toSet()
+        GamificationService.buildSkillTree(langId, completedIds)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val courseJourneySteps: StateFlow<List<CourseJourneyStep>> = combine(
+        _selectedLanguageId,
+        allProgress
+    ) { langId, progressList ->
+        val completedIds = progressList.filter { it.courseId == langId && it.status == LessonStatus.COMPLETED.name }
+            .map { it.lessonId }
+            .toSet()
+        GamificationService.buildCourseJourney(langId, completedIds)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _selectedSkillNodeDetail = MutableStateFlow<SkillNode?>(null)
+    val selectedSkillNodeDetail: StateFlow<SkillNode?> = _selectedSkillNodeDetail.asStateFlow()
+
+    fun openSkillNodeDetail(node: SkillNode) {
+        _selectedSkillNodeDetail.value = node
+    }
+
+    fun closeSkillNodeDetail() {
+        _selectedSkillNodeDetail.value = null
+    }
+
+    // ----------------------------------------------------
+    // Multi-factor Topic Mastery List
+    // ----------------------------------------------------
+    val courseTopicMasteryList: StateFlow<List<TopicMasteryInfo>> = combine(
+        _selectedLanguageId,
+        allProgress,
+        allMistakes
+    ) { langId, progressList, mistakes ->
+        val lessons = CourseCatalog.getLessonsForCourse(langId)
+        val progressMap = progressList.associateBy { it.lessonId }
+        lessons.map { lesson ->
+            GamificationService.computeTopicMastery(
+                lesson = lesson,
+                progress = progressMap[lesson.id],
+                mistakes = mistakes
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // ----------------------------------------------------
+    // Daily Challenge
+    // ----------------------------------------------------
+    private val _dailyChallengeState = MutableStateFlow(
+        GamificationService.getDailyChallenge("dart", isCompleted = repository.isDailyChallengeCompletedToday())
+    )
+    val dailyChallengeState: StateFlow<DailyChallengeItem> = _dailyChallengeState.asStateFlow()
+
+    private val _showDailyChallengeDialog = MutableStateFlow(false)
+    val showDailyChallengeDialog: StateFlow<Boolean> = _showDailyChallengeDialog.asStateFlow()
+
+    fun openDailyChallenge() {
+        _dailyChallengeState.value = GamificationService.getDailyChallenge(
+            _selectedLanguageId.value,
+            isCompleted = repository.isDailyChallengeCompletedToday()
+        )
+        _showDailyChallengeDialog.value = true
+    }
+
+    fun closeDailyChallenge() {
+        _showDailyChallengeDialog.value = false
+    }
+
+    fun solveDailyChallenge(optionIndex: Int) {
+        val current = _dailyChallengeState.value
+        if (optionIndex == current.correctOptionIndex && !current.isCompletedToday) {
+            viewModelScope.launch {
+                repository.completeDailyChallenge(current)
+                _dailyChallengeState.value = current.copy(isCompletedToday = true)
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+    // Smart Review Recommendations
+    // ----------------------------------------------------
+    val smartReviewRecommendations: StateFlow<List<SmartReviewRecommendation>> = combine(
+        _selectedLanguageId,
+        allMistakes,
+        allProgress
+    ) { langId, mistakes, progressList ->
+        GamificationService.getSmartReviewRecommendations(langId, mistakes, progressList)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // ----------------------------------------------------
+    // Theme Mode & Editor Settings
+    // ----------------------------------------------------
+    private val _themeMode = MutableStateFlow(com.example.ui.theme.AppThemeMode.FLUTTER_DART_DARK)
+    val themeMode: StateFlow<com.example.ui.theme.AppThemeMode> = _themeMode.asStateFlow()
+
+    val isDarkTheme: StateFlow<Boolean> = _themeMode.map { it.isDark }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    private val _editorTheme = MutableStateFlow(com.example.ui.theme.EditorTheme.FLUTTER_STUDIO)
+    val editorTheme: StateFlow<com.example.ui.theme.EditorTheme> = _editorTheme.asStateFlow()
+
+    private val _editorFontSize = MutableStateFlow(13)
+    val editorFontSize: StateFlow<Int> = _editorFontSize.asStateFlow()
+
+    fun setThemeMode(mode: com.example.ui.theme.AppThemeMode) {
+        _themeMode.value = mode
+    }
 
     fun toggleTheme() {
-        _isDarkTheme.value = !_isDarkTheme.value
+        _themeMode.value = if (_themeMode.value.isDark) {
+            com.example.ui.theme.AppThemeMode.LIGHT
+        } else {
+            com.example.ui.theme.AppThemeMode.OBSIDIAN_DARK
+        }
+    }
+
+    fun toggleEyeCareMode() {
+        _themeMode.value = if (_themeMode.value == com.example.ui.theme.AppThemeMode.WARM_AMBER_EYE_CARE) {
+            com.example.ui.theme.AppThemeMode.OBSIDIAN_DARK
+        } else {
+            com.example.ui.theme.AppThemeMode.WARM_AMBER_EYE_CARE
+        }
     }
 
     fun setDarkTheme(isDark: Boolean) {
-        _isDarkTheme.value = isDark
+        _themeMode.value = if (isDark) com.example.ui.theme.AppThemeMode.OBSIDIAN_DARK else com.example.ui.theme.AppThemeMode.LIGHT
+    }
+
+    fun setEditorTheme(theme: com.example.ui.theme.EditorTheme) {
+        _editorTheme.value = theme
+    }
+
+    fun setEditorFontSize(sizeSp: Int) {
+        _editorFontSize.value = sizeSp.coerceIn(10, 20)
     }
 
     // Search Query
@@ -140,6 +320,12 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // UI Dialogs
+    val appLanguage: StateFlow<AppLanguage> = repository.appLanguageFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), repository.getAppLanguage())
+
+    private val _showInitialLanguageDialog = MutableStateFlow(!repository.hasCompletedInitialLanguageSelection())
+    val showInitialLanguageDialog: StateFlow<Boolean> = _showInitialLanguageDialog.asStateFlow()
+
     private val _showPremiumDialog = MutableStateFlow(false)
     val showPremiumDialog: StateFlow<Boolean> = _showPremiumDialog.asStateFlow()
 
@@ -148,6 +334,24 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
 
     private val _showNoteDialog = MutableStateFlow<Lesson?>(null)
     val showNoteDialog: StateFlow<Lesson?> = _showNoteDialog.asStateFlow()
+
+    fun setAppLanguage(language: AppLanguage) {
+        repository.setAppLanguage(language)
+    }
+
+    fun completeInitialLanguageSelection(language: AppLanguage) {
+        repository.setAppLanguage(language)
+        repository.setCompletedInitialLanguageSelection(true)
+        _showInitialLanguageDialog.value = false
+    }
+
+    fun openInitialLanguageDialog() {
+        _showInitialLanguageDialog.value = true
+    }
+
+    fun closeInitialLanguageDialog() {
+        _showInitialLanguageDialog.value = false
+    }
 
     // Quiz Session
     private val _quizState = MutableStateFlow(QuizSessionState())
@@ -296,7 +500,7 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
             )
         } else {
             // Quiz finished
-            val earnedXp = state.correctAnswersCount * 15
+            val earnedXp = if (state.correctAnswersCount == state.questions.size) 50 else 30
             _quizState.value = state.copy(
                 isQuizCompleted = true,
                 xpEarned = earnedXp
@@ -441,5 +645,103 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun closeCertificate() {
         _showCertificateModal.value = null
+    }
+
+    // ----------------------------------------------------
+    // AI Assistant (Gemini & Pedagogical Shortcuts)
+    // ----------------------------------------------------
+    private val _aiAssistantState = MutableStateFlow(AiAssistantState())
+    val aiAssistantState: StateFlow<AiAssistantState> = _aiAssistantState.asStateFlow()
+
+    fun openAiAssistant(
+        lesson: Lesson? = null,
+        initialShortcut: AiShortcut? = null,
+        targetSentence: String? = null
+    ) {
+        val currentLangId = lesson?.courseId ?: _selectedLanguageId.value
+        val lang = CourseCatalog.languages.firstOrNull { it.id == currentLangId } ?: CourseCatalog.languages.first()
+
+        val context = AiAssistantContext(
+            languageId = lang.id,
+            languageName = lang.name,
+            lessonId = lesson?.id,
+            lessonTitle = lesson?.title,
+            lessonContentSnippet = lesson?.shortDesc ?: lesson?.detailedExplanation?.firstOrNull()?.body,
+            lessonCodeSnippet = lesson?.codeExample
+        )
+
+        _aiAssistantState.value = _aiAssistantState.value.copy(
+            isOpen = true,
+            context = context,
+            selectedShortcut = initialShortcut,
+            confusingSentenceInput = targetSentence ?: "",
+            errorMessage = null
+        )
+
+        if (initialShortcut != null && !targetSentence.isNullOrBlank()) {
+            sendAiMessage(targetSentence, initialShortcut)
+        } else if (initialShortcut != null && initialShortcut != AiShortcut.EXPLAIN_SENTENCE) {
+            val topicName = lesson?.title ?: lang.name
+            sendAiMessage("${initialShortcut.title}: $topicName konusunu açıkla.", initialShortcut)
+        }
+    }
+
+    fun closeAiAssistant() {
+        _aiAssistantState.value = _aiAssistantState.value.copy(isOpen = false)
+    }
+
+    fun selectAiShortcut(shortcut: AiShortcut) {
+        _aiAssistantState.value = _aiAssistantState.value.copy(selectedShortcut = shortcut)
+    }
+
+    fun sendAiMessage(prompt: String, shortcut: AiShortcut? = null) {
+        val cleanPrompt = prompt.trim()
+        if (cleanPrompt.isEmpty()) return
+
+        val userMessage = AiChatMessage(
+            id = UUID.randomUUID().toString(),
+            sender = AiMessageSender.USER,
+            text = cleanPrompt,
+            shortcutUsed = shortcut,
+            relatedLessonId = _aiAssistantState.value.context.lessonId,
+            relatedLanguageId = _aiAssistantState.value.context.languageId
+        )
+
+        val updatedMessages = _aiAssistantState.value.messages + userMessage
+        _aiAssistantState.value = _aiAssistantState.value.copy(
+            messages = updatedMessages,
+            isLoading = true,
+            selectedShortcut = shortcut
+        )
+
+        viewModelScope.launch {
+            val responseText = GeminiApiClient.askTutor(
+                userPrompt = cleanPrompt,
+                shortcut = shortcut ?: _aiAssistantState.value.selectedShortcut,
+                context = _aiAssistantState.value.context
+            )
+
+            val assistantMessage = AiChatMessage(
+                id = UUID.randomUUID().toString(),
+                sender = AiMessageSender.ASSISTANT,
+                text = responseText,
+                shortcutUsed = shortcut ?: _aiAssistantState.value.selectedShortcut,
+                relatedLessonId = _aiAssistantState.value.context.lessonId,
+                relatedLanguageId = _aiAssistantState.value.context.languageId
+            )
+
+            _aiAssistantState.value = _aiAssistantState.value.copy(
+                messages = _aiAssistantState.value.messages + assistantMessage,
+                isLoading = false
+            )
+        }
+    }
+
+    fun clearAiChat() {
+        _aiAssistantState.value = _aiAssistantState.value.copy(
+            messages = emptyList(),
+            selectedShortcut = null,
+            confusingSentenceInput = ""
+        )
     }
 }

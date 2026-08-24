@@ -3,7 +3,6 @@ package com.example.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,12 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.engine.CodeExecutionEngine
 import com.example.model.CodingChallenge
+import com.example.ui.components.CodeEditorComponent
 import com.example.ui.theme.*
 import com.example.viewmodel.ChallengeSessionState
 import com.example.viewmodel.MainViewModel
@@ -129,68 +131,29 @@ fun CodingChallengeScreen(
                 }
             }
 
-            // 2. Code Editor Field
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Kod Editörü", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
-                    Text("${selectedLangId.uppercase()}", fontSize = 11.sp, color = PrimaryIndigo, fontFamily = FontFamily.Monospace)
-                }
-
-                OutlinedTextField(
-                    value = challengeState.userCode,
-                    onValueChange = { viewModel.updateChallengeCode(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .testTag("challenge_code_input"),
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 13.sp,
-                        color = Color(0xFFF8FAFC)
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = CodeBg,
-                        unfocusedContainerColor = CodeBg,
-                        focusedBorderColor = PrimaryIndigo,
-                        unfocusedBorderColor = DarkCardBorder
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                // Quick Symbol Shortcuts Toolbar
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    val symbols = listOf("{}", "()", "[]", "\"", ";", ":", "=>", "=", "==", "+", "-", "print()", "cout")
-                    symbols.forEach { sym ->
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = DarkSurface,
-                            border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder)),
-                            modifier = Modifier
-                                .clickable {
-                                    viewModel.updateChallengeCode(challengeState.userCode + sym)
-                                }
-                                .padding(vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = sym,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace,
-                                color = TextPrimary,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                            )
-                        }
-                    }
-                }
-            }
+            // 2. Full-featured Interactive Code Editor
+            CodeEditorComponent(
+                code = challengeState.userCode,
+                onCodeChange = { viewModel.updateChallengeCode(it) },
+                language = selectedLangId,
+                initialOutput = challengeState.executionResult,
+                title = challenge.title,
+                minEditorHeight = 180,
+                showSymbolsToolbar = true,
+                onExecuteCode = { userCode, lang ->
+                    viewModel.testChallenge()
+                    challengeState.executionResult ?: CodeExecutionEngine.testCodingChallenge(userCode, challenge, lang)
+                },
+                onResetCode = {
+                    viewModel.updateChallengeCode(challenge.starterCode)
+                },
+                onAskAi = { userCode ->
+                    viewModel.openAiAssistant(
+                        targetSentence = "Görev: ${challenge.title}\nYazdığım Kod:\n```$selectedLangId\n$userCode\n```\nNeden beklenen çıktıyı alamıyorum veya nerede hata yapıyorum?"
+                    )
+                },
+                testTagPrefix = "challenge"
+            )
 
             // 3. Multi-tier Progressive Hint System
             Card(
@@ -259,87 +222,20 @@ fun CodingChallengeScreen(
                 }
             }
 
-            // 4. Action Buttons (Test Et & Çözümü Kontrol Et)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Button(
-                    onClick = { viewModel.testChallenge() },
-                    enabled = !challengeState.isRunning,
-                    modifier = Modifier.weight(1f).height(48.dp).testTag("run_test_challenge_btn"),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    if (challengeState.isRunning) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
-                    } else {
-                        Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Kodu Test Et", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-
-            // 5. Test Execution Results Card
-            if (challengeState.executionResult != null) {
-                val res = challengeState.executionResult
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .border(
-                            1.dp,
-                            if (res.isSuccess) AccentEmeraldBorder else AccentRoseBorder,
-                            RoundedCornerShape(14.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (res.isSuccess) AccentEmeraldSubtle else AccentRoseSubtle
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = if (res.isSuccess) "✓ BAŞARILI! Testler Geçti" else "✗ TEST BAŞARISIZ",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = if (res.isSuccess) AccentEmeraldLight else AccentRose
-                            )
-                            Text("${res.executionTimeMs}ms", fontSize = 11.sp, color = TextMuted)
-                        }
-
-                        Text(
-                            text = res.output,
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily.Monospace,
-                            color = TextPrimary
-                        )
-
-                        if (res.error != null) {
-                            Text(
-                                text = res.error,
-                                fontSize = 11.sp,
-                                color = AccentRose
-                            )
-                        }
-                    }
-                }
-            }
-
+            // 4. Submit & Done Button
             if (challengeState.isCompleted) {
                 Button(
                     onClick = onClose,
-                    modifier = Modifier.fillMaxWidth().height(46.dp).testTag("challenge_done_btn"),
+                    modifier = Modifier.fillMaxWidth().height(48.dp).testTag("challenge_done_btn"),
                     colors = ButtonDefaults.buttonColors(containerColor = AccentEmerald),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Tebrikler! Derse Geri Dön", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.CheckCircle, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Tebrikler! Derse Geri Dön", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 }
             }
         }
     }
 }
+

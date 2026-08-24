@@ -1,11 +1,11 @@
 package com.example.model
 
 enum class CourseLevel(val displayName: String, val order: Int) {
-    BEGINNER("Başlangıç", 1),
-    FUNDAMENTAL("Temel", 2),
-    INTERMEDIATE("Orta", 3),
-    ADVANCED("İleri", 4),
-    EXPERT("Uzman", 5)
+    BEGINNER("Başlangıç (Beginner)", 1),
+    FUNDAMENTAL("Temel (Fundamental)", 2),
+    INTERMEDIATE("Orta (Intermediate)", 3),
+    ADVANCED("İleri (Advanced)", 4),
+    EXPERT("Uzman (Expert)", 5)
 }
 
 enum class LessonStatus {
@@ -22,6 +22,11 @@ enum class QuestionType {
     FIND_BUG,
     CODE_MATCH
 }
+
+data class TopicQAItem(
+    val question: String,
+    val answer: String
+)
 
 data class ProgrammingLanguage(
     val id: String,
@@ -43,7 +48,9 @@ data class CourseSection(
     val title: String,
     val level: CourseLevel,
     val order: Int,
-    val description: String
+    val description: String,
+    val prerequisites: List<String> = emptyList(),
+    val learningObjectives: List<String> = emptyList()
 )
 
 data class Lesson(
@@ -55,13 +62,21 @@ data class Lesson(
     val level: CourseLevel,
     val order: Int,
     val isPremium: Boolean, // First 2 lessons are false (Free), 3rd+ are true (Premium)
+    val learningObjectives: List<String> = emptyList(),
+    val prerequisites: List<String> = emptyList(),
+    val subtopics: List<String> = emptyList(),
     val detailedExplanation: List<LessonContentBlock>,
     val codeExample: String,
     val codeExplanation: String,
+    val realWorldExample: String? = null,
+    val practicalTask: String? = null,
     val starterPlaygroundCode: String,
     val miniQuestion: MiniQuestion? = null,
     val codingChallenge: CodingChallenge? = null,
-    val quizQuestions: List<QuizQuestion> = emptyList()
+    val quizQuestions: List<QuizQuestion> = emptyList(),
+    val qaItems: List<TopicQAItem> = emptyList(),
+    val completionCriteria: List<String> = emptyList(),
+    val miniProject: ProjectItem? = null
 )
 
 data class LessonContentBlock(
