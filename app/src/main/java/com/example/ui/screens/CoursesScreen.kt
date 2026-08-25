@@ -64,6 +64,7 @@ fun CoursesScreen(
     val selectedLanguageId by viewModel.selectedLanguageId.collectAsState()
     val allProgressMap by viewModel.allLanguagesProgress.collectAsState()
     val allProgressList by viewModel.allProgress.collectAsState()
+    val userProfile by viewModel.userProfile.collectAsState()
     val appLanguage by viewModel.appLanguage.collectAsState()
     val isTr = appLanguage == AppLanguage.TR
     val strings = remember(appLanguage) { AppStrings.get(appLanguage) }
@@ -190,6 +191,7 @@ fun CoursesScreen(
                         selectedLevelFilter = selectedLevelFilter,
                         allLanguages = languages,
                         allProgressMap = allProgressMap,
+                        isUserPremium = userProfile.isPremium,
                         isTr = isTr,
                         onLevelFilterSelected = { selectedLevelFilter = it },
                         onSelectLanguage = { langId ->
@@ -307,6 +309,7 @@ fun CoursesScreen(
                                 selectedLevelFilter = selectedLevelFilter,
                                 allLanguages = languages,
                                 allProgressMap = allProgressMap,
+                                isUserPremium = userProfile.isPremium,
                                 isTr = isTr,
                                 onLevelFilterSelected = { selectedLevelFilter = it },
                                 onSelectLanguage = { langId ->
@@ -792,6 +795,7 @@ private fun SelectableLessonListContent(
     selectedLevelFilter: CourseLevel?,
     allLanguages: List<ProgrammingLanguage>,
     allProgressMap: Map<String, CourseProgressInfo>,
+    isUserPremium: Boolean,
     isTr: Boolean,
     onLevelFilterSelected: (CourseLevel?) -> Unit,
     onSelectLanguage: (String) -> Unit,
@@ -1076,6 +1080,7 @@ private fun SelectableLessonListContent(
                     index = index + 1,
                     lesson = lesson,
                     isCompleted = isCompleted,
+                    isUserPremium = isUserPremium,
                     isTr = isTr,
                     onOpen = { onOpenLesson(lesson) }
                 )
@@ -1092,16 +1097,19 @@ private fun SelectableLessonItemCard(
     index: Int,
     lesson: Lesson,
     isCompleted: Boolean,
+    isUserPremium: Boolean,
     isTr: Boolean,
     onOpen: () -> Unit
 ) {
+    val isLocked = lesson.isPremium && !isUserPremium
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .border(
                 1.dp,
-                if (isCompleted) AccentEmeraldBorder else DarkCardBorder,
+                if (isCompleted) AccentEmeraldBorder else if (isLocked) DarkCardBorder else DarkCardBorder,
                 RoundedCornerShape(16.dp)
             )
             .clickable { onOpen() }
@@ -1120,16 +1128,29 @@ private fun SelectableLessonItemCard(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)
-                    .background(if (isCompleted) AccentEmeraldSubtle else PrimarySubtle)
+                    .background(
+                        if (isCompleted) AccentEmeraldSubtle
+                        else if (isLocked) DarkBg
+                        else PrimarySubtle
+                    )
                     .border(
                         1.dp,
-                        if (isCompleted) AccentEmeraldBorder else PrimarySubtleBorder,
+                        if (isCompleted) AccentEmeraldBorder
+                        else if (isLocked) DarkCardBorder
+                        else PrimarySubtleBorder,
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 if (isCompleted) {
                     Text("✓", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AccentEmeraldLight)
+                } else if (isLocked) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Locked",
+                        tint = TextMuted,
+                        modifier = Modifier.size(18.dp)
+                    )
                 } else {
                     Text(
                         text = String.format("%02d", index),
@@ -1150,7 +1171,7 @@ private fun SelectableLessonItemCard(
                         text = lesson.title,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = if (isLocked) TextSecondary else TextPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -1159,18 +1180,33 @@ private fun SelectableLessonItemCard(
                 Text(
                     text = lesson.shortDesc,
                     fontSize = 11.sp,
-                    color = TextSecondary,
+                    color = TextMuted,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     lineHeight = 15.sp
                 )
 
-                // Mini Badges (Level, XP, Quiz)
+                // Mini Badges (Level, XP, Quiz, Premium status)
                 Row(
                     modifier = Modifier.padding(top = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (lesson.isPremium) {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = if (isUserPremium) AccentEmeraldSubtle else AccentAmberSubtle
+                        ) {
+                            Text(
+                                text = if (isUserPremium) (if (isTr) "👑 PRO Açık" else "👑 PRO Unlocked") else "🔒 PRO",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isUserPremium) AccentEmeraldLight else AccentAmber,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+
                     Surface(
                         shape = RoundedCornerShape(4.dp),
                         color = DarkBg
@@ -1214,9 +1250,9 @@ private fun SelectableLessonItemCard(
 
             // Action Chevron / Arrow
             Icon(
-                imageVector = Icons.Default.ChevronRight,
+                imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.ChevronRight,
                 contentDescription = "Open Lesson",
-                tint = if (isCompleted) AccentEmeraldLight else PrimaryIndigoLight,
+                tint = if (isCompleted) AccentEmeraldLight else if (isLocked) TextMuted else PrimaryIndigoLight,
                 modifier = Modifier.size(20.dp)
             )
         }

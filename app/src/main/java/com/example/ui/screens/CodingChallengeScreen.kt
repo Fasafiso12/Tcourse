@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.engine.CodeExecutionEngine
+import com.example.model.AiShortcut
 import com.example.model.CodingChallenge
 import com.example.ui.components.CodeEditorComponent
 import com.example.ui.theme.*
@@ -149,7 +150,8 @@ fun CodingChallengeScreen(
                 },
                 onAskAi = { userCode ->
                     viewModel.openAiAssistant(
-                        targetSentence = "Görev: ${challenge.title}\nYazdığım Kod:\n```$selectedLangId\n$userCode\n```\nNeden beklenen çıktıyı alamıyorum veya nerede hata yapıyorum?"
+                        initialShortcut = AiShortcut.CHECK_CODE,
+                        targetSentence = "Görev: ${challenge.title}\nYazdığım Kod:\n```$selectedLangId\n$userCode\n```\nNeden beklenen çıktıyı alamıyorum veya nerede hata yapıyorum? Lütfen cevabı doğrudan vermeden ipucu ver."
                     )
                 },
                 testTagPrefix = "challenge"

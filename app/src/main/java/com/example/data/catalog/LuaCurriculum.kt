@@ -91,17 +91,23 @@ object LuaCurriculum {
                 "String birleştirme (..) operatörünü ve type() fonksiyonunu kullanmak"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("print() Fonksiyonu", "local vs global Değişkenler", "Lua Veri Tipleri", "String Birleştirme (..)", "type() Fonksiyonu"),
+            subtopics = listOf("Lua Register-Based VM", "local vs global ve _ENV", "Dinamik Tip Sistemi (8 Temel Tip)", "String Interning & Bellek", "type() ve tostring() Fonksiyonları"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Lua Sözdizimi ve local Tanımı",
-                    body = "Lua'da değişkenler varsayılan olarak globaldir. En iyi uygulama her zaman `local` anahtar kelimesini kullanmaktır. Lua'da satır sonu noktalı virgül isteğe bağlıdır.",
-                    codeSnippet = "-- Tek satırlık yorum\nlocal isim = \"Lua\"\nlocal versiyon = 5.4\nlocal aktif = true\n\nprint(\"Dil: \" .. isim .. \" v\" .. tostring(versiyon))\nprint(\"Tip: \" .. type(versiyon)) -- number"
+                    subtitle = "1. Lua'nın Mimarisi ve Register-Based Sanal Makinesi",
+                    body = "Lua, C diliyle yazılmış olağanüstü hafif (~200-300 KB) ve hızlı bir script dilidir. Çoğu sanal makinenin aksine (JVM, Python stack-based iken), Lua VM register-based (yazmaç tabanlı) bir mimariye sahiptir. Bu sayede daha az CPU komutuyla çok yüksek bytecode yürütme hızına ulaşır.\n\nLua'da 8 temel veri tipi bulunur:\n1. `nil`: Değersizlik / yokluk durumu\n2. `boolean`: true / false\n3. `number`: IEEE 754 Çift duyarlıklı float veya 64-bit integer\n4. `string`: Değiştirilemez (immutable) ve bellekte tekilleştirilmiş (interned) karakter dizileri\n5. `table`: Dizi, hashmap ve nesne temsil eden tek bileşik yapı\n6. `function`: Birinci sınıf vatandaş (first-class closure)\n7. `userdata`: C veri yapılarını sarmalayan ham bellek bloğu\n8. `thread`: Eşyordamlar (Coroutines)",
+                    codeSnippet = "-- local anahtar kelimesi değişkeni doğrudan VM register'ına atar (En hızlı erişim):\nlocal isim = \"Lua\"\nlocal versiyon = 5.4\nlocal aktif = true\n\nprint(\"Dil: \" .. isim .. \" v\" .. tostring(versiyon))\nprint(\"Tip: \" .. type(versiyon)) -- number",
+                    tip = "Global değişkenler `_G` tablosu üzerinde hash araması gerektirir. Daima `local` değişken kullanın; local değişkenler CPU register eşdeğeri slotlarda saklanır ve 30-50% daha hızlıdır."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. nil ve Boolean Değerleri",
-                    body = "Lua'da yalnızca `false` ve `nil` mantıksal olarak YANLIŞ kabul edilir. Sayı `0` ve boş string `\"\"` DOĞRU (true) sayılır! Bu özellik diğer dillerden farklıdır.",
-                    tip = "Lua'da stringleri birleştirmek için '+' değil '..' kullanılır."
+                    subtitle = "2. Lua'da Doğruluk Mantığı (Truthy / Falsy Kuralları)",
+                    body = "Lua'da mantıksal olarak YANLIŞ sayılan yalnızca iki değer vardır:\n• `nil`\n• `false`\n\nDiğer tüm dillerin aksine sayı `0` ve boş metin `\"\"` Lua'da KESİNLİKLE DOĞRU (true) kabul edilir! Bu durum diğer dillerden gelenler için sık yapılan bir hata kaynağıdır.",
+                    codeSnippet = "local sayi = 0\nif sayi then\n    print(\"0 degeri Lua'da TRUE kabul edilir!\")\nend"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. String Interning ve Bellek Verimliliği",
+                    body = "Lua sanal makinesinde tüm stringler global bir hash tablosunda tekilleştirilir (String Interning). Aynı metne sahip iki string bellekte tek bir adreste tutulur; bu sayede string karşılaştırmaları (`str1 == str2`) O(1) hızında pointer karşılaştırmasıyla gerçekleşir.",
+                    tip = "Stringleri birleştirmek için '+' matematiksel toplama yapar (ör: \"5\" + 2 -> 7). Metin birleştirmek için mutlaka '..' operatörü kullanılmalıdır."
                 )
             ),
             codeExample = "local oyuncuAdi = \"Kahraman\"\nlocal seviye = 12\nlocal altin = 1500.5\n\nprint(\"Oyuncu: \" .. oyuncuAdi)\nprint(\"Seviye: \" .. seviye)\nprint(\"Altin: \" .. altin)",
@@ -150,17 +156,22 @@ object LuaCurriculum {
                 "repeat ... until döngüsünün koşul mantığını öğrenmek"
             ),
             prerequisites = listOf("Lua'ya Giriş & Tipler"),
-            subtopics = listOf("if-then-else ve end", "Mantıksal Operatörler (and, or, not)", "Sayısal for Döngüsü", "while do ... end", "repeat ... until"),
+            subtopics = listOf("if-then-else ve end Blokları", "Mantıksal Operatörler (and, or, not) İle Kısa Devre", "Sayısal for ve JIT Optimizasyonu", "while do ... end", "repeat ... until Döngü Mantığı"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Koşul Yapısı ve end",
-                    body = "Lua'da bloklar süslü parantez `{}` ile değil `end` anahtar kelimesiyle kapatılır.",
+                    subtitle = "1. Koşul Yapısı ve Blok Kapatma",
+                    body = "Lua'da bloklar süslü parantez `{}` yerine `end` anahtar kelimesiyle kapatılır. `if ... then ... elseif ... else ... end` yapısı kullanılır (`elseif` bitişik yazılır).",
                     codeSnippet = "local can = 75\n\nif can > 80 then\n    print(\"Durum: Mukemmel\")\nelseif can > 40 then\n    print(\"Durum: Normal\")\nelse\n    print(\"Durum: Kritik!\")\nend"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Sayısal for Döngüsü",
-                    body = "`for i = 1, 10, 2 do` ifadesi 1'den 10'a kadar 2'şer artarak döner. Step belirtilmezse varsayılan artış 1'dir.",
-                    tip = "repeat ... until döngüsü gövdeyi en az bir kez çalıştırır ve koşul true olana kadar tekrarlar."
+                    subtitle = "2. and / or İle Kısa Devre ve Ternary Operatör Simülasyonu",
+                    body = "Lua'da C/Java benzeri `? :` üçlü operatörü yoktur. Bunun yerine `a and b or c` deyimi kullanılır. `a` true ise `b` döner, false ise `c` döner.\n\n`local deger = girdi or \"varsayilan\"` kalıbı Lua'da varsayılan parametre atamanın standart yoludur.",
+                    codeSnippet = "local kullanici = nil\nlocal isim = kullanici or \"Misafir\"\nprint(\"Hosgeldin: \" .. isim) -- Hosgeldin: Misafir"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Sayısal for (Numeric for) ve repeat-until",
+                    body = "• `for i = start, stop, step do ... end`: `start`, `stop` ve `step` döngüye girmeden önce yalnızca bir kez hesaplanır (önbelleğe alınır).\n• `repeat ... until kosul`: Gövde en az 1 kez çalışır; koşul `true` olana kadar (while'ın tersine) tekrarlar. repeat bloğunda tanımlanan yerel değişkenler `until` koşulunda da görünür!",
+                    tip = "repeat-until döngüsünde `until` koşulu, döngü gövdesinde tanımlanan `local` değişkenlere erişebilir."
                 )
             ),
             codeExample = "local toplam = 0\nfor i = 1, 5 do\n    toplam = toplam + i\n    print(\"Adim \" .. i .. \" -> Toplam: \" .. toplam)\nend",
@@ -209,17 +220,22 @@ object LuaCurriculum {
                 "Değişken sayıda argüman alan (... varargs) fonksiyonlar yazmak"
             ),
             prerequisites = listOf("Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Fonksiyon Tanımlama", "Çoklu Dönüş (return a, b)", "Çoklu Atama (x, y = fn())", "Varargs (...) Operatörü", "Anonim Fonksiyonlar"),
+            subtopics = listOf("Fonksiyon Tanımlama", "Çoklu Dönüş (return a, b)", "Çoklu Atama (x, y = fn())", "Varargs (...) ve select()", "Upvalues ve Closures (Kapanışlar)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Çoklu Dönüş Değerleri (Multiple Returns)",
-                    body = "Lua'da bir fonksiyon tek seferde birden fazla değeri `return x, y, z` şeklinde dönebilir. Bu özellik tuple veya struct oluşturma ihtiyacını ortadan kaldırır.",
+                    subtitle = "1. Çoklu Dönüş Değerleri ve Çoklu Atama",
+                    body = "Lua'da bir fonksiyon tek seferde birden fazla değeri `return x, y, z` şeklinde dönebilir. Dönen değerler `local a, b = fn()` şeklinde doğrudan yakalanır. Eğer fonksiyon çağrısı başka bir fonksiyonun son argümanı ise tüm değerler iletilir.",
                     codeSnippet = "local function minMax(a, b)\n    if a < b then\n        return a, b\n    else\n        return b, a\n    end\nend\n\nlocal enKucuk, enBuyuk = minMax(45, 12)\nprint(\"Min: \" .. enKucuk .. \", Max: \" .. enBuyuk)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Varargs (...) Sözdizimi",
-                    body = "Kaç adet parametre geleceği bilinmiyorsa `...` kullanılır ve `select()` veya `{...}` tablosuna dönüştürülerek okunur.",
-                    tip = "Birinci sınıf fonksiyonlar değişkenlere atanabilir ve başka fonksiyonlara parametre olarak verilebilir."
+                    subtitle = "2. Varargs (...) ve select() Fonksiyonu",
+                    body = "Değişken sayıda parametre almak için `...` (üç nokta) kullanılır. `select('#', ...)` gelen parametre sayısını verir; `select(i, ...)` i'nci parametreden sonrasını döndürür. `{...}` ifadesi parametreleri anında bir Lua tablosuna dönüştürür.",
+                    codeSnippet = "local function logla(etiket, ...)\n    print(\"[\" .. etiket .. \"] Toplam Parametre: \" .. select('#', ...))\nend\nlogla(\"DEBUG\", 1, 2, \"test\")"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Birinci Sınıf Fonksiyonlar, Kapanışlar (Closures) ve Upvalue",
+                    body = "Lua'da fonksiyonlar birinci sınıf değerlerdir. Bir fonksiyon başka bir fonksiyon içinde tanımlandığında, dış fonksiyondaki yerel değişkenleri saklar (Upvalue) ve fonksiyon sonlansa bile erişmeye devam eder (Lexical Scoping).",
+                    tip = "Upvalue'lar Lua'da veri gizleme (private field simülasyonu) ve durum koruyan sayaçlar için en yaygın tekniktir."
                 )
             ),
             codeExample = "local function toplaHepsi(...)\n    local toplam = 0\n    for _, sayi in ipairs({...}) do\n        toplam = toplam + sayi\n    end\n    return toplam\nend\n\nprint(\"Sonuc: \" .. toplaHepsi(10, 20, 30, 40))",
@@ -268,17 +284,22 @@ object LuaCurriculum {
                 "Sıralı diziler için ipairs, genel tablolar için pairs döngüsünü doğru seçmek"
             ),
             prerequisites = listOf("Fonksiyonlar ve Çoklu Dönüş"),
-            subtopics = listOf("Tablo Tanımlama ({})", "1-Tabanlı İndeksleme", "Key-Value Çiftleri", "ipairs vs pairs", "table.insert ve table.remove"),
+            subtopics = listOf("Tablo Mimarisi (Array Part vs Hash Part)", "1-Tabanlı İndeksleme Mantığı", "Key-Value Çiftleri", "ipairs vs pairs Performansı", "table.insert / remove / sort"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Tablo (Table) Mimarisi",
-                    body = "Lua'da başka hiçbir bileşik veri yapısı (Array, Set, Map, Class) yoktur; her şey tablodur (`{}`).\n• Sıralı dizi: `local d = {\"A\", \"B\", \"C\"}` (d[1] -> \"A\")\n• Sözlük: `local s = {ad = \"Ahmet\", yas = 25}` (s.ad veya s[\"ad\"])",
-                    codeSnippet = "local diller = {\"Lua\", \"Python\", \"C++\"}\ntable.insert(diller, \"Kotlin\")\n\nfor index, deger in ipairs(diller) do\n    print(index .. \": \" .. deger)\nend"
+                    subtitle = "1. Tablonun İç Yapısı: Array Part & Hash Part",
+                    body = "Lua tabloları C düzeyinde iki bileşenden oluşur:\n• Dizi Bölümü (Array Part): 1'den N'e kadar sıralı tamsayı indeksler için C dizisi hızında O(1) erişim sağlar.\n• Hash Bölümü (Hash Part): String veya diğer anahtarlar için hash tablosu üzerinde çalışır.\n\nBu melez yapı sayesinde tek bir `{}` hem optimize bir dizi hem de esnek bir sözlüktür.",
+                    codeSnippet = "local tablo = {\"Birinci\", \"Ikinci\", ad = \"Lua\", puan = 100}\nprint(tablo[1])   -- Dizi bolumunden gelir: Birinci\nprint(tablo.ad)    -- Hash bolumunden gelir: Lua"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. ipairs vs pairs",
-                    body = "• `ipairs`: 1'den başlayan sıralı tamsayı dizileri için hızlıdır, ilk nil değerinde durur.\n• `pairs`: Anahtarlı (hash) sözlüklerdeki tüm anahtar-değer çiftlerini dolaşır.",
-                    tip = "Dizi uzunluğunu almak için `#tablo` uzunluk operatörü kullanılır."
+                    subtitle = "2. 1-Tabanlı İndeksleme ve # Uzunluk Operatörü",
+                    body = "Lua dizileri geleneksel olarak 1'den başlar (`dizi[1]`). `#dizi` operatörü tablodaki ardışık sıralı elemanların uzunluğunu döndürür.\n\nEğer dizide aralara `nil` değerler girerse (delikli dizi / sparse array), `#` operatörünün sonucu tanımsız olabilir!",
+                    tip = "Diziyi temizlemek için `for i = #d, 1, -1 do table.remove(d, i) end` geriye doğru döngü kurmak indeks kaymalarını önler."
+                ),
+                LessonContentBlock(
+                    subtitle = "3. İterasyon: ipairs vs pairs",
+                    body = "• `ipairs(t)`: Yalnızca t[1], t[2], ... sıralı sayısal indeksleri dolaşır ve ilk `nil` değerde anında durur. (Hızlıdır)\n• `pairs(t)`: Tablodaki tüm anahtarları (string, boolean, sayı) hash sırasına göre dolaşır.",
+                    codeSnippet = "for anahtar, deger in pairs(tablo) do\n    print(tostring(anahtar) .. \" => \" .. tostring(deger))\nend"
                 )
             ),
             codeExample = "local oyuncu = {\n    isim = \"Gölge Savaşçı\",\n    can = 100,\n    envanter = {\"Kılıç\", \"İksir\", \"Kalkan\"}\n}\n\nprint(\"Oyuncu: \" .. oyuncu.isim)\nprint(\"İlk Eşya: \" .. oyuncu.envanter[1])",
@@ -327,17 +348,22 @@ object LuaCurriculum {
                 "__index metamethodunu fallback ve prototip kalıtımı için yapılandırmak"
             ),
             prerequisites = listOf("Tablolar ve Fonksiyonlar"),
-            subtopics = listOf("setmetatable Fonksiyonu", "Operatör Metamethodları (__add, __eq)", "__tostring ile Metin Temsili", "__index Metamethodu", "Veri Koruması (__newindex)"),
+            subtopics = listOf("setmetatable & getmetatable", "Operatör Metamethodları (__add, __sub, __mul, __eq)", "__tostring ile Metin Temsili", "__index Metamethodu ve Prototip Kalıtımı", "Veri Koruması (__newindex)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Metatable Nedir?",
-                    body = "Metatable, sıradan bir tablonun operatörlerle karşılaştığında (+, -, *, ..) veya bulunamayan bir anahtara erişildiğinde nasıl davranacağını belirleyen kural tablosudur.",
-                    codeSnippet = "local Vektor = {}\nlocal mt = {\n    __add = function(v1, v2)\n        return setmetatable({x = v1.x + v2.x, y = v1.y + v2.y}, mt)\n    },\n    __tostring = function(v)\n        return \"Vektor(\" .. v.x .. \", \" .. v.y .. \")\"\n    }\n}\n\nlocal v1 = setmetatable({x = 10, y = 20}, mt)\nlocal v2 = setmetatable({x = 5, y = 15}, mt)\nlocal v3 = v1 + v2 -- __add tetiklenir\nprint(tostring(v3)) -- Vektor(15, 35)"
+                    subtitle = "1. Metatable Mimarisi ve Operatör Aşırı Yükleme",
+                    body = "Metatable, sıradan bir tablonun operatörlerle karşılaştığında (+, -, *, ==, ..) veya özel durumlarda nasıl tepki vereceğini yöneten kural tablosudur.\n\n• `__add`: `+` operatörü\n• `__sub`: `-` operatörü\n• `__mul`: `*` operatörü\n• `__eq`: `==` operatörü\n• `__tostring`: `print()` veya `tostring()` çağrıldığında dönen metin",
+                    codeSnippet = "local Vektor = {}\nlocal mt = {\n    __add = function(v1, v2)\n        return setmetatable({x = v1.x + v2.x, y = v1.y + v2.y}, mt)\n    },\n    __tostring = function(v)\n        return \"Vektor(\" .. v.x .. \", \" .. v.y .. \")\"\n    }\n}\n\nlocal v1 = setmetatable({x = 10, y = 20}, mt)\nlocal v2 = setmetatable({x = 5, y = 15}, mt)\nlocal v3 = v1 + v2\nprint(tostring(v3)) -- Vektor(15, 35)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. __index Metamethodu",
-                    body = "Bir tabloda aranan anahtar bulunamadığında Lua `__index` tablosuna bakar. Bu mekanizma Lua'nın nesne yönelimli sisteminin temelidir.",
-                    tip = "__newindex metamethodu tabloya yeni bir alan eklenmeye çalışıldığında araya girmeyi sağlar."
+                    subtitle = "2. __index Metamethodu ve Fallback Mekanizması",
+                    body = "Bir tabloda aranan bir alan bulunamadığında (`nil`), Lua sanal makinesi metatable'daki `__index` alanına bakar. `__index` bir fonksiyon veya başka bir tablo olabilir.\nBu kural zinciri Lua'da Sınıf (Class) ve Prototip tabanlı Nesne Yönelimli Programlamanın (OOP) temel direğidir.",
+                    codeSnippet = "local NesneSinifi = { can = 100, seviye = 1 }\nNesneSinifi.__index = NesneSinifi\n\nlocal yeniNesne = setmetatable({ isim = \"Savasci\" }, NesneSinifi)\nprint(yeniNesne.can) -- NesneSinifi'ndan gelir: 100"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. __newindex ile Salt-Okunur (Read-Only) Tablolar",
+                    body = "Var olmayan bir anahtara yeni değer atanmaya çalışıldığında `__newindex` tetiklenir. Bu metamethod ile tablolar salt-okunur (immutable) yapılabilir veya atanacak değerlerin tip güvenliği denetlenebilir.",
+                    tip = "Bir tabloyu kilitlemek için `__newindex = function() error(\"Bu tablo salt okunurdur!\") end` yazabilirsiniz."
                 )
             ),
             codeExample = "local Varsayilanlar = { can = 100, seviye = 1 }\nlocal mt = { __index = Varsayilanlar }\n\nlocal yeniOyuncu = setmetatable({ isim = \"Can\" }, mt)\nprint(\"Oyuncu: \" .. yeniOyuncu.isim)\nprint(\"Can (Varsayilan): \" .. yeniOyuncu.can) -- Varsayilanlar'dan gelir",

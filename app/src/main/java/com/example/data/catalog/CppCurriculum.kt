@@ -91,17 +91,17 @@ object CppCurriculum {
                 "Temel veri tiplerini ve constexpr sabitlerini öğrenmek"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("main() Giriş Fonksiyonu", "#include <iostream>", "std::cout << & std::cin >>", "Temel Veri Tipleri", "const & constexpr"),
+            subtopics = listOf("C++ Derleme Aşamaları (Preprocess, Compile, Assemble, Link)", "main() ve Çıkış Durum Kodları", "iostream Akış Mimarisi & Buffer Flushing", "Veri Tipleri & IEEE 754 Boyutları", "const vs constexpr (Compile-Time Evaluation)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. C++ main() ve Akışlar (Streams)",
-                    body = "Her C++ programı `int main()` ile başlar ve 0 döndürerek işletim sistemine başarılı çıkış bildirir. Ekrana yazdırmak için `std::cout <<`, kullanıcıdan girdi almak için `std::cin >>` kullanılır.",
-                    codeSnippet = "#include <iostream>\n\nint main() {\n    std::cout << \"C++ Dünyasına Hoş Geldiniz!\" << std::endl;\n    return 0;\n}"
+                    subtitle = "1. C++ Derleme Modeli ve main() Fonksiyonu",
+                    body = "C++ kodu doğrudan makine diline derlenir. Süreç 4 aşamadan oluşur:\n1. Preprocessor (`#include`, `#define` başlıklarını genişletir)\n2. Compiler (C++ kodunu Assembly'ye çevirir)\n3. Assembler (Assembly'yi Object (.o/.obj) makine koduna çevirir)\n4. Linker (Nesne dosyalarını ve kütüphaneleri bağlayıp çalıştırılabilir ikili dosya - executable üretir).\n\n`int main()` işletim sisteminin çağırdığı giriş noktasıdır.",
+                    codeSnippet = "#include <iostream>\n\nint main() {\n    // std::cout bir çıkış akışıdır (ostream)\n    std::cout << \"C++ Yüksek Performans Dünyası\" << \"\\n\";\n    return 0; // 0 = EXIT_SUCCESS\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. constexpr: Derleme Zamanı Hesaplaması",
-                    body = "• const: Değiştirilemeyen çalışma veya derleme zamanı sabiti.\n• constexpr: Kesinlikle derleme zamanında hesaplanan sıfır ek yük getiren sabitlerdir.",
-                    tip = "C++'ta her satır noktalı virgül (;) ile bitmek zorundadır."
+                    subtitle = "2. constexpr: Sıfır Çalışma Zamanı Maliyeti",
+                    body = "• `const`: Değişkenin çalışma zamanında değiştirilmesini engeller.\n• `constexpr`: Değerin veya fonksiyonun tamamen DERLEME ZAMANINDA (Compile-Time) hesaplanmasını zorunlu kılar. İkili dosyada sabit bir sayı olarak gömülür ve CPU döngüsü harcamaz.",
+                    tip = "std::endl yerine '\\n' kullanmak her satırda gereksiz I/O buffer flush işlemini önleyerek performansı katbekat artırır."
                 )
             ),
             codeExample = "#include <iostream>\n\nint main() {\n    int yas = 25;\n    double maas = 75000.50;\n    char seviye = 'A';\n    bool aktif = true;\n    \n    std::cout << \"Yaş: \" << yas << \", Seviye: \" << seviye << \"\\n\";\n    return 0;\n}",
@@ -174,17 +174,17 @@ object CppCurriculum {
                 "Modern Range-based for döngüsü ile dizileri temizce gezmek"
             ),
             prerequisites = listOf("C++'a Giriş, main() & Temel Veri Tipleri"),
-            subtopics = listOf("Mantıksal Operatörler (&&, ||, !)", "if - else if - else", "switch-case & break", "for & while Döngüleri", "Range-based for (auto)"),
+            subtopics = listOf("Kısa Devre Değerlendirmesi (Short-Circuit Logic)", "if, else if ve C++17 Başlatıcılı if (if with init)", "switch-case Jump Tables & [[fallthrough]]", "Döngü Optimizasyonları (Loop Unrolling)", "Range-based for (const auto&)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. if-else ve switch Karar Yapıları",
-                    body = "C++ koşul ifadeleri parantez içinde yazılır. switch-case sadece tamsayı ve enum tipleriyle çalışır.",
-                    codeSnippet = "int notu = 85;\nif (notu >= 90) std::cout << \"AA\";\nelse if (notu >= 80) std::cout << \"BA\";\nelse std::cout << \"CC\";"
+                    subtitle = "1. if Karar Yapıları ve C++17 if with Initializer",
+                    body = "Modern C++17 ile gelen `if (auto val = hesapla(); val > 0)` sözdizimi, değişkenin kapsamını (scope) yalnızca o if bloğuyla sınırlar. Bu sayede isim kirliliği ve hatalı değişken erişimi engellenir.",
+                    codeSnippet = "if (int status = baglantiKontrol(); status == 200) {\n    std::cout << \"Bağlantı Başarılı\\n\";\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Range-Based for Döngüsü",
-                    body = "C++11 ile gelen `for (const auto& item : koleksiyon)` sözdizimi dizileri indeks hatası riski olmadan en hızlı şekilde gezer.",
-                    tip = "Diziyi değiştirmiyorsanız kopyalamayı önlemek için `const auto&` kullanın."
+                    subtitle = "2. Range-Based for Döngüsü ve Referans Performansı",
+                    body = "Diziler ve STL vektörleri üzerinde `for (const auto& item : koleksiyon)` yapısı kullanıldığında, her elemanın bellekte gereksiz kopyası çıkarılmaz; doğrudan RAM'deki bellek adresine const referansla erişilerek önbellek (L1/L2 Cache) verimliliği maksimize edilir.",
+                    tip = "Döngü içinde elemanları değiştirmeyecekseniz her zaman `const auto&` tercih edin."
                 )
             ),
             codeExample = "#include <iostream>\n\nint main() {\n    int sayilar[] = {10, 20, 30, 40, 50};\n    int toplam = 0;\n    \n    for (const auto& s : sayilar) {\n        toplam += s;\n    }\n    \n    std::cout << \"Dizi Toplamı: \" << toplam << \"\\n\";\n    return 0;\n}",
@@ -257,17 +257,17 @@ object CppCurriculum {
                 "Function Overloading (Fonksiyon Aşırı Yükleme) kurallarını uygulamak"
             ),
             prerequisites = listOf("C++ Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Fonksiyon Bildirimi & Tanımı", "Pass by Value (Kopyalama)", "Pass by Reference (&)", "const Reference (const T&)", "Function Overloading"),
+            subtopics = listOf("Stack Frame Mimarisi & Call Convention", "Pass by Value (Kopyalama Ek Yükü)", "Pass by Reference (&)", "const T& İmzaları", "Function Overloading & Name Mangling"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Pass by Value vs Pass by Reference",
-                    body = "• Pass by Value: Değişkenin tam bir kopyası fonksiyona gönderilir. Orijinal değişken değişmez.\n• Pass by Reference (`&`): Değişkenin bellek adresi paylaşılır. Fonksiyondaki değişiklik orijinal değişkeni doğrudan etkiler.",
+                    subtitle = "1. Pass by Value vs Pass by Reference (&)",
+                    body = "• Pass by Value: Parametre Stack üzerine kopyalanır. Orijinal veri korunur ancak büyük nesnelerde (örneğin 1 MB'lık bir vector) devasa bellek ve işlemci israfına yol açar.\n• Pass by Reference (`&`): Fonksiyon değişkenin doğrudan bellek adresini bir takma ad (alias) olarak kullanır. Kopyalama maliyeti sıfırdır.",
                     codeSnippet = "void takas(int& a, int& b) {\n    int temp = a;\n    a = b;\n    b = temp;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. const T& Tasarım Standardı",
-                    body = "Büyük nesneler (string, vector vb.) fonksiyona kopyalanmadan ama kazara değiştirilmesini de önleyecek şekilde `const std::string&` olarak geçirilir.",
-                    tip = "Modern C++'ta ilkel tipler (int, double) değerle, nesneler (class, struct) const referansla geçirilir."
+                    subtitle = "2. const T& ve Name Mangling",
+                    body = "Fonksiyon parametresini `const std::string& str` şeklinde tanımlamak, nesneyi kopyalamadan geçirirken fonksiyon içinde kazara değiştirilmesini derleme zamanında engeller.\n\nC++ derleyicisi aşırı yüklenmiş fonksiyonları ayırt etmek için fonksiyon adını parametre tipleriyle birleştirerek sembol tablosuna yazar (Name Mangling).",
+                    tip = "İlkel türler (int, float, char) doğrudan değerle, sınıf ve yapılar (struct, class, std::string) `const T&` ile geçilmelidir."
                 )
             ),
             codeExample = "#include <iostream>\n#include <string>\n\nvoid selamla(const std::string& isim) {\n    std::cout << \"Merhaba, \" << isim << \"!\\n\";\n}\n\nvoid ikiKatinaCikar(int& sayi) {\n    sayi *= 2;\n}\n\nint main() {\n    int x = 10;\n    ikiKatinaCikar(x);\n    std::cout << \"x: \" << x << \"\\n\"; // 20\n    return 0;\n}",
@@ -340,17 +340,17 @@ object CppCurriculum {
                 "nullptr kullanımını ve tehlikeli vahşi işaretçileri (dangling pointers) öğrenmek"
             ),
             prerequisites = listOf("C++ Fonksiyonlar ve Referanslar"),
-            subtopics = listOf("Bellek Mimarisi & Adres Operatörü (&)", "Pointer Tanımlama (*)", "Dereferencing (*ptr)", "nullptr vs NULL", "Pointer Aritmetiği"),
+            subtopics = listOf("RAM Adresleme & Hex Düzeni", "Pointer Tanımlama ve Dereferencing (*)", "nullptr Güvenliği & Dangling Pointer Tehlikesi", "Pointer Aritmetiği (sizeof Adımları)", "Pointer vs Reference Karşılaştırması"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Pointer Anatomisi",
-                    body = "Pointer bir değişkenin RAM'deki bellek adresini tutan özel bir değişkendir.\n• `&x`: x değişkeninin bellek adresini verir.\n• `*ptr`: ptr adresindeki asıl veriyi okur veya yazar.",
-                    codeSnippet = "int sayi = 42;\nint* ptr = &sayi; // ptr sayi'nin adresini tutar\n*ptr = 100; // sayi artık 100 olur!"
+                    subtitle = "1. Pointer Mantığı ve Bellek Adresi",
+                    body = "Pointer, RAM'deki bir baytın hexadecimal (onaltılık) adresini tutan özel bir değişkendir.\n• `&değişken`: Değişkenin adresini verir (Address-of).\n• `*ptr`: Adrese gidip oradaki ham baytları türe göre okur veya yazar (Dereference).",
+                    codeSnippet = "int sayi = 42;\nint* ptr = &sayi; // ptr sayi'nin bellek adresini tutar\n*ptr = 100; // sayi doğrudan 100 olarak güncellenir"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. nullptr Güvenliği",
-                    body = "Boş bir pointer tanımlarken C'deki 'NULL' yerine tip güvenli modern C++ 'nullptr' kullanılmalıdır.",
-                    tip = "Başlatılmamış pointer'lar (Wild/Dangling Pointer) rastgele bellek alanlarını göstererek programın çökmesine (Segmentation Fault) sebep olur."
+                    subtitle = "2. nullptr Güvenliği ve Pointer Aritmetiği",
+                    body = "C dilindeki `NULL` (aslında `0` tamsayısı) yerine C++11 ile gelen tip güvenli `nullptr` kullanılmalıdır.\n\nPointer aritmetiğinde `ptr + 1` işlemi adresi 1 bayt değil, `sizeof(T)` kadar (örneğin 64-bit int için 4 bayt, double için 8 bayt) ileri öteler.",
+                    tip = "Serbest bırakılan veya başlatılmamış pointer'lar (Dangling/Wild Pointer) tanımsız davranışlara (Undefined Behavior) ve Segmentation Fault çökmelerine yol açar."
                 )
             ),
             codeExample = "#include <iostream>\n\nint main() {\n    int a = 10;\n    int* p = &a;\n    \n    std::cout << \"a'nin degeri: \" << a << \"\\n\";\n    std::cout << \"a'nin adresi (&a): \" << p << \"\\n\";\n    std::cout << \"p uzerinden deger (*p): \" << *p << \"\\n\";\n    \n    *p = 50; // Doğrudan RAM adresine yazıldı\n    std::cout << \"a'nin yeni degeri: \" << a << \"\\n\";\n    return 0;\n}",
@@ -423,17 +423,17 @@ object CppCurriculum {
                 "RAII (Resource Acquisition Is Initialization) prensibini kavramak"
             ),
             prerequisites = listOf("Pointerlar, Referanslar ve Bellek Adresleri"),
-            subtopics = listOf("Stack Mimarisi & Hızlı Tahsis", "Heap Mimarisi & new / delete", "Dizilerde new[] / delete[]", "Bellek Sızıntısı (Memory Leak)", "RAII Prensibi"),
+            subtopics = listOf("Stack Frame vs Heap Tahsisi", "new ve delete İç Mekanizması", "Dizilerde new[] ve delete[] Eşleşmesi", "Bellek Sızıntısı (Memory Leak) Tespiti", "RAII (Resource Acquisition Is Initialization) Paradigması"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Stack vs Heap",
-                    body = "• Stack: Fonksiyon çağrıldığında otomatik açılır, fonksiyon bitince anında temizlenir. Çok hızlıdır ancak boyutu sınırlıdır (~1-8 MB).\n• Heap: Çalışma anında dinamik olarak `new` ile açılır. Boyutu RAM kadardır ancak `delete` ile manuel temizlenmek zorundadır.",
-                    codeSnippet = "int* dinamikSayi = new int(100); // Heap'te tahsis edildi\n// Kullanıldıktan sonra:\ndelete dinamikSayi; // Bellek iade edildi\ndinamikSayi = nullptr;"
+                    subtitle = "1. Stack vs Heap Bellek Bölgeleri",
+                    body = "• Stack: CPU'nun Stack Pointer (SP) kaydı ile yönetilen ultra hızlı bellek bölgesidir. Fonksiyon bittiğinde tahsis edilen değişkenler otomatik serbest bırakılır (~1-8 MB limitli).\n• Heap: İşletim sistemi çekirdeğinden (brk/mmap çağrılarıyla) dinamik olarak `new` ile tahsis edilir. Boyutu RAM kadardır ancak `delete` ile manuel temizlenmelidir.",
+                    codeSnippet = "int* p = new int(100); // Heap'te tahsis edildi\ndelete p; // Bellek iade edildi\np = nullptr;"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. RAII (Resource Acquisition Is Initialization)",
-                    body = "C++'ın en önemli ilkesidir: Kaynak (bellek, dosya, kilit) bir nesnenin kurucusunda (constructor) tahsis edilir, yıkıcısında (destructor) otomatik serbest bırakılır. Bu sayede istisna (exception) fırlatılsa bile sızıntı olmaz.",
-                    tip = "Dinamik diziler tahsis edildiğinde `delete[] dizi;` ile silinmelidir. Düz delete tanımsız davranışa (undefined behavior) yol açar."
+                    subtitle = "2. RAII: C++'ın En Güçlü Kaynak Yönetim İlkesi",
+                    body = "RAII (Resource Acquisition Is Initialization) ilkesine göre: Bir kaynak (heap bellek, dosya tanımlayıcısı, mutex kilidi) bir nesnenin kurucusunda (Constructor) edinilir ve yıkıcısında (Destructor `~Class()`) otomatik iade edilir. Nesne kapsamdan (scope `{ }`) çıktığında veya bir istisna fırlatıldığında C++ derleyicisi yıkıcıyı garantili olarak çağırır.",
+                    tip = "`new[]` ile tahsis edilen diziler mutlaka `delete[]` ile silinmelidir. Düz `delete` tanımsız davranışa ve sızıntıya yol açar."
                 )
             ),
             codeExample = "#include <iostream>\n\nclass GuvenliDizi {\n    int* veri;\n    int boyut;\npublic:\n    GuvenliDizi(int b) : boyut(b), veri(new int[b]) {\n        std::cout << \"Heap bellek acildi.\\n\";\n    }\n    ~GuvenliDizi() {\n        delete[] veri; // RAII: Scope bitince otomatik temizlenir\n        std::cout << \"Heap bellek serbest birakildi.\\n\";\n    }\n};\n\nint main() {\n    {\n        GuvenliDizi d(1000); // Blok bitince yıkıcı otomatik çalışır\n    }\n    std::cout << \"Bloktan cikildi.\\n\";\n    return 0;\n}",

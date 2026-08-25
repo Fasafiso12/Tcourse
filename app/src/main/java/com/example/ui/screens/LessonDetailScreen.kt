@@ -6,9 +6,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Lock
@@ -18,17 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.catalog.CourseCatalog
 import com.example.model.AiShortcut
+import com.example.model.ExecutionResult
 import com.example.model.Lesson
+import com.example.ui.components.CodeEditorComponent
 import com.example.ui.components.SyntaxHighlightedCode
 import com.example.ui.theme.*
 import com.example.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LessonDetailScreen(
@@ -48,13 +55,38 @@ fun LessonDetailScreen(
     var isMiniQuestionChecked by remember(lesson.id) { mutableStateOf(false) }
     var expandedQaIndex by remember(lesson.id) { mutableStateOf<Int?>(null) }
 
+    val userProfile by viewModel.userProfile.collectAsState()
+    val appLanguage by viewModel.appLanguage.collectAsState()
+    val isTr = appLanguage == com.example.model.AppLanguage.TR
+
+    val defaultTaskCode = remember(lesson.id, lesson.courseId, isTr) {
+        getPracticalTaskStarterTemplate(lesson.courseId, lesson.title, isTr)
+    }
+
+    var practicalTaskCode by remember(lesson.id) {
+        mutableStateOf(defaultTaskCode)
+    }
+    var practicalTaskResult by remember(lesson.id) {
+        mutableStateOf<ExecutionResult?>(null)
+    }
+    var isPracticalTaskRunning by remember(lesson.id) {
+        mutableStateOf(false)
+    }
+    var isPracticalTaskPassed by remember(lesson.id, allProgress) {
+        mutableStateOf(allProgress.any { it.lessonId == lesson.id && it.codingChallengeCompleted })
+    }
+
+    val listState = rememberLazyListState()
+
     LaunchedEffect(lesson.id) {
         miniQuestionSelectedOption = null
         isMiniQuestionChecked = false
         expandedQaIndex = null
+        practicalTaskCode = getPracticalTaskStarterTemplate(lesson.courseId, lesson.title, isTr)
+        practicalTaskResult = null
+        isPracticalTaskRunning = false
+        listState.scrollToItem(0)
     }
-
-    val userProfile by viewModel.userProfile.collectAsState()
 
     val allLessons = remember(lesson.courseId) { CourseCatalog.getLessonsForCourse(lesson.courseId) }
     val nextLesson = remember(lesson) {
@@ -183,6 +215,7 @@ fun LessonDetailScreen(
         containerColor = DarkBg
     ) { innerPadding ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -409,30 +442,51 @@ fun LessonDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(
+                                    modifier = Modifier.weight(1f),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     Text("🤖", fontSize = 22.sp)
                                     Column {
                                         Text(
-                                            text = "Anlamadığın Bir Yer Mi Var?",
+                                            text = if (isTr) "Anlamadığın Bir Yer Mi Var?" else "Need Quick Help?",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = TextPrimary
                                         )
                                         Text(
-                                            text = "Yapay Zeka bu konu için hazır bekliyor",
+                                            text = if (isTr) "Yapay Zeka bu konu için hazır bekliyor" else "AI Tutor is ready for this topic",
                                             fontSize = 11.sp,
                                             color = TextSecondary
                                         )
                                     }
                                 }
 
-                                TextButton(
-                                    onClick = { viewModel.openAiAssistant(lesson = lesson) },
-                                    modifier = Modifier.testTag("lesson_ai_chat_btn")
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = PrimarySubtle,
+                                    border = CardDefaults.outlinedCardBorder().copy(
+                                        brush = androidx.compose.ui.graphics.SolidColor(PrimarySubtleBorder)
+                                    ),
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { viewModel.openAiAssistant(lesson = lesson) }
+                                        .testTag("lesson_ai_chat_btn")
                                 ) {
-                                    Text("Soru Sor", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PrimaryIndigoLight)
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isTr) "Soru Sor" else "Ask AI",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PrimaryIndigoLight
+                                        )
+                                    }
                                 }
                             }
 
@@ -495,20 +549,43 @@ fun LessonDetailScreen(
                                     text = block.subtitle,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = PrimaryIndigoLight
+                                    color = PrimaryIndigoLight,
+                                    lineHeight = 20.sp,
+                                    modifier = Modifier.weight(1f)
                                 )
 
-                                TextButton(
-                                    onClick = {
-                                        viewModel.openAiAssistant(
-                                            lesson = lesson,
-                                            initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
-                                            targetSentence = "${block.subtitle}: ${block.body}"
-                                        )
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = PrimarySubtle,
+                                    border = CardDefaults.outlinedCardBorder().copy(
+                                        brush = androidx.compose.ui.graphics.SolidColor(PrimarySubtleBorder)
+                                    ),
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable {
+                                            viewModel.openAiAssistant(
+                                                lesson = lesson,
+                                                initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
+                                                targetSentence = "${block.subtitle}: ${block.body}"
+                                            )
+                                        }
                                 ) {
-                                    Text("🤖 AI Açıkla", fontSize = 11.sp, color = PrimaryIndigoLight)
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("🤖", fontSize = 12.sp)
+                                        Text(
+                                            text = if (isTr) "AI Açıkla" else "AI Explain",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = PrimaryIndigoLight,
+                                            maxLines = 1
+                                        )
+                                    }
                                 }
                             }
 
@@ -561,23 +638,45 @@ fun LessonDetailScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Kapsamlı Kod Örneği",
+                                text = if (isTr) "Kapsamlı Kod Örneği" else "Comprehensive Code Example",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                                color = TextPrimary,
+                                modifier = Modifier.weight(1f)
                             )
 
-                            TextButton(
-                                onClick = {
-                                    viewModel.openAiAssistant(
-                                        lesson = lesson,
-                                        initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
-                                        targetSentence = "Şu koddaki mantığı satır satır analiz eder misin?\n```${lesson.courseId}\n${lesson.codeExample}\n```"
-                                    )
-                                },
-                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = PrimarySubtle,
+                                border = CardDefaults.outlinedCardBorder().copy(
+                                    brush = androidx.compose.ui.graphics.SolidColor(PrimarySubtleBorder)
+                                ),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        viewModel.openAiAssistant(
+                                            lesson = lesson,
+                                            initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
+                                            targetSentence = "Şu koddaki mantığı satır satır analiz eder misin?\n```${lesson.courseId}\n${lesson.codeExample}\n```"
+                                        )
+                                    }
                             ) {
-                                Text("🤖 Kodu AI'ya Sor", fontSize = 11.sp, color = PrimaryIndigoLight)
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text("🤖", fontSize = 12.sp)
+                                    Text(
+                                        text = if (isTr) "Kodu AI'ya Sor" else "Ask AI about Code",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = PrimaryIndigoLight,
+                                        maxLines = 1
+                                    )
+                                }
                             }
                         }
 
@@ -639,28 +738,398 @@ fun LessonDetailScreen(
                     }
                 }
 
-                // Practical Task / Uygulamalı Görev
+                // Practical Task / Uygulamalı Görev (Interactive Code Editor + Verification)
                 if (!lesson.practicalTask.isNullOrBlank()) {
                     item {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(16.dp))
-                                .border(1.dp, AccentEmeraldBorder, RoundedCornerShape(16.dp)),
+                                .border(
+                                    1.dp,
+                                    if (isPracticalTaskPassed) AccentEmerald.copy(alpha = 0.8f) else AccentEmeraldBorder,
+                                    RoundedCornerShape(16.dp)
+                                )
+                                .testTag("lesson_practical_task_card"),
                             colors = CardDefaults.cardColors(containerColor = DarkSurface)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Text("🛠️", fontSize = 16.sp)
-                                    Text("Uygulamalı Görev", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = AccentEmeraldLight)
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                // 1. Header with icon, title and status / XP badge
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Text("🛠️", fontSize = 18.sp)
+                                        Column {
+                                            Text(
+                                                text = if (isTr) "Uygulamalı Görev" else "Hands-On Task",
+                                                fontSize = 15.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = AccentEmeraldLight
+                                            )
+                                            Text(
+                                                text = if (isTr) "Kodu yazın ve görevi doğrulayın" else "Write code and verify task",
+                                                fontSize = 11.sp,
+                                                color = TextMuted
+                                            )
+                                        }
+                                    }
+
+                                    Surface(
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = if (isPracticalTaskPassed) AccentEmerald.copy(alpha = 0.2f) else AccentAmber.copy(alpha = 0.2f)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            if (isPracticalTaskPassed) {
+                                                Text("✓", color = AccentEmerald, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                Text(
+                                                    text = if (isTr) "Tamamlandı" else "Completed",
+                                                    color = AccentEmerald,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            } else {
+                                                Text("+20 XP", color = AccentAmber, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = lesson.practicalTask,
-                                    fontSize = 13.sp,
-                                    color = TextPrimary,
-                                    lineHeight = 19.sp
+
+                                // 2. Task Instructions Box
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = DarkSurfaceVariant,
+                                    border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder))
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            text = if (isTr) "GÖREV YÖNERGESİ:" else "TASK INSTRUCTIONS:",
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PrimaryIndigoLight,
+                                            letterSpacing = 1.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = lesson.practicalTask,
+                                            fontSize = 13.sp,
+                                            color = TextPrimary,
+                                            lineHeight = 20.sp
+                                        )
+                                    }
+                                }
+
+                                // 3. Interactive Code Editor Component
+                                CodeEditorComponent(
+                                    code = practicalTaskCode,
+                                    onCodeChange = { newCode ->
+                                        practicalTaskCode = newCode
+                                        if (practicalTaskResult != null) {
+                                            practicalTaskResult = null
+                                        }
+                                        if (isPracticalTaskPassed) {
+                                            isPracticalTaskPassed = false
+                                        }
+                                    },
+                                    language = lesson.courseId,
+                                    title = lesson.title,
+                                    minEditorHeight = 160,
+                                    showSymbolsToolbar = true,
+                                    showRunButton = false,
+                                    showOutputTerminal = false,
+                                    onResetCode = {
+                                        practicalTaskCode = defaultTaskCode
+                                        practicalTaskResult = null
+                                        isPracticalTaskPassed = false
+                                    },
+                                    onAskAi = { userCode ->
+                                        viewModel.openAiAssistant(
+                                            lesson = lesson,
+                                            initialShortcut = AiShortcut.CHECK_CODE,
+                                            targetSentence = if (isTr) {
+                                                "Uygulamalı Görev: ${lesson.practicalTask}\nYazdığım Kod:\n```${lesson.courseId}\n$userCode\n```\nLütfen yazdığım kodu kontrol et ve nerede hata yaptığımı açıkla. Kesinlikle doğrudan tam cevabı veya hazır çalışan kodu verme; nerede hata yaptığımı fark etmem için pedagojik ipuçları ve yönlendirmeler ver."
+                                            } else {
+                                                "Practical Task: ${lesson.practicalTask}\nMy Code:\n```${lesson.courseId}\n$userCode\n```\nPlease check my code and tell me where I made mistakes without revealing the direct solution. Provide pedagogical hints and guidance instead."
+                                            }
+                                        )
+                                    },
+                                    testTagPrefix = "lesson_practical_task"
                                 )
+
+                                val coroutineScope = rememberCoroutineScope()
+
+                                // 4. Failure / Diagnostics Card
+                                if (practicalTaskResult != null && !practicalTaskResult!!.isSuccess) {
+                                    val errRes = practicalTaskResult!!
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = AccentRoseSubtle,
+                                        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentRoseBorder)),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag("practical_task_error_card")
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(14.dp),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Cancel,
+                                                    contentDescription = null,
+                                                    tint = AccentRose,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Text(
+                                                    text = if (isTr) "Tekrar Deneyiniz" else "Try Again",
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = AccentRose
+                                                )
+                                            }
+
+                                            if (errRes.output.isNotBlank()) {
+                                                Text(
+                                                    text = errRes.output,
+                                                    fontSize = 12.sp,
+                                                    color = TextPrimary,
+                                                    fontFamily = FontFamily.Monospace,
+                                                    lineHeight = 18.sp
+                                                )
+                                            }
+
+                                            if (errRes.error != null && errRes.error != errRes.output) {
+                                                Text(
+                                                    text = "💡 ${errRes.error}",
+                                                    fontSize = 11.sp,
+                                                    color = AccentRose,
+                                                    lineHeight = 16.sp
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // 5. Simplified Success Card (No 'Devam Et' button)
+                                if (practicalTaskResult?.isSuccess == true || (isPracticalTaskPassed && practicalTaskResult == null)) {
+                                    Surface(
+                                        shape = RoundedCornerShape(14.dp),
+                                        color = AccentEmeraldSubtle,
+                                        border = CardDefaults.outlinedCardBorder().copy(
+                                            brush = SolidColor(AccentEmeraldBorder)
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag("practical_task_success_card")
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            // Üstte "Başarılı" yazısı
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.CheckCircle,
+                                                    contentDescription = null,
+                                                    tint = AccentEmerald,
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                                Text(
+                                                    text = if (isTr) "Başarılı" else "Success",
+                                                    fontSize = 18.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = AccentEmeraldLight
+                                                )
+                                            }
+
+                                            // Kısa bilgilendirme metni
+                                            Text(
+                                                text = if (isTr) "Görevi başarıyla tamamladınız." else "Task completed successfully.",
+                                                fontSize = 12.sp,
+                                                color = TextSecondary,
+                                                textAlign = TextAlign.Center
+                                            )
+
+                                            // Altında kazandığı XP
+                                            Surface(
+                                                shape = RoundedCornerShape(16.dp),
+                                                color = AccentEmerald.copy(alpha = 0.2f),
+                                                border = CardDefaults.outlinedCardBorder().copy(
+                                                    brush = SolidColor(AccentEmerald.copy(alpha = 0.4f))
+                                                )
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    Text("⭐", fontSize = 12.sp)
+                                                    Text(
+                                                        text = "+20 XP",
+                                                        fontSize = 13.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = AccentEmeraldLight
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // 6. Action Buttons (Verify / Re-test & AI Shortcuts)
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    // 1. Ana Test / Çalıştırma Butonu
+                                    Button(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                isPracticalTaskRunning = true
+                                                val res = viewModel.verifyAndSubmitPracticalTask(
+                                                    lessonId = lesson.id,
+                                                    courseId = lesson.courseId,
+                                                    lessonTitle = lesson.title,
+                                                    taskDescription = lesson.practicalTask,
+                                                    userCode = practicalTaskCode
+                                                )
+                                                isPracticalTaskRunning = false
+                                                practicalTaskResult = res
+                                                isPracticalTaskPassed = res.isSuccess
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(46.dp)
+                                            .testTag("verify_practical_task_btn"),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (practicalTaskResult?.isSuccess == true || isPracticalTaskPassed) AccentEmerald else PrimaryIndigo,
+                                            contentColor = Color.White
+                                        ),
+                                        shape = RoundedCornerShape(12.dp),
+                                        enabled = !isPracticalTaskRunning
+                                    ) {
+                                        if (isPracticalTaskRunning) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(18.dp),
+                                                color = Color.White,
+                                                strokeWidth = 2.dp
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(if (isTr) "Kontrol Ediliyor..." else "Checking...", fontSize = 13.sp)
+                                        } else {
+                                            Text(if (practicalTaskResult?.isSuccess == true || isPracticalTaskPassed) "✓" else "▶", fontSize = 14.sp)
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = if (practicalTaskResult?.isSuccess == true || isPracticalTaskPassed) {
+                                                    if (isTr) "Kodu Tekrar Test Et" else "Test Code Again"
+                                                } else {
+                                                    if (isTr) "Görevi Kontrol Et" else "Check Task"
+                                                },
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+
+                                    // 2. Yapay Zeka Kısayolları Satırı: Kodu Kontrol Et (AI) & AI İpucu
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // "Kodu Kontrol Et (AI)" - Yapay zeka kodu inceler, doğrudan cevabı vermeden hataları ve ipuçlarını söyler
+                                        OutlinedButton(
+                                            onClick = {
+                                                viewModel.openAiAssistant(
+                                                    lesson = lesson,
+                                                    initialShortcut = AiShortcut.CHECK_CODE,
+                                                    targetSentence = if (isTr) {
+                                                        "Uygulamalı Görev: ${lesson.practicalTask}\nYazdığım Kod:\n```${lesson.courseId}\n$practicalTaskCode\n```\nLütfen yazdığım kodu detaylıca kontrol et ve nerede hata yaptığımı, neyin eksik olduğunu bana açıkla. ÖNEMLİ KURAL: Kesinlikle doğrudan tam cevabı veya hazır kodu söyleme; nerede hata yaptığımı kendimin bulması için yönlendirici pedagojik ipuçları ver."
+                                                    } else {
+                                                        "Practical Task: ${lesson.practicalTask}\nMy Code:\n```${lesson.courseId}\n$practicalTaskCode\n```\nPlease check my code and point out where I made mistakes without giving away the direct answer. Provide pedagogical hints and guidance instead."
+                                                    }
+                                                )
+                                            },
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(42.dp)
+                                                .testTag("practical_task_ai_check_code_btn"),
+                                            shape = RoundedCornerShape(10.dp),
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                contentColor = AccentEmeraldLight
+                                            ),
+                                            border = CardDefaults.outlinedCardBorder().copy(
+                                                brush = SolidColor(AccentEmerald.copy(alpha = 0.5f))
+                                            )
+                                        ) {
+                                            Text("🩺", fontSize = 13.sp)
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = if (isTr) "Kodu Kontrol Et (AI)" else "Check Code (AI)",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                maxLines = 1
+                                            )
+                                        }
+
+                                        // "AI İpucu" - Genel yaklaşım ve çözüm ipucu
+                                        OutlinedButton(
+                                            onClick = {
+                                                viewModel.openAiAssistant(
+                                                    lesson = lesson,
+                                                    initialShortcut = AiShortcut.STEP_BY_STEP,
+                                                    targetSentence = if (isTr) {
+                                                        "Uygulamalı Görev: ${lesson.practicalTask}\nBu görevi nasıl çözebileceğim konusunda bana doğrudan cevabı vermeden adım adım yol gösterici ipucu verir misin?"
+                                                    } else {
+                                                        "Practical Task: ${lesson.practicalTask}\nCan you give me step-by-step hints on how to approach this task without giving away the direct answer?"
+                                                    }
+                                                )
+                                            },
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(42.dp)
+                                                .testTag("practical_task_ai_hint_btn"),
+                                            shape = RoundedCornerShape(10.dp),
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                contentColor = PrimaryIndigoLight
+                                            ),
+                                            border = CardDefaults.outlinedCardBorder().copy(
+                                                brush = SolidColor(PrimarySubtleBorder)
+                                            )
+                                        ) {
+                                            Text("💡", fontSize = 13.sp)
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = if (isTr) "AI İpucu" else "AI Hint",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                maxLines = 1
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -935,5 +1404,28 @@ fun LessonDetailScreen(
                 }
             }
         }
+    }
+}
+
+private fun getPracticalTaskStarterTemplate(courseId: String, lessonTitle: String, isTr: Boolean): String {
+    val lang = courseId.lowercase()
+    val comment = if (isTr) "Çözüm kodunuzu buraya yazın:" else "Write your solution here:"
+    return when {
+        lang.contains("kotlin") -> "// $lessonTitle\n// $comment\n\nfun main() {\n    \n}\n"
+        lang.contains("python") -> "# $lessonTitle\n# $comment\n\n"
+        lang.contains("javascript") || lang.contains("js") || lang.contains("typescript") || lang.contains("ts") -> "// $lessonTitle\n// $comment\n\n"
+        lang.contains("c") || lang.contains("cpp") -> "// $lessonTitle\n// $comment\n#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}\n"
+        lang.contains("java") -> "// $lessonTitle\npublic class Solution {\n    public static void main(String[] args) {\n        // $comment\n    }\n}\n"
+        lang.contains("dart") || lang.contains("flutter") -> "// $lessonTitle\nvoid main() {\n    // $comment\n}\n"
+        lang.contains("go") -> "// $lessonTitle\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    // $comment\n}\n"
+        lang.contains("csharp") || lang.contains("cs") -> "// $lessonTitle\nusing System;\n\nclass Program {\n    static void Main() {\n        // $comment\n    }\n}\n"
+        lang.contains("swift") -> "// $lessonTitle\nimport Foundation\n\n// $comment\n"
+        lang.contains("php") -> "<?php\n// $lessonTitle\n// $comment\n"
+        lang.contains("ruby") -> "# $lessonTitle\n# $comment\n"
+        lang.contains("rust") -> "// $lessonTitle\nfn main() {\n    // $comment\n}\n"
+        lang.contains("sql") -> "-- $lessonTitle\n-- $comment\n"
+        lang.contains("html") -> "<!-- $lessonTitle - $comment -->\n"
+        lang.contains("css") -> "/* $lessonTitle - $comment */\n"
+        else -> "// $lessonTitle\n// $comment\n"
     }
 }

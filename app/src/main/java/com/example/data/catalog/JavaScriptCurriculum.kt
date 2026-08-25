@@ -80,53 +80,58 @@ object JavaScriptCurriculum {
             id = "js_1",
             courseId = "javascript",
             sectionId = "js_sec_1",
-            title = "JavaScript'e Giriş: let, const, Veri Tipleri & Template Literals",
-            shortDesc = "Modern JS temelleri: let vs const vs var (Block vs Function Scope), Primitif Tipler, Tip Zorlama (Type Coercion: == vs ===) ve Şablon Dizgileri.",
+            title = "V8 Motoru Mimarisi, Execution Context & Değişkenler",
+            shortDesc = "V8 Ignition & TurboFan derleme hattı, Execution Context, Call Stack & Heap, Primitifler vs Referanslar, IEEE 754 ve TDZ.",
             level = CourseLevel.BEGINNER,
             order = 1,
             isPremium = false,
             learningObjectives = listOf(
-                "let ve const kullanım kurallarını ve blok kapsamını (Block Scope) öğrenmek",
-                "Primitif tipleri (Number, String, Boolean, null, undefined, Symbol, BigInt) ayırt etmek",
-                "Strict Equality (===) ile güvenli karşılaştırma yapmak",
-                "Template Literals ile çok satırlı dinamik metinler oluşturmak"
+                "V8 JavaScript motorunun Ignition (Interpreter) ve TurboFan (JIT Compiler) çalışma hattını öğrenmek",
+                "Execution Context, Call Stack ve Heap bellek organizasyonunu kavramak",
+                "Primitif tipler (IEEE 754 Float64, String, Symbol, BigInt) ile Referans nesneleri ayırt etmek",
+                "Temporal Dead Zone (TDZ) ve Strict Equality (===) mantığını derinlemesine anlamak"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("let & const vs var", "Primitif Veri Tipleri", "Strict Equality (===) vs (==)", "Template Literals", "typeof Operatörü"),
+            subtopics = listOf("V8 Engine: Ignition Interpreter & TurboFan JIT", "Execution Context & Call Stack", "Primitif Tipler (IEEE 754) vs Heap Referansları", "var, let, const & Temporal Dead Zone (TDZ)", "Strict Equality (===) & Type Coercion"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. let, const ve var Farkı",
-                    body = "• `const`: Değeri yeniden atanamaz (Re-assignment yapılamaz), blok kapsamlıdır (`{}`).\n• `let`: Değeri değiştirilebilir, blok kapsamlıdır.\n• `var`: Eski JS mirasıdır; blok kapsamını tanımaz, fonksiyon kapsamlıdır ve Hoisting nedeniyle hatalara yol açar. Modern JS'de asla kullanılmamalıdır.",
-                    codeSnippet = "const pi = 3.14159;\nlet sayac = 0;\nsayac += 1; // Geçerli"
+                    subtitle = "1. V8 Yürütme Motoru ve Execution Context Mimarisi",
+                    body = "JavaScript kodu doğrudan donanım tarafından değil; Google V8 gibi yüksek performanslı motorlar tarafından yürütülür. V8 şu aşamaları izler:\n1. **Parser & AST:** Kaynak kod ayrıştırılarak Soyut Sözdizimi Ağacı'na (AST) dönüştürülür.\n2. **Ignition (Bytecode Interpreter):** AST'yi optimize bayt koduna çevirir ve Call Stack üzerinde çalıştırmaya başlar.\n3. **TurboFan (JIT Compiler):** Sık çalışan ('hot') fonksiyonları profiller ve doğrudan makine koduna (Machine Code) derler.\n\nKod çalışırken her fonksiyon çağrısında bir **Execution Context** (Yürütme Bağlamı) üretilir. Bu bağlam; Variable Environment, Lexical Environment ve `this` bağlamını kapsüller.",
+                    codeSnippet = "// Primitifler Stack / Registry üzerinde tutulurken nesneler Heap üzerindedir:\nlet a = 42; // IEEE 754 64-bit float (Number)\nlet b = a;  // Değer kopyalanır\nb = 100;    // a etkilenmez (42 kalır)\n\nconst obj1 = { id: 1 }; // Heap üzerinde nesne tahsisi\nconst obj2 = obj1;     // Heap bellek adresi (Pointer) kopyalanır\nobj2.id = 99;\nconsole.log(obj1.id);  // 99 (Aynı heap nesnesi güncellendi)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Strict Equality (===) Neden Zorunludur?",
-                    body = "`==` operatörü tipleri otomatik dönüştürür (Type Coercion) ve `\"0\" == false` gibi yanıltıcı sonuçlar üretir. `===` ise hem değeri hem de tipi kontrol eder.",
-                    tip = "Daima `const` ile başlayın; yalnızca değeri değişmek zorunda olan değişkenler için `let` kullanın."
+                    subtitle = "2. Hoisting, Temporal Dead Zone (TDZ) ve let / const",
+                    body = "JavaScript'te derleme (Creation Phase) aşamasında tüm değişken bildirimleri taranır:\n• `var`: Global veya fonksiyon kapsamının en tepesine taşınır (hoist) ve derhal `undefined` değeri ile ilklendirilir.\n• `let` ve `const`: Bellekte ayrılır ancak ilklendirilmez (Uninitialized). Kapsamın başlangıcından değişkenin tanımlandığı satıra kadar olan bu bölgeye **Temporal Dead Zone (TDZ)** denir. TDZ içinde değişkene erişilmeye çalışılırsa `ReferenceError` fırlatılır.",
+                    codeSnippet = "console.log(eskiVar); // undefined (Hoisting çalıştı)\nvar eskiVar = 'Eski';\n\n// console.log(yeniLet); // ReferenceError: Cannot access 'yeniLet' before initialization (TDZ)\nlet yeniLet = 'Modern';"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Strict Equality (===) ve IEEE 754 Sayı Mimarisi",
+                    body = "JavaScript'te tüm sayılar 64-bit IEEE 754 çift duyarlıklı kayan nokta formatındadır (Double Precision Float). Bu nedenle `0.1 + 0.2 === 0.3` ifadesi `false` döner (`0.30000000000000004`).\n\n`==` operatörü tipleri zorlayarak (Type Coercion) `\"0\" == false` durumunda `true` döndürürken; `===` hem tip hem değer denetimi yaparak öngörülebilir ve güvenli kodlama sağlar.",
+                    tip = "Daima `const` ile başlayın; yalnızca değeri değişmek zorunda olan değişkenler için `let` kullanın. `var` modern JavaScript'te asla kullanılmamalıdır."
                 )
             ),
-            codeExample = "const kullanici = {\n    ad: \"Deniz\",\n    yas: 25,\n    diller: [\"JS\", \"Python\"]\n};\n\n// Template literal ile dinamik metin oluşturma:\nconst mesaj = \"Kullanıcı: \" + kullanici.ad + \", Yaş: \" + kullanici.yas + \", Diller: \" + kullanici.diller.join(\", \");\n\nconsole.log(mesaj);\nconsole.log(typeof kullanici.yas); // 'number'",
+            codeExample = "const kullanici = {\n    ad: \"Deniz\",\n    yas: 25,\n    diller: [\"JS\", \"Python\"]\n};\n\n// Template literal ile dinamik metin oluşturma:\nconst mesaj = `Kullanıcı: \${kullanici.ad}, Yaş: \${kullanici.yas}, Diller: \${kullanici.diller.join(\", \")}`;\n\nconsole.log(mesaj);\nconsole.log(typeof kullanici.yas); // 'number'",
             codeExplanation = "const ile immutable referans tanımlandı, template literal değişkenleri okudu ve typeof veri tipini doğruladı.",
             realWorldExample = "Tüm modern frontend kütüphaneleri (React, Vue, Node.js) veri tanımlamalarında %100 oranında const ve let blok kapsamını kullanır.",
             practicalTask = "Adınızı ve yaşınızı iki değişkende tutup konsola bir karşılama metni yazdırın.",
             starterPlaygroundCode = "const ad = \"Ali\";\nconst yas = 20;\nconsole.log(\"Merhaba \" + ad + \", yaşın: \" + yas);",
             miniQuestion = MiniQuestion(
                 id = "js_q_1",
-                question = "JavaScript'te '0 == false' ve '0 === false' ifadelerinin sonuçları sırasıyla nedir?",
-                options = listOf("true, true", "true, false", "false, false", "false, true"),
-                correctIndex = 1,
-                explanation = "== tip zorlaması (coercion) yaptığı için 0 ve false eşittir (true); === tip kontrolü de yaptığı için farklı tiptedir (false)."
+                question = "V8 motorunda 'let' ve 'const' değişkenlerinin tanımlandığı satıra kadar erişilmesini engelleyen ve ReferenceError fırlatan güvenlik bölgesine ne ad verilir?",
+                options = listOf("Temporal Dead Zone (TDZ)", "Memory Sandbox", "Garbage Collection Zone", "Stack Frame Lock"),
+                correctIndex = 0,
+                explanation = "Temporal Dead Zone (TDZ), let/const değişkenlerinin bildirilmeden önce kullanılmasını engelleyerek hataları önler."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_js_1",
                 lessonId = "js_1",
                 title = "Kullanıcı Karşılama Kartı",
-                instructions = "ad ve rol parametrelerini alıp 'Kullanıcı: [ad] (Rol: [rol])' formatında metin döndüren karsila(ad, rol) fonksiyonunu yazın.",
+                instructions = "ad ve rol parametrelerini alıp 'Kullanıcı: [ad] (Rol: [rol])' formatında template literal çıktısı üreten karsila(ad, rol) fonksiyonunu yazın.",
                 exampleInput = "karsila(\"Selin\", \"Admin\")",
                 exampleOutput = "\"Kullanıcı: Selin (Rol: Admin)\"",
                 starterCode = "function karsila(ad, rol) {\n    // Kodunu buraya yaz:\n    return \"\";\n}",
-                solutionCode = "function karsila(ad, rol) {\n    return \"Kullanıcı: \" + ad + \" (Rol: \" + rol + \")\";\n}",
-                hints = listOf("Metin birleştirme yapın."),
+                solutionCode = "function karsila(ad, rol) {\n    return `Kullanıcı: \${ad} (Rol: \${rol})`;\n}",
+                hints = listOf("Template literal `\${ad}` ve `\${rol}` kullanın."),
                 testCases = listOf(
                     TestCase("karsila(\"Selin\", \"Admin\")", "Kullanıcı: Selin (Rol: Admin)", "Format testi")
                 )
@@ -151,9 +156,9 @@ object JavaScriptCurriculum {
                 )
             ),
             completionCriteria = listOf(
-                "let, const ve var farkını bilmek",
-                "=== ile kesin tip ve değer eşitliğini denetlemek",
-                "Template Literals ile formatlı metin üretebilmek"
+                "V8 derleme hattını ve Execution Context yapısını kavramak",
+                "let, const ve TDZ mekanizmasını bilmek",
+                "=== ile kesin tip ve değer eşitliğini denetlemek"
             )
         ),
 
@@ -164,28 +169,34 @@ object JavaScriptCurriculum {
             id = "js_2",
             courseId = "javascript",
             sectionId = "js_sec_1",
-            title = "Kontrol Akışı, Döngüler & Arrow Functions (Lexical this)",
-            shortDesc = "Kısa devre operatörleri (&&, ||, ??), for...of döngüleri, Fonksiyon Bildirimleri vs Arrow Functions ve kritik 'lexical this' farkı.",
+            title = "Kontrol Akışı, İterasyon & Arrow Functions (Lexical this)",
+            shortDesc = "Kısa devre operatörleri (&&, ||, ??), Symbol.iterator protokolü, for...of vs for...in ve Arrow Function Lexical this mekanizması.",
             level = CourseLevel.BEGINNER,
             order = 2,
             isPremium = false,
             learningObjectives = listOf(
-                "Nullish Coalescing (??) ile mantıksal OR (||) farkını kavramak",
-                "for...of (değerler) ile for...in (anahtarlar) arasındaki ayrımı öğrenmek",
-                "Arrow Functions sözdizimini ve 'this' bağlamını miras almasını (Lexical Scope) anlamak"
+                "Nullish Coalescing (??) ile mantıksal OR (||) arasındaki Falsy farklarını kavramak",
+                "JavaScript İteratör Protokolünü (Symbol.iterator, next()) ve for...of döngüsünü öğrenmek",
+                "Arrow Functions sözdizimini ve 'Lexical this' miras alma mekanizmasını derinlemesine anlamak",
+                "call, apply ve bind metotları ile dinamik this bağlamı arasındaki farkı bilmek"
             ),
             prerequisites = listOf("JavaScript Temelleri ve Değişkenler"),
-            subtopics = listOf("Nullish Coalescing (??)", "Ternary & Short-Circuit", "for...of vs for...in", "Arrow Functions Sözdizimi", "Lexical 'this' Davranışı"),
+            subtopics = listOf("Nullish Coalescing (??) vs OR (||)", "Short-Circuiting Bytecode Değerlendirmesi", "JavaScript İteratör Protokolü (Symbol.iterator)", "for...of vs for...in Döngüleri", "Arrow Functions vs Standart Fonksiyonlar & Lexical 'this'"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Nullish Coalescing (??) vs OR (||)",
-                    body = "`||` operatörü `0`, `\"\"`, `false` gibi falsy değerlerde de sağdaki yedeğe geçer. `??` ise YALNIZCA `null` veya `undefined` olduğunda yedeğe geçer; bu sayede `sayac = 0` değerini ezmez.",
-                    codeSnippet = "const puan = 0;\nconst v1 = puan || 10; // 10 (Hatalı! 0'ı yok saydı)\nconst v2 = puan ?? 10; // 0 (Doğru!)"
+                    subtitle = "1. Nullish Coalescing (??) ve Kısa Devre Mantığı",
+                    body = "`||` operatörü solundaki değer Falsy (`0`, `\"\"`, `false`, `null`, `undefined`, `NaN`) olduğunda sağdaki varsayılan değere geçer. Bu durum `0` sayısının geçerli bir değer olduğu senaryolarda (örn: limit = 0, koordinat = 0) kritik hatalara yol açar.\n\n`??` (Nullish Coalescing) operatörü ise SADECE solundaki değer `null` veya `undefined` (Nullish) olduğunda sağa geçer; `0`, `false` ve `\"\"` değerlerini korur.",
+                    codeSnippet = "const limit = 0;\nconst a = limit || 100; // 100 (HATA! 0 ezildi)\nconst b = limit ?? 100; // 0 (DOĞRU! Nullish korundu)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Arrow Functions ve Lexical this",
-                    body = "Geleneksel fonksiyonlarda `this` fonksiyonun NASIL çağrıldığına bağlıdır. Arrow functions (`() => {}`) ise kendi `this` bağlamına sahip DEĞİLDİR; tanımlandığı çevreleyen kapsamın `this` değerini aynen kullanır.",
-                    tip = "Nesne metotlarında geleneksel fonksiyon, callback ve dizi dönüşümlerinde ise daima arrow function tercih edin."
+                    subtitle = "2. İteratör Protokolü (Symbol.iterator) ve for...of",
+                    body = "JavaScript'te bir nesnenin `for...of` döngüsü ile gezilebilmesi için `[Symbol.iterator]` metodunu içermesi gerekir. Bu metot her adımda `{ value: any, done: boolean }` nesnesi döndüren bir iteratör üretir.\n\n• `for...of`: Yinelenebilir nesnelerin (Array, Map, Set, String) doğrudan değerlerini (values) gezer.\n• `for...in`: Nesnelerin sayılabilir özellik anahtarlarını (keys) ve prototip zincirini gezer (Dizilerde asla kullanılmamalıdır).",
+                    codeSnippet = "const dizi = ['A', 'B'];\nconst it = dizi[Symbol.iterator]();\nconsole.log(it.next()); // { value: 'A', done: false }\nconsole.log(it.next()); // { value: 'B', done: false }\nconsole.log(it.next()); // { value: undefined, done: true }"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Arrow Functions ve 'Lexical this' Mekanizması",
+                    body = "Geleneksel `function` bildirimlerinde `this` dinamiktir; fonksiyonun nerede tanımlandığına değil, NASIL çağrıldığına (Call-Site) göre belirlenir (`obj.metot()`, `call()`, `apply()`, `bind()`).\n\nArrow Functions (`() => {}`) kendi `this`, `arguments`, `super` veya `new.target` bağlamlarına sahip değildir. Tanımlandıkları çevreleyen kapsamın (Lexical Scope) `this` değerini doğrudan miras alırlar.",
+                    codeSnippet = "const sayac = {\n    deger: 0,\n    baslat() {\n        // Arrow function lexical this miras alır, sayac nesnesini gösterir:\n        setTimeout(() => {\n            this.deger++;\n            console.log('Sayaç:', this.deger);\n        }, 100);\n    }\n};\nsayac.baslat();"
                 )
             ),
             codeExample = "const sayilar = [10, 20, 30];\n\n// for...of ile elemanları gezme:\nfor (const sayi of sayilar) {\n    console.log(\"Eleman: \" + sayi);\n}\n\n// Arrow function ile tek satırlık çarpım:\nconst kareAl = x => x * x;\nconsole.log(\"Kare: \" + kareAl(5)); // 25",
@@ -231,13 +242,13 @@ object JavaScriptCurriculum {
             qaItems = listOf(
                 TopicQAItem(
                     question = "for...in ile for...of arasındaki fark nedir?",
-                    answer = "`for...in` nesnelerin veya dizilerin anahtarları/indeksleri (keys) üzerinde döner. `for...of` ise yinelenebilir nesnelerin (Iterable: Array, Map, Set) doğrudan değerleri (values) üzerinde döner."
+                    answer = "`for...in` nesnelerin anahtarları/indeksleri (keys) ve prototip zinciri üzerinde döner. `for...of` ise yinelenebilir nesnelerin (Iterable: Array, Map, Set) doğrudan değerleri (values) üzerinde döner."
                 )
             ),
             completionCriteria = listOf(
                 "?? ile || arasındaki falsy farkını bilmek",
-                "for...of döngüsünü kullanabilmek",
-                "Arrow functions ve lexical this mantığını kavramak"
+                "İteratör protokolünü ve for...of döngüsünü kavramak",
+                "Arrow functions ve lexical this mantığını derinlemesine açıklayabilmek"
             )
         ),
 
@@ -248,28 +259,29 @@ object JavaScriptCurriculum {
             id = "js_3",
             courseId = "javascript",
             sectionId = "js_sec_2",
-            title = "Nesneler, Destructuring, Rest & Spread Operatörü",
-            shortDesc = "ES6+ veri parçalama: Array/Object Destructuring, Yeniden isimlendirme, Varsayılan değerler, Spread (...) ile kopyalama ve Rest parametreleri.",
+            title = "Nesne Mimarisi, Destructuring, Rest & Spread",
+            shortDesc = "Property Descriptors, Array/Object Destructuring, Yeniden isimlendirme, Rest/Spread mekanizması ve Shallow vs structuredClone derin kopyalama.",
             level = CourseLevel.BEGINNER,
             order = 3,
             isPremium = false,
             learningObjectives = listOf(
-                "Nesne ve Dizi Destructuring ile temiz kod yazmak",
-                "Destructuring sırasında yeniden isimlendirme ve varsayılan değer atamak",
-                "Spread operatörü ile değişmez (immutable) nesne kopyalama ve birleştirme yapmak"
+                "Nesne Özellik Tanımlayıcılarını (Property Descriptors: enumerable, writable, configurable) anlamak",
+                "İç içe Destructuring, Takma Ad (Aliasing) ve Varsayılan Değer desenlerini ustaca uygulamak",
+                "Spread (...) operatörünün sığ kopyalama (Shallow Copy) sınırlarını ve structuredClone() derin kopyalama motorunu kavramak",
+                "Rest parametreleri (...args) ile değişken parametreli fonksiyonlar tasarlamak"
             ),
             prerequisites = listOf("Kontrol Akışı ve Arrow Functions"),
-            subtopics = listOf("Object Destructuring", "Array Destructuring", "Destructuring Renaming & Defaults", "Spread Operatörü (...)", "Rest Parametreleri (...args)"),
+            subtopics = listOf("Nesne Mimarisi & Property Descriptors", "Object & Nested Array Destructuring", "Destructuring Takma Adları (Aliasing) & Defaults", "Spread (...) Operatörü & Shallow Copy Sınırları", "structuredClone() ile Deep Copy & Rest Parametreleri"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Object Destructuring",
-                    body = "Nesnelerin içindeki alanları doğrudan değişken olarak ayıklayabilir, yeniden isimlendirebilir ve varsayılan değer verebilirsiniz.",
-                    codeSnippet = "const kisi = { ad: \"Can\", rol: \"Admin\" };\nconst { ad, rol: unvan, sehir = \"İstanbul\" } = kisi;\n// ad: 'Can', unvan: 'Admin', sehir: 'İstanbul'"
+                    subtitle = "1. Object ve Array Destructuring İleri Desenleri",
+                    body = "Destructuring, veri yapılarını parçalayarak yerel değişkenlere bağlama mekanizmasıdır:\n• Yeniden isimlendirme (Aliasing): `{ ad: kullaniciAdi }`\n• Varsayılan değerler: `{ rol = 'Misafir' }`\n• İç içe ayıklama: `const { adres: { sehir } } = kullanici;`\n• Kalan elemanları toplama (Rest): `const [ilk, ...kalanlar] = dizi;`",
+                    codeSnippet = "const yanit = { data: { user: { id: 101, username: 'dev' } }, status: 200 };\nconst { data: { user: { username: kullaniciAdi } }, status } = yanit;\nconsole.log(kullaniciAdi, status); // 'dev', 200"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Spread (...) ile Immutable Kopyalama",
-                    body = "Mevcut bir nesneyi bozmadan yeni alanlar eklemek için Spread kullanılır (React State mantığı).",
-                    codeSnippet = "const eskiState = { sayac: 1, yukleniyor: false };\nconst yeniState = { ...eskiState, yukleniyor: true };"
+                    subtitle = "2. Spread (...) vs structuredClone() (Shallow vs Deep Copy)",
+                    body = "Spread (`{ ...obj }` veya `[...dizi]`) işlemi **Shallow Copy** (Sığ Kopyalama) yapar. İlk seviyedeki primitif değerleri kopyalar; ancak iç içe nesnelerin yalnızca bellek işaretçilerini (referanslarını) kopyalar. İçteki bir nesne değiştirilirse orijinal nesne de mutasyona uğrar!\n\nTam bağımsız derin bir kopya üretmek için modern JavaScript'in yerleşik **`structuredClone(obj)`** API'si kullanılmalıdır.",
+                    codeSnippet = "const orijinal = { ad: 'Emre', ayarlar: { tema: 'Koyu' } };\n\n// Sığ Kopyalama (Spread):\nconst sigKopya = { ...orijinal };\nsigKopya.ayarlar.tema = 'Açık';\nconsole.log(orijinal.ayarlar.tema); // 'Açık' (Orijinal bozuldu!)\n\n// Derin Kopyalama (structuredClone):\nconst derinKopya = structuredClone(orijinal);\nderinKopya.ayarlar.tema = 'Mavi';\nconsole.log(orijinal.ayarlar.tema); // 'Açık' (Orijinal korundu!)"
                 )
             ),
             codeExample = "const kullanici = {\n    id: 101,\n    ad: \"Ece\",\n    iletisim: { email: \"ece@test.com\", tel: \"555-1234\" },\n    roller: [\"Kullanıcı\", \"Yazar\"]\n};\n\n// İç içe destructuring ve spread:\nconst { ad, iletisim: { email }, roller: [anaRol] } = kullanici;\nconst guncelKullanici = { ...kullanici, sonGiris: \"Bugün\" };\n\nconsole.log(\"Ad: \" + ad + \", Email: \" + email + \", Rol: \" + anaRol);\nconsole.log(guncelKullanici);",
@@ -303,12 +315,12 @@ object JavaScriptCurriculum {
                     id = "js_quiz_3_1",
                     lessonId = "js_3",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "JavaScript'te bir fonksiyonun alacağı tüm argümanları bir dizi olarak toplayan sözdizimi hangisidir?",
-                    options = listOf("arguments object", "Rest parametresi (...args)", "Spread parametresi", "Array.from()"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Fonksiyon tanımındaki '...args' gelen tüm ek parametreleri gerçek bir JavaScript dizisi olarak toplar.",
-                    explanationWrong = "Rest parametresi (...args) kullanılır.",
-                    reviewTopic = "Rest Parameters"
+                    questionText = "JavaScript'te iç içe geçmiş karmaşık bir nesneyi tüm alt dallarıyla birlikte tam bağımsız kopyalamak (Deep Clone) için modern yerleşik standart hangisidir?",
+                    options = listOf("Object.assign()", "Spread operatörü ({...obj})", "structuredClone(obj)", "Array.prototype.slice()"),
+                    correctOptionIndex = 2,
+                    explanationRight = "Doğru! structuredClone() tarayıcılarda ve Node.js'te döngüsel referansları da destekleyen yerleşik derin kopyalama API'sidir.",
+                    explanationWrong = "structuredClone(obj) kullanılır.",
+                    reviewTopic = "Deep Clone API"
                 )
             ),
             qaItems = listOf(
@@ -319,7 +331,7 @@ object JavaScriptCurriculum {
             ),
             completionCriteria = listOf(
                 "Array ve Object Destructuring yapabilmek",
-                "Destructuring'de varsayılan ve takma ad kullanımını bilmek",
+                "Shallow copy ve structuredClone deep copy farkını bilmek",
                 "Spread ve Rest operatörlerini doğru ayırt etmek"
             )
         ),
@@ -331,28 +343,34 @@ object JavaScriptCurriculum {
             id = "js_4",
             courseId = "javascript",
             sectionId = "js_sec_3",
-            title = "Fonksiyonel Dizi Metotları: map, filter, reduce & flatMap",
-            shortDesc = "Modern veri işleme: map, filter, reduce, find, some, every, flatMap ve method chaining ile deklaratif veri akışları.",
+            title = "Fonksiyonel Dizi Mimarisi, V8 Elements & Transducers",
+            shortDesc = "V8 Fast Elements (PACKED_SMI vs HOLEY), map, filter, reduce akümülatör mimarisi, Saf Fonksiyonlar ve toSorted/toReversed.",
             level = CourseLevel.INTERMEDIATE,
             order = 4,
             isPremium = true,
             learningObjectives = listOf(
-                "map, filter ve reduce ile dizileri mutasyona uğratmadan dönüştürmek",
-                "reduce akümülatörü ile toplam, gruplama ve frekans tabloları oluşturmak",
-                "flatMap ile iç içe dizileri tek hamlede düzleştirmek ve dönüştürmek"
+                "V8 motorunun dizi bellek modellerini (PACKED_SMI, PACKED_DOUBLE, HOLEY Elements) öğrenmek",
+                "map, filter ve reduce ile saf (Pure), yan etkisiz veri dönüştürme boru hatları kurmak",
+                "reduce akümülatörü ile tek geçişte (single-pass) karmaşık gruplama ve frekans hesaplama yapmak",
+                "ECMAScript 2023 değişmez (Immutable) dizi metotlarını (toSorted, toReversed, toSpliced) kullanmak"
             ),
             prerequisites = listOf("Destructuring ve Spread Operatörü"),
-            subtopics = listOf("map (Dönüşüm)", "filter (Eleme)", "reduce (Akümülasyon)", "find & findIndex", "some & every", "flatMap"),
+            subtopics = listOf("V8 Dizi Optimizasyonları (Packed vs Holey)", "map (Projeksiyon & Yeni Dizi)", "filter (Koşullu Eleme)", "reduce (Akümülatör & İndirgeme Deseni)", "İmmutable Dizi Metotları (toSorted, toReversed, with)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. reduce: İsviçre Çakısı",
-                    body = "`reduce((acc, cur) => ..., initialValue)` dizideki tüm elemanları tek bir değere (sayı, nesne veya yeni bir diziye) indirger.",
-                    codeSnippet = "const sayilar = [10, 20, 30];\nconst toplam = sayilar.reduce((acc, curr) => acc + curr, 0); // 60"
+                    subtitle = "1. V8 Fast Elements Mimarisi (PACKED vs HOLEY)",
+                    body = "V8 dizileri performansına göre dahili olarak sınıflandırır:\n• `PACKED_SMI_ELEMENTS`: Yalnızca küçük tamsayılar içeren, boşluğu olmayan en hızlı dizi.\n• `PACKED_DOUBLE_ELEMENTS`: Kayan noktalı sayılar içeren dizi.\n• `HOLEY_ELEMENTS`: İçinde `delete arr[i]` yapılmış veya `arr[100] = 5` ile arada boşluklar bırakılmış seyrek dizi.\n\nBoşluklu (Holey) diziler V8'i prototip zincirini taramaya zorlar ve performansı ciddi şekilde düşürür. Bu nedenle diziler daima ardışık doldurulmalıdır.",
+                    codeSnippet = "const hizliDizi = [1, 2, 3, 4]; // PACKED_SMI\nhizliDizi.push(5);              // Optimize kalır\n\ndelete hizliDizi[1];             // HOLEY_ELEMENTS'e düşer (Yavaşlar!)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Zincirleme Metotlar (Method Chaining)",
-                    body = "Fonksiyonel programlamada veriler for döngüleri yerine `data.filter(...).map(...).reduce(...)` zinciriyle işlenir.",
-                    tip = "Dizi üzerinde arama yaparken ilk eşleşen elemanı bulmak için filter yerine `find` kullanın; ilk elemanı bulduğu an aramayı durdurur."
+                    subtitle = "2. reduce Akümülatörü ile Tek Geçişli (Single-Pass) Veri İşleme",
+                    body = "`reduce` en güçlü fonksiyonel metottur. `map` ve `filter` art arda zincirlendiğinde dizi üzerinde iki ayrı döngü oluşurken, `reduce` her iki işlemi tek bir geçişte (single pass) tamamlayabilir.",
+                    codeSnippet = "const islemler = [\n    { tip: 'GELIR', tutar: 1000 },\n    { tip: 'GIDER', tutar: 300 },\n    { tip: 'GELIR', tutar: 500 }\n];\n\n// Tek geçişte hem bakiye hem de işlem adedi hesaplama:\nconst ozet = islemler.reduce((acc, islem) => {\n    if (islem.tip === 'GELIR') acc.toplamGelir += islem.tutar;\n    else acc.toplamGider += islem.tutar;\n    acc.islemSayisi++;\n    return acc;\n}, { toplamGelir: 0, toplamGider: 0, islemSayisi: 0 });"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. ECMAScript 2023 Değişmez (Immutable) Dizi Metotları",
+                    body = "Geleneksel `sort()`, `reverse()` ve `splice()` orijinal diziyi mutasyona uğratır (impure). ES2023 ile gelen `toSorted()`, `toReversed()`, `toSpliced()` ve `with(index, value)` orijinal diziyi koruyarak yeni bir kopya döner.",
+                    codeSnippet = "const sayilar = [3, 1, 4, 1, 5];\nconst sirali = sayilar.toSorted((a, b) => a - b);\nconsole.log(sayilar); // [3, 1, 4, 1, 5] (Orijinal bozulmadı!)\nconsole.log(sirali);  // [1, 1, 3, 4, 5]"
                 )
             ),
             codeExample = "const urunler = [\n    { ad: \"Klavye\", fiyat: 500, kategori: \"Elektronik\" },\n    { ad: \"Mouse\", fiyat: 250, kategori: \"Elektronik\" },\n    { ad: \"Defter\", fiyat: 40, kategori: \"Kırtasiye\" }\n];\n\n// Elektronik ürünlerin toplam fiyatını hesaplayalım:\nconst elektronikToplam = urunler\n    .filter(u => u.kategori === \"Elektronik\")\n    .map(u => u.fiyat)\n    .reduce((toplam, f) => toplam + f, 0);\n\nconsole.log(\"Elektronik Toplam: \" + elektronikToplam + \" TL\");",
@@ -362,10 +380,10 @@ object JavaScriptCurriculum {
             starterPlaygroundCode = "const sayilar = [1, 2, 3, 4];\nconsole.log(sayilar.filter(x => x % 2 === 0));",
             miniQuestion = MiniQuestion(
                 id = "js_q_4",
-                question = "JavaScript'te 'every()' metodu dizi elemanları için ne zaman 'true' döner?",
-                options = listOf("En az bir eleman koşulu sağladığında", "Dizideki TÜM elemanlar verilen test fonksiyonunu geçtiğinde", "Dizi boş olduğunda false döner", "İlk eleman true olduğunda"),
-                correctIndex = 1,
-                explanation = "every() dizideki istisnasız tüm elemanlar testi geçtiğinde true döner; bir tanesi bile bozarsa false döner."
+                question = "JavaScript ES2023 ile gelen ve orijinal diziyi bozmadan sıralanmış yeni bir kopya döndüren saf metot hangisidir?",
+                options = listOf("toSorted()", "sort()", "quickSort()", "immutableSort()"),
+                correctIndex = 0,
+                explanation = "toSorted() metodu orijinal diziyi mutasyona uğratmadan sıralanmış yeni bir dizi döndürür."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_js_4",
@@ -401,9 +419,9 @@ object JavaScriptCurriculum {
                 )
             ),
             completionCriteria = listOf(
+                "V8 dizi yapılarını ve optimizasyonlarını kavramak",
                 "map, filter ve reduce ile veri dönüştürebilmek",
-                "Saf (pure) dizi metotlarını mutasyonlu olanlardan ayırmak",
-                "find, some, every kontrol metotlarını kullanmak"
+                "ES2023 toSorted() ve immutable metotları kullanabilmek"
             )
         ),
 
@@ -414,28 +432,34 @@ object JavaScriptCurriculum {
             id = "js_5",
             courseId = "javascript",
             sectionId = "js_sec_4",
-            title = "Kapsam (Scope), Hoisting & Closures (Kapanışlar)",
-            shortDesc = "JS'nin kalbi: Lexical Scope, Hoisting mekanizması, Closures (Kapanışlar), Kapsülleme (Private Data), Fabrika Fonksiyonları ve Currying.",
+            title = "Scope Chain, Closures & Bellek Yönetimi",
+            shortDesc = "Lexical Environment, Scope Chain çözümlemesi, Closures dahili bellek modeli, Data Encapsulation ve Memory Leak önleme.",
             level = CourseLevel.INTERMEDIATE,
             order = 5,
             isPremium = true,
             learningObjectives = listOf(
-                "Lexical Environment ve Scope Chain mekanizmasını kavramak",
-                "Hoisting sırasında var vs let/const (Temporal Dead Zone - TDZ) farkını anlamak",
-                "Closures kullanarak dışarıdan erişilemeyen özel değişkenler (Private State) üretmek"
+                "Lexical Environment Records ve Scope Chain arama hiyerarşisini derinlemesine anlamak",
+                "Closure'ların Heap bellek tahsisi ve Garbage Collector (Mark-and-Sweep) etkileşimini kavramak",
+                "Özel durumları (Private State) kapsüllemek için Closure fabrika fonksiyonları yazmak",
+                "Gereksiz Closure referanslarından kaynaklanan bellek sızıntılarını (Memory Leaks) önlemek"
             ),
             prerequisites = listOf("Fonksiyonel Dizi Metotları"),
-            subtopics = listOf("Lexical Environment", "Temporal Dead Zone (TDZ)", "Closure Nedir?", "Data Encapsulation (Özel Değişkenler)", "Function Currying"),
+            subtopics = listOf("Lexical Environment & Environment Records", "Scope Chain Çözümlemesi", "Closures Bellek Mimarisi & Heap Tahsisi", "Data Encapsulation (Gizli State & Modül Deseni)", "Garbage Collection & Memory Leak Önleme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Closure Nedir?",
-                    body = "Bir fonksiyonun, dışındaki (çevreleyen) fonksiyon sonlansa bile onun değişkenlerini hatırlaması ve bunlara erişmeye devam etmesi yeteneğidir.",
-                    codeSnippet = "function sayacOlustur() {\n    let sayi = 0; // Private state\n    return () => ++sayi;\n}\nconst sayac = sayacOlustur();\nsayac(); // 1\nsayac(); // 2"
+                    subtitle = "1. Lexical Environment ve Scope Chain Çözümlemesi",
+                    body = "Her fonksiyon oluşturulduğunda gizli bir `[[Environment]]` özelliğiyle tanımlandığı Lexical Environment'a bağlanır.\n\nBir değişkene erişilmek istendiğinde JavaScript motoru **Scope Chain** boyunca arama yapar: Önce mevcut fonksiyonun Environment Record'una bakar; bulamazsa dış çevreleyen (outer) fonksiyona, en son Global Environment'a kadar tırmanır.",
+                    codeSnippet = "const globalVar = 'Global';\nfunction dis() {\n    const disVar = 'Dış';\n    function ic() {\n        const icVar = 'İç';\n        console.log(icVar, disVar, globalVar); // Scope chain ile yukarı tırmanır\n    }\n    return ic;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Temporal Dead Zone (TDZ)",
-                    body = "`let` ve `const` hoist edilir ancak başlatılmaz. Tanımlandıkları satıra kadar olan bölgeye TDZ denir ve bu aralıkta değişkene erişilirse `ReferenceError` fırlatılır.",
-                    tip = "Closure'lar bellek yönetiminde dikkat gerektirir; gereksiz closure referansları değişkenlerin Garbage Collector tarafından temizlenmesini engelleyebilir."
+                    subtitle = "2. Closure (Kapanış) Bellek Modeli ve Heap Tahsisi",
+                    body = "Normal şartlarda bir fonksiyon çalışıp bittiğinde yerel değişkenleri Call Stack'ten silinir.\n\nAncak iç fonksiyon dış fonksiyonun bir değişkenini referans alıyorsa (Closure), V8 motoru bu değişkeni Stack yerine **Heap** belleğe taşır (Context Allocation). Dış fonksiyon sonlansa bile iç fonksiyon referansı yaşadığı sürece bu Heap alanı Garbage Collector tarafından temizlenmez.",
+                    codeSnippet = "function sayacUretici() {\n    let sayi = 0; // Heap üzerinde korunur (Private State)\n    return {\n        artir: () => ++sayi,\n        deger: () => sayi\n    };\n}\nconst sayac = sayacUretici();\nconsole.log(sayac.artir()); // 1\nconsole.log(sayac.artir()); // 2\n// console.log(sayac.sayi); // undefined (Doğrudan erişilemez!)"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Bellek Sızıntılarını (Memory Leak) Engelleme",
+                    body = "Closure'lar kapatılan değişkenlerin GC tarafından toplanmasını engeller. Eğer büyük veri yapıları veya DOM referansları gereksiz yere closure içinde tutulursa bellek sızıntısı oluşur. İşi biten olay dinleyicileri (Event Listeners) temizlenmeli veya `WeakMap` / `WeakRef` kullanılmalıdır.",
+                    tip = "Closure'lar React'in `useState` ve `useEffect` hook'larının bellek yönetiminin temelini oluşturur."
                 )
             ),
             codeExample = "function bankaHesabi(baslangicBakiye) {\n    let bakiye = baslangicBakiye; // Dışarıdan doğrudan erişilemez!\n    \n    return {\n        paraYatir: (miktar) => { bakiye += miktar; },\n        paraCek: (miktar) => {\n            if (miktar <= bakiye) bakiye -= miktar;\n            else console.log(\"Yetersiz Bakiye!\");\n        },\n        bakiyeGoster: () => bakiye\n    };\n}\n\nconst hesap = bankaHesabi(1000);\nhesap.paraYatir(500);\nconsole.log(\"Mevcut Bakiye: \" + hesap.bakiyeGoster() + \" TL\"); // 1500",
@@ -508,16 +532,16 @@ object JavaScriptCurriculum {
                 "extends, super() ve private class fields (#alan) ile nesne yönelimli mimariler tasarlamak"
             ),
             prerequisites = listOf("Scope, Hoisting ve Closures"),
-            subtopics = listOf("Prototip Zinciri (Prototype Chain)", "Object.prototype & __proto__", "ES6 Class & constructor", "extends & super()", "Private Fields (#) & Getters/Setters"),
+            subtopics = listOf("Prototip Tabanlı Kalıtım (Prototypal Inheritance)", "prototype vs __proto__", "ES6 Sınıfları & constructor", "Kalıtım: extends & super()", "Private Class Fields (#) & Encapsulation"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Prototip Zinciri Nasıl Çalışır?",
-                    body = "Bir nesnenin özelliğine erişildiğinde JS önce nesnenin kendisine bakar. Bulamazsa onun prototipine (`__proto__`), oradan `Object.prototype`'a kadar zinciri tırmanır. Bulamazsa `undefined` döner.",
-                    codeSnippet = "class Hayvan {\n    constructor(isim) { this.isim = isim; }\n    sesCikar() { return \"Ses\"; }\n}\nclass Kopek extends Hayvan {\n    sesCikar() { return super.sesCikar() + \" -> Hav Hav!\"; }\n}"
+                    subtitle = "1. Prototip Zinciri (Prototype Chain) ve ES6 Sınıfları",
+                    body = "JavaScript nesne yönelimli diller gibi 'Class-based' değil, 'Prototype-based' bir dildir. ES6 `class` sözdizimi, arka plandaki prototip zincirini saran şık bir sözdizimsel şekerdir (Syntactic Sugar).\n\nBir nesnenin `obj.metot()` çağrıldığında, motor önce nesnenin kendi alanlarına bakar; bulamazsa `obj.__proto__` üzerinden prototip zincirini tırmanarak `Object.prototype`'a kadar arar.",
+                    codeSnippet = "class Hayvan {\n    constructor(isim) { this.isim = isim; }\n    sesCikar() { return \"Genel ses\"; }\n}\n\nclass Kedi extends Hayvan {\n    sesCikar() {\n        return `\${super.sesCikar()} -> Miyav!`;\n    }\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Gerçek Özel Alanlar (#private)",
-                    body = "Modern JavaScript'te `#` ile başlayan sınıf alanları sınıf dışından hiçbir şekilde okunamaz veya değiştirilemez (Hard Private).",
+                    subtitle = "2. Gerçek Özel Alanlar (#private) ve Kapsülleme",
+                    body = "Eski JS'deki `_gizliAlan` konvansiyonu dışarıdan erişimi engellemezdi. Modern JavaScript'te `#` önekiyle tanımlanan alanlar (`#sifre`) hem derleme hem çalışma anında sınıf dışından tamamen gizlenir (Hard Private).",
                     tip = "Sınıf metotları prototipe tek bir kez yazılır; constructor içindeki metotlar ise her nesne örneğinde yeniden oluşturulup bellek harcar."
                 )
             ),
@@ -591,16 +615,16 @@ object JavaScriptCurriculum {
                 "Promise.all, Promise.allSettled ve Promise.race ile çoklu asenkron işlemleri yönetmek"
             ),
             prerequisites = listOf("Prototip Zinciri ve ES6 Sınıfları"),
-            subtopics = listOf("Promise Mimarisi", "then, catch, finally", "async / await Sözdizimi", "Hata Yönetimi (try/catch)", "Promise.all vs allSettled vs race"),
+            subtopics = listOf("Promise Durum Makinesi (State Machine)", ".then(), .catch() & .finally()", "async / await Sözdizimsel Şekeri", "Hata Yönetimi (try/catch blokları)", "Promise Combinators (all, allSettled, race, any)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Promise Durumları",
-                    body = "Bir Promise 3 durumdan birinde olabilir:\n1. `Pending`: Henüz tamamlanmadı.\n2. `Fulfilled`: Başarıyla bitti (`resolve(deger)`).\n3. `Rejected`: Hata ile sonuçlandı (`reject(hata)`).",
-                    codeSnippet = "const bekle = ms => new Promise(res => setTimeout(res, ms));\nasync function test() {\n    await bekle(1000);\n    console.log(\"1 sn geçti\");\n}"
+                    subtitle = "1. Promise Durum Makinesi ve async/await Mimarisi",
+                    body = "Promise, gelecekte tamamlanacak bir asenkron işlemin nihai sonucunu temsil eder. 3 durumdan birinde bulunur:\n\n• `Pending`: İşlem sürüyor.\n• `Fulfilled`: Başarıyla bitti (`resolve(veri)`).\n• `Rejected`: Hata ile sonuçlandı (`reject(hata)`).\n\n`async/await` ise Promise zincirlerini (`.then().then()`) düz senkron kod gibi okunabilir ve `try/catch` ile yakalanabilir hale getirir.",
+                    codeSnippet = "async function kullaniciYukle(id) {\n    try {\n        const yanit = await fetch(`/api/users/\${id}`);\n        if (!yanit.ok) throw new Error(`HTTP Hata: \${yanit.status}`);\n        const veri = await yanit.json();\n        return veri;\n    } catch (err) {\n        console.error('Kullanıcı çekilemedi:', err.message);\n    }\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Promise.all vs Promise.allSettled",
-                    body = "• `Promise.all`: İsteklerden BİRİ BİLE hata verirse anında çöker (Fail-fast).\n• `Promise.allSettled`: Hata verse bile tüm isteklerin bitmesini bekler ve her birinin sonucunu `{ status, value/reason }` olarak döndürür.",
+                    subtitle = "2. Promise Kombinatörleri (all vs allSettled vs race)",
+                    body = "• `Promise.all([p1, p2])`: Tüm istekleri paralel koşturur. BİRİ BİLE hata verirse anında çöker (Fail-Fast).\n• `Promise.allSettled([p1, p2])`: Hiçbir zaman erken çökmez; tüm işlemlerin bitmesini bekler ve sonuçları `{ status: 'fulfilled'|'rejected', value, reason }` dizisi olarak verir.\n• `Promise.race([p1, p2])`: İlk sonuçlanan (hata veya başarı) Promise'in değerini alır.",
                     tip = "Bağımsız paralel API isteklerinde `await api1(); await api2();` yerine `await Promise.all([api1(), api2()]);` kullanarak süreyi yarıya indirin."
                 )
             ),
@@ -674,16 +698,16 @@ object JavaScriptCurriculum {
                 "Microtask (Promise) kuyruğunun Macrotask (setTimeout) kuyruğuna olan MUTLAK ÖNCELİĞİNİ kodla kanıtlamak"
             ),
             prerequisites = listOf("Promises ve Async/Await"),
-            subtopics = listOf("Single Thread & Call Stack", "Web APIs & Asenkron Delegasyon", "Microtask Queue (Promises)", "Macrotask Queue (setTimeout, setInterval)", "Event Loop Öncelik Sıralaması"),
+            subtopics = listOf("Single-Threaded Call Stack Mimarisi", "Web APIs & Arka Plan İşlemleri", "Microtask Queue (Promise.then, queueMicrotask)", "Macrotask Queue (setTimeout, setInterval, I/O)", "Event Loop Öncelik Döngüsü"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Event Loop Öncelik Kuralı",
-                    body = "1. Call Stack'teki tüm senkron kodlar çalıştırılır.\n2. Call Stack boşaldığında, Microtask Queue'daki (Promise .then/catch, queueMicrotask) TÜM görevler bitene kadar boşaltılır.\n3. Ardından Macrotask Queue'dan (setTimeout, setInterval) TEK BİR görev alınır ve süreç tekrarlanır.",
-                    codeSnippet = "console.log('1'); // Senkron\nsetTimeout(() => console.log('2'), 0); // Macrotask\nPromise.resolve().then(() => console.log('3')); // Microtask\nconsole.log('4'); // Senkron\n// Sıralama: 1, 4, 3, 2"
+                    subtitle = "1. Event Loop ve Görev Kuyruklarının Kesin Öncelik Sıralaması",
+                    body = "JavaScript tek iş parçacıklıdır (Single-Threaded). Asenkronluğu yöneten Event Loop şu kesin sırayla döner:\n\n1. **Call Stack:** Senkron kodlar yukarıdan aşağıya işlenir ve stack sıfırlanır.\n2. **Microtask Queue:** Call Stack boşaldığı anda, kuyruktaki TÜM microtask'lar (`Promise.then/catch/finally`, `queueMicrotask`, `MutationObserver`) tamamen bitene kadar işlenir.\n3. **Render (Yenileme):** Tarayıcı ekranı günceller (varsa).\n4. **Macrotask Queue:** Kuyruktaki SADECE BİR Macrotask (`setTimeout`, `setInterval`, `setImmediate`, I/O) çağrılır ve döngü 1. adıma başa döner.",
+                    codeSnippet = "console.log('1: Senkron');\nsetTimeout(() => console.log('2: Macrotask (setTimeout)'), 0);\nPromise.resolve().then(() => console.log('3: Microtask (Promise)'));\nconsole.log('4: Senkron');\n// Çıktı Sırası: 1 -> 4 -> 3 -> 2"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. UI Donmasını Önleme",
-                    body = "Ağır hesaplamalar Call Stack'i kilitlerse tarayıcı 60 FPS çizimini ve tıklamaları işleyemez (Freezing). Bu işler `requestAnimationFrame` veya Web Workers'a devredilmelidir.",
+                    subtitle = "2. UI Donmasını Önleme ve Macrotask Stratejisi",
+                    body = "Ağır matematiksel döngüler Call Stack'i kilitlerse tarayıcı UI render işlemlerini (60 FPS) ve kullanıcı tıklamalarını işleyemez (Freezing). Uzun süren senkron işler `setTimeout(fn, 0)` parçalarına bölünmeli veya `Web Workers`'a taşınmalıdır.",
                     tip = "`setTimeout(fn, 0)` işlemi 0 milisaniye sonra değil, mevcut Call Stack ve Microtask kuyruğu tamamen bittikten sonra çalıştırılır."
                 )
             ),
@@ -757,16 +781,16 @@ object JavaScriptCurriculum {
                 "Özellik doğrulama (Validation) ve Reaktif UI Data-Binding motoru geliştirmek"
             ),
             prerequisites = listOf("Event Loop ve Nesne Yönelimli JS"),
-            subtopics = listOf("Proxy Kavramı ve Traps", "get ve set Tuzakları", "Reflect API Entegrasyonu", "Veri Doğrulama ve Güvenlik", "Reaktif Durum Yönetimi Mimarisi"),
+            subtopics = listOf("Proxy & Traps (Tuzaklar) Kavramı", "get & set ile Veri Yakalama", "Reflect API ile Güvenli İşlemler", "Dinamik Doğrulama (Data Validation)", "Reaktif Durum (Vue 3 / MobX Mimarisi)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Proxy Traps ve Interception",
-                    body = "Proxy bir nesnenin önüne koyulan bir güvenlik/aracı katmanıdır. `target.alan` okunduğunda `get()`, yazıldığında `set()` tuzakları devreye girer.",
-                    codeSnippet = "const hedef = { bakiye: 100 };\nconst p = new Proxy(hedef, {\n    get(target, prop) {\n        console.log(prop + \" okundu\");\n        return Reflect.get(target, prop);\n    }\n});"
+                    subtitle = "1. Proxy Tuzakları (Traps) ve İşlem Yakalama (Interception)",
+                    body = "Proxy nesnesi, hedef bir nesnenin (Target) önüne yerleşen bir meta-programlama kalkanıdır. Nesnenin özelliklerine erişildiğinde (`get`), değer atandığında (`set`), silindiğinde (`deleteProperty`) veya fonksiyon olarak çağrıldığında (`apply`) araya girerek özel mantık çalıştırmanızı sağlar.",
+                    codeSnippet = "const hedef = { bakiye: 100 };\nconst korumaliBanka = new Proxy(hedef, {\n    get(target, prop, receiver) {\n        console.log(`[LOG]: \${String(prop)} alanı okundu.`);\n        return Reflect.get(target, prop, receiver);\n    },\n    set(target, prop, value, receiver) {\n        if (prop === 'bakiye' && value < 0) {\n            throw new RangeError('Bakiye eksiye düşemez!');\n        }\n        return Reflect.set(target, prop, value, receiver);\n    }\n});"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Neden Reflect Kullanılır?",
-                    body = "Reflect metotları nesne işlemlerini fonksiyonel hale getirir ve işlem başarısız olduğunda hata fırlatmak yerine boolean (`true/false`) döndürür.",
+                    subtitle = "2. Neden Reflect API Kullanılır?",
+                    body = "`Reflect`, JavaScript'in dahili nesne operasyonlarını fonksiyonel bir standartta sunar. Başarısız atamalarda kodun patlamasını engelleyip `false` döner ve `this` bağlamının (Receiver) doğru prototipe iletilmesini garanti eder.",
                     tip = "Vue 3 reaktivite motoru (Reactivity API) tamamen JavaScript `Proxy` nesneleri üzerine kurulmuştur."
                 )
             ),
@@ -840,17 +864,17 @@ object JavaScriptCurriculum {
                 "Tree-Shaking mekanizmasının kullanılmayan ölü kodları nasıl temizlediğini kavramak"
             ),
             prerequisites = listOf("Proxy ve Metaprogramming"),
-            subtopics = listOf("ESM (import / export)", "Named vs Default Export", "CommonJS (require / module.exports)", "Dynamic import() (Code Splitting)", "Tree-Shaking & Bundle Optimization"),
+            subtopics = listOf("ES Modules (import / export)", "Named vs Default Export", "CommonJS (require / module.exports) Mimarisi", "Dinamik import() & Code Splitting", "Tree-Shaking & Dead Code Elimination"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. ESM Neden Üstündür?",
-                    body = "CommonJS (`require`) çalışma zamanında dinamik yüklenir. ESM (`import`) ise derleme zamanında statik olarak analiz edilir. Bu sayede derleyiciler (Vite, Rollup) projedeki kullanılmayan fonksiyonları nihai paketten tamamen çıkarır (Tree-Shaking).",
-                    codeSnippet = "// Named Export:\nexport const topla = (a, b) => a + b;\n// Default Export:\nexport default class Motor { ... }"
+                    subtitle = "1. ESM (Statik) vs CommonJS (Dinamik) Mimarisi",
+                    body = "CommonJS (`require`), Node.js'in klasik sistemidir ve çalışma zamanında (Runtime) dinamik yürütülür. ES Modules (`import/export`) ise resmi web standardıdır ve derleme zamanında (Build-time) statik analiz edilebilir.\n\nStatik yapı sayesinde derleyiciler (Vite, Rollup, Webpack) projedeki import edilen ancak çağrılmayan ölü kod dallarını (Dead Code) nihai üretim paketinden tamamen atar (Tree-Shaking).",
+                    codeSnippet = "// utils.js\nexport const topla = (a, b) => a + b;\nexport const carp = (a, b) => a * b;\n\n// main.js\nimport { topla } from './utils.js';\n// 'carp' fonksiyonu kullanılmadığı için bundle'a asla eklenmez (Tree-Shaking)!"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Dinamik import() ile Lazy Loading",
-                    body = "Sayfa açılışında ihtiyaç duyulmayan ağır kütüphaneler sadece kullanıcı ilgili butona tıkladığında yüklenebilir.",
-                    codeSnippet = "button.onclick = async () => {\n    const { grafikCiz } = await import('./chart.js');\n    grafikCiz();\n};"
+                    subtitle = "2. Dinamik import() ve Kod Bölme (Code Splitting)",
+                    body = "Sayfa açılışında ihtiyaç duyulmayan ağır grafik veya rapor modülleri ilk yüklemeye dahil edilmez. Yalnızca kullanıcı ilgili butona tıkladığında `const mod = await import('./heavyChart.js')` şeklinde asenkron Lazy Load edilir.",
+                    tip = "Daima 'Named Export' (`export { foo }`) tercih edin; 'Default Export' (`export default`) Tree-Shaking verimini ve otomatik IDE refactoring'lerini zorlaştırır."
                 )
             ),
             codeExample = "// math.js modülü:\nexport const pi = 3.14;\nexport function kare(x) { return x * x; }\n\n// main.js:\n// import { kare } from './math.js';\n// console.log(kare(4)); // 'pi' kullanılmadığı için bundle'a dahil edilmez (Tree-Shaking)!\nconsole.log(\"ESM Statik Modül Sistemi Aktif\");",
@@ -923,16 +947,16 @@ object JavaScriptCurriculum {
                 "SharedArrayBuffer ve Atomics ile kilitlenmesiz sıfır kopyalı paylaşımlı bellek yönetimi yapmak"
             ),
             prerequisites = listOf("Modüller ve Asenkron JS"),
-            subtopics = listOf("Web Workers Mimarisi", "postMessage & onmessage İletişimi", "SharedArrayBuffer & Paylaşımlı Bellek", "Atomics Operasyonları (add, wait, notify)", "TypedArrays (Uint8Array, Float32Array)"),
+            subtopics = listOf("Web Workers & Multithreading", "postMessage & onmessage (Structured Clone)", "SharedArrayBuffer ile Bellek Paylaşımı", "Atomics API & Thread Eşzamanlama", "TypedArrays (ArrayBuffer, Uint8Array)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Web Worker Neden Gereklidir?",
-                    body = "JavaScript tek thread'dir. Ağır bir görüntü işleme, kripto madenciliği veya ses sentezi ana thread'de yapılırsa sayfa donar. Web Worker bu işi ayrı bir işletim sistemi thread'ine taşır.",
-                    codeSnippet = "// Ana Thread:\nconst worker = new Worker('worker.js');\nworker.postMessage({ sayi: 5000000 });\nworker.onmessage = (e) => console.log('Sonuç:', e.data);\n\n// worker.js:\nonmessage = (e) => {\n    const sonuc = agirHesaplama(e.data.sayi);\n    postMessage(sonuc);\n};"
+                    subtitle = "1. Web Workers ile Gerçek Paralel İşleme",
+                    body = "JavaScript ana iş parçacığı UI render ve kullanıcı etkileşimlerini yönetir. Görüntü filtreleme, 3D fizik hesaplamaları veya şifreleme gibi CPU-yoğun işlemler Web Worker ile ayrı bir işletim sistemi thread'ine devredilir.\n\nİletişim `postMessage()` ve `onmessage` eventleri üzerinden mesaj tabanlı (Message Passing) yürütülür.",
+                    codeSnippet = "// main.js\nconst worker = new Worker('hesaplayici.js');\nworker.postMessage({ sayilar: [100, 200, 300] });\nworker.onmessage = (e) => console.log('Sonuç:', e.data);\n\n// hesaplayici.js\nonmessage = (e) => {\n    const sonuc = e.data.sayilar.reduce((a, b) => a + b, 0);\n    postMessage(sonuc);\n};"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. SharedArrayBuffer ve Atomics",
-                    body = "Normal mesajlaşma veriyi klonlar (maliyetlidir). `SharedArrayBuffer` ile iki thread aynı bellek bloğunu doğrudan paylaşır. Race condition'ları önlemek için `Atomics.add`, `Atomics.wait` kullanılır.",
+                    subtitle = "2. SharedArrayBuffer, Atomics ve TypedArrays",
+                    body = "Normal mesajlaşma veriyi klonlar (büyük dizilerde kopyalama maliyeti oluşur). `SharedArrayBuffer` ile iki thread aynı ham bellek adresini sıfır kopyalama ile paylaşır.\n\nFarklı thread'lerin aynı byte'a aynı anda yazıp veri bozmasını engellemek için `Atomics.add`, `Atomics.load`, `Atomics.wait` ve `Atomics.notify` komutları kullanılır.",
                     tip = "Web Workers içinde `window`, `document` ve DOM API'leri KULLANILAMAZ; sadece saf hesaplama, fetch ve IndexedDB erişilebilir."
                 )
             ),
@@ -1007,16 +1031,16 @@ object JavaScriptCurriculum {
                 "Garbage Collector (Scavenger & Mark-Sweep) çalışma mantığıyla bellek sızıntılarını önlemek"
             ),
             prerequisites = listOf("Web Workers, TypedArrays ve İleri JS"),
-            subtopics = listOf("Ignition (Interpreter) vs TurboFan (JIT)", "Hidden Classes (Shape/Maps)", "Inline Caching & Polymorphism", "Deoptimization (Bailout) Tuzakları", "Garbage Collection (Generational GC & WeakMap)"),
+            subtopics = listOf("Ignition (Interpreter) vs TurboFan (JIT Compiler)", "Hidden Classes (Shape/Maps) Mimarisi", "Inline Caching (IC) & Monomorphism", "Deoptimization (Bailout) Tuzakları", "Garbage Collection & WeakMap / WeakRef"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Hidden Classes (Gizli Sınıflar) ve Inline Caching",
-                    body = "V8, nesnelerin özelliklerine hızlı erişmek için arka planda C++ benzeri 'Hidden Classes' üretir. Nesneye rastgele sırayla alan eklemek veya `delete obj.prop` yapmak gizli sınıfı bozar ve kodu yavaş yoruma (Deopt) iter.",
-                    codeSnippet = "// İYİ (Aynı Hidden Class):\nfunction Nokta(x, y) { this.x = x; this.y = y; }\nconst p1 = new Nokta(1, 2);\nconst p2 = new Nokta(3, 4);\n\n// KÖTÜ (Farklı Hidden Classes - Deopt):\nconst a = {}; a.x = 1; a.y = 2;\nconst b = {}; b.y = 2; b.x = 1; // Farklı sıra!"
+                    subtitle = "1. V8 Derleme Boru Hattı: Ignition & TurboFan",
+                    body = "V8 motoru JavaScript kodunu iki aşamada çalıştırır:\n\n1. **Ignition (Bytecode Interpreter):** Kodu hemen yorumlar ve hızlı başlatır. Kodun çalışma profilini (Type feedback) toplar.\n2. **TurboFan (Optimizing JIT Compiler):** Sık çağrılan 'sıcak' (Hot) fonksiyonları doğrudan makine koduna (Assembly) derler.\n\nEğer bir fonksiyona sürekli beklenmedik tipte veriler gönderilirse JIT optimizasyonu çöker (Deoptimization / Bailout) ve kod yavaş yoruma geri döner.",
+                    codeSnippet = "function topla(a, b) {\n    return a + b; // Sürekli tamsayı (int) gelirse TurboFan tamsayı toplama makine koduna derler.\n}\ntopla(10, 20); // Optimize (Hot)\ntopla(\"hata\", {}); // Deoptimization! TurboFan optimizasyonu iptal eder."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Monomorphic vs Megamorphic Çağrılar",
-                    body = "Bir fonksiyon her zaman aynı nesne tipiyle çağrılırsa 'Monomorphic' olur ve V8 assembly hızında doğrudan bellek ofsetine zıplar. 4'ten fazla farklı tipte çağrılırsa 'Megamorphic' olur ve optimizasyon tamamen devre dışı kalır.",
+                    subtitle = "2. Hidden Classes (Gizli Sınıflar) ve Monomorphic Erişim",
+                    body = "V8, nesne özelliklerine C/C++ hızında bellek ofsetiyle erişebilmek için 'Hidden Classes' (Shapes) üretir. Nesnelere rastgele sırada alan eklemek veya `delete obj.alan` yapmak gizli sınıfları parçalar ve erişim hızını 10 kat düşürür.",
                     tip = "Nesnelerden alan silmek (`delete obj.prop`) yerine `obj.prop = undefined` atayın; böylece V8 gizli sınıf yapısını korur."
                 )
             ),

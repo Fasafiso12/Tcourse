@@ -384,5 +384,93 @@ object CodeExecutionEngine {
             executionTimeMs = (35..85).random().toLong()
         )
     }
+
+    suspend fun verifyPracticalTask(
+        code: String,
+        taskDescription: String,
+        lessonTitle: String,
+        languageId: String
+    ): ExecutionResult {
+        delay(160)
+        val cleanCode = code.trim()
+
+        if (cleanCode.isEmpty() || cleanCode.lines().all { it.trim().startsWith("//") || it.trim().startsWith("#") || it.trim().isEmpty() }) {
+            return ExecutionResult(
+                isSuccess = false,
+                output = "Editörde henüz geçerli bir kod bulunamadı.",
+                error = "Lütfen görevde istenen çözümü kod editörüne yazıp 'Görevi Kontrol Et' butonuna basınız."
+            )
+        }
+
+        // 1. Compile / Syntax Check via Playground Engine
+        val runResult = executePlaygroundCode(cleanCode, languageId)
+        if (!runResult.isSuccess) {
+            return ExecutionResult(
+                isSuccess = false,
+                output = "Derleme / Sözdizimi Hatası:\n${runResult.error ?: runResult.output}",
+                error = runResult.error ?: "Yazdığınız kodda sözdizimi veya derleme hatası tespit edildi. Lütfen parantezleri ve yazım kurallarını kontrol edin."
+            )
+        }
+
+        // 2. Semantic and Requirement Verification based on task description
+        val lowerCode = cleanCode.lowercase()
+        val lowerTask = taskDescription.lowercase()
+        val missingHints = mutableListOf<String>()
+
+        // Check null-safety or optional checks
+        if ((lowerTask.contains("null") || lowerTask.contains("nil") || lowerTask.contains("option")) &&
+            !lowerCode.contains("?") && !lowerCode.contains("null") && !lowerCode.contains("nil") && !lowerCode.contains("is null") && !lowerCode.contains("== null") && !lowerCode.contains("!= null")) {
+            missingHints.add("Null güvenliği / kontrolü yapısı (örneğin ?, ?:, != null veya nil kontrolü) tespit edilemedi.")
+        }
+
+        // Check loops
+        if ((lowerTask.contains("döngü") || lowerTask.contains("1'den") || lowerTask.contains("sayıları") || lowerTask.contains("step") || lowerTask.contains("tek sayılar") || lowerTask.contains("çift sayılar") || lowerTask.contains("karelerini")) &&
+            !lowerCode.contains("for") && !lowerCode.contains("while") && !lowerCode.contains("step") && !lowerCode.contains("loop") && !lowerCode.contains("map") && !lowerCode.contains("filter") && !lowerCode.contains("range") && !lowerCode.contains("until") && !lowerCode.contains("..")) {
+            missingHints.add("Görevdeki döngü veya aralık yapısı (for, while, step, .. vb.) eksik görünüyor.")
+        }
+
+        // Check functions or lambdas
+        if ((lowerTask.contains("fonksiyon") || lowerTask.contains("metot") || lowerTask.contains("lambda") || lowerTask.contains("calculator")) &&
+            !lowerCode.contains("fun ") && !lowerCode.contains("def ") && !lowerCode.contains("fn ") && !lowerCode.contains("function") && !lowerCode.contains("void ") && !lowerCode.contains("int ") && !lowerCode.contains("double ") && !lowerCode.contains("bool") && !lowerCode.contains("auto ") && !lowerCode.contains("->") && !lowerCode.contains("=>")) {
+            missingHints.add("Görevde istenen fonksiyon, metot veya lambda tanımı eksik görünüyor.")
+        }
+
+        // Check classes or structs
+        if ((lowerTask.contains("sınıf") || lowerTask.contains("class") || lowerTask.contains("struct") || lowerTask.contains("data class") || lowerTask.contains("jenerik")) &&
+            !lowerCode.contains("class") && !lowerCode.contains("struct") && !lowerCode.contains("interface") && !lowerCode.contains("type") && !lowerCode.contains("enum")) {
+            missingHints.add("Görevde tanımlanması istenen sınıf (class / struct) yapısı eksik görünüyor.")
+        }
+
+        // Check coroutine / async / concurrency
+        if ((lowerTask.contains("flow") || lowerTask.contains("coroutine") || lowerTask.contains("async") || lowerTask.contains("suspend") || lowerTask.contains("channel") || lowerTask.contains("sharedflow") || lowerTask.contains("withcontext")) &&
+            !lowerCode.contains("suspend") && !lowerCode.contains("flow") && !lowerCode.contains("async") && !lowerCode.contains("launch") && !lowerCode.contains("channel") && !lowerCode.contains("withcontext") && !lowerCode.contains("dispatchers")) {
+            missingHints.add("Eşzamanlılık / Asenkron yapı (suspend, Flow, Channel, withContext vb.) eksik.")
+        }
+
+        // Check print or output statements
+        if ((lowerTask.contains("yazdır") || lowerTask.contains("ekrana") || lowerTask.contains("printf") || lowerTask.contains("print")) &&
+            !lowerCode.contains("print") && !lowerCode.contains("printf") && !lowerCode.contains("println") && !lowerCode.contains("console.log") && !lowerCode.contains("cout") && !lowerCode.contains("io.write") && !lowerCode.contains("fmt.")) {
+            missingHints.add("Sonucu ekrana yazdıran çıktı ifadesi (print / println / printf / console.log vb.) eksik.")
+        }
+
+        if (missingHints.isNotEmpty()) {
+            val outputStr = if (runResult.output.isNotBlank()) "\n\n🖥️ Konsol Çıktınız:\n${runResult.output.trim()}" else ""
+            return ExecutionResult(
+                isSuccess = false,
+                output = "Kodunuz derlendi ancak görev gereksinimleri tam karşılanmadı:\n" +
+                        missingHints.joinToString("\n") { "• $it" } +
+                        outputStr,
+                error = "Lütfen görev yönergelerindeki eksik adımları tamamlayıp tekrar deneyiniz."
+            )
+        }
+
+        val outputSnippet = if (runResult.output.isNotBlank()) " Çıktı: ${runResult.output.trim()}" else ""
+
+        return ExecutionResult(
+            isSuccess = true,
+            output = "Görev başarıyla tamamlandı.$outputSnippet",
+            executionTimeMs = runResult.executionTimeMs ?: (30..70).random().toLong()
+        )
+    }
 }
 

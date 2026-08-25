@@ -75,14 +75,19 @@ class AppRepository(
     // ----------------------------------------------------
     // User Stats & Profile
     // ----------------------------------------------------
+    fun isPremium(): Boolean {
+        return prefs?.getBoolean("pref_is_premium", false) ?: false
+    }
+
     val userStatsFlow: Flow<UserStatsEntity> = statsDao.getUserStatsFlow().map { entity ->
+        val fallbackPremium = isPremium()
         entity ?: UserStatsEntity(
             id = 1,
             username = "Geliştirici",
             xp = 240,
             streak = 7,
             lastActiveDate = GamificationService.getTodayDateString(),
-            isPremium = false,
+            isPremium = fallbackPremium,
             studyMinutes = 45,
             solvedQuestions = 14,
             completedLessons = 4,
@@ -294,6 +299,7 @@ class AppRepository(
     }
 
     suspend fun setPremium(isPremium: Boolean) {
+        prefs?.edit()?.putBoolean("pref_is_premium", isPremium)?.apply()
         val stats = getOrCreateStats()
         statsDao.upsertStats(stats.copy(isPremium = isPremium))
     }
@@ -400,13 +406,14 @@ class AppRepository(
     // Internal Helper Functions
     // ----------------------------------------------------
     private suspend fun getOrCreateStats(): UserStatsEntity {
+        val defaultPremium = isPremium()
         return statsDao.getUserStats() ?: UserStatsEntity(
             id = 1,
             username = "Geliştirici",
             xp = 240,
             streak = 7,
             lastActiveDate = GamificationService.getTodayDateString(),
-            isPremium = false
+            isPremium = defaultPremium
         )
     }
 

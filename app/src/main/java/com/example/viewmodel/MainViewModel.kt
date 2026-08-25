@@ -54,13 +54,13 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     val activeLesson: StateFlow<Lesson?> = _activeLesson.asStateFlow()
 
     val userProfile: StateFlow<UserProfileData> = repository.userProfileDataFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserProfileData())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, UserProfileData(isPremium = repository.isPremium()))
 
     val userStats: StateFlow<UserStatsEntity> = repository.userStatsFlow
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            UserStatsEntity(id = 1, currentActiveCourseId = "dart")
+            SharingStarted.Eagerly,
+            UserStatsEntity(id = 1, currentActiveCourseId = "dart", isPremium = repository.isPremium())
         )
 
     val allProgress: StateFlow<List<UserProgressEntity>> = repository.getAllProgressFlow()
@@ -388,12 +388,16 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
     // ----------------------------------------------------
     // Lesson Navigation & Freemium Gate
     // ----------------------------------------------------
+    private var pendingLessonToOpen: Lesson? = null
+
     fun openLesson(lesson: Lesson): Boolean {
-        val isUserPremium = userStats.value.isPremium
+        val isUserPremium = repository.isPremium() || userStats.value.isPremium || userProfile.value.isPremium
         if (lesson.isPremium && !isUserPremium) {
+            pendingLessonToOpen = lesson
             _showPremiumDialog.value = true
             return false
         }
+        pendingLessonToOpen = null
         _activeLesson.value = lesson
         _playgroundCode.value = lesson.starterPlaygroundCode
         _playgroundResult.value = null
@@ -577,6 +581,25 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
         _challengeState.value = ChallengeSessionState()
     }
 
+    suspend fun verifyAndSubmitPracticalTask(
+        lessonId: String,
+        courseId: String,
+        lessonTitle: String,
+        taskDescription: String,
+        userCode: String
+    ): ExecutionResult {
+        val result = CodeExecutionEngine.verifyPracticalTask(
+            code = userCode,
+            taskDescription = taskDescription,
+            lessonTitle = lessonTitle,
+            languageId = courseId
+        )
+        if (result.isSuccess) {
+            repository.recordCodingChallengeFinished(lessonId, courseId)
+        }
+        return result
+    }
+
     // Playground
     fun updatePlaygroundCode(code: String) {
         _playgroundCode.value = code
@@ -606,12 +629,40 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
         viewModelScope.launch {
             repository.setPremium(true)
             _showPremiumDialog.value = false
+            pendingLessonToOpen?.let { lesson ->
+                _activeLesson.value = lesson
+                _playgroundCode.value = lesson.starterPlaygroundCode
+                _playgroundResult.value = null
+                pendingLessonToOpen = null
+            }
         }
     }
 
     fun cancelPremium() {
         viewModelScope.launch {
             repository.setPremium(false)
+        }
+    }
+
+    fun setPremiumDevMode(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setPremium(enabled)
+            _showPremiumDialog.value = false
+            if (enabled) {
+                pendingLessonToOpen?.let { lesson ->
+                    _activeLesson.value = lesson
+                    _playgroundCode.value = lesson.starterPlaygroundCode
+                    _playgroundResult.value = null
+                    pendingLessonToOpen = null
+                }
+            }
+        }
+    }
+
+    fun togglePremiumDevMode() {
+        viewModelScope.launch {
+            val current = repository.isPremium() || userStats.value.isPremium || userProfile.value.isPremium
+            setPremiumDevMode(!current)
         }
     }
 

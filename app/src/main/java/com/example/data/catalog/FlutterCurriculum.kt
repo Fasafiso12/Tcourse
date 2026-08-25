@@ -91,17 +91,17 @@ object FlutterCurriculum {
                 "Temel StatelessWidget ile ilk ekranı oluşturmak"
             ),
             prerequisites = listOf("Temel Dart Programlama Bilgisi"),
-            subtopics = listOf("Flutter Mimarisi & Impeller", "Widget Ağacı Kavramı", "MaterialApp & Başlangıç", "Scaffold (AppBar, Body, FloatingActionButton)", "Center & Text Widget'ları"),
+            subtopics = listOf("Flutter Mimarisi & Impeller vs Skia Motoru", "Üç Ağaç (Three Trees) Modeli (Widget, Element, RenderObject)", "MaterialApp & runApp() Başlatma Hattı", "Scaffold Ekran İskeleti", "const Anahtarı & Yeniden Çizim Optimizasyonu"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. 'Her Şey Bir Widget'tır'",
-                    body = "Flutter'da bir buton, bir metin, aradaki boşluk (Padding) ve hatta ekranın tamamı birer `Widget` nesnesidir. Widget'lar arayüzün deklaratif (bildirimsel) tarifleridir.",
-                    codeSnippet = "import 'package:flutter/material.dart';\n\nvoid main() {\n  runApp(const BenimUygulamam());\n}\n\nclass BenimUygulamam extends StatelessWidget {\n  const BenimUygulamam({super.key});\n  @override\n  Widget build(BuildContext context) {\n    return const MaterialApp(\n      home: Scaffold(\n        body: Center(child: Text('Merhaba Flutter! 🚀')),\n      ),\n    );\n  }\n}"
+                    subtitle = "1. Flutter'ın Katmanlı Mimarisi ve Impeller Grafik Motoru",
+                    body = "Flutter geleneksel web-view veya JavaScript köprüsü (bridge) kullanan melez çerçevelerin aksine, C++ ile yazılmış kendi grafik motoru (Engine) üzerinden doğrudan piksel çizer.\n\n• Impeller: Shader derleme gecikmelerini (Shader Compilation Jank) tamamen ortadan kaldırmak için Metal (iOS) ve Vulkan (Android) üzerinde AOT (Ahead-of-Time) derlenmiş gölgelendiricilerle çalışan yeni nesil grafik motorudur.\n• Üç Ağaç (Three-Tree Architecture): Flutter arayüzü üç katmandan oluşur: 1. Widget Ağacı (Hafif, değişmez yapılandırma), 2. Element Ağacı (Yaşam döngüsü ve referans bağı), 3. RenderObject Ağacı (Boyutlandırma, yerleşim ve gerçek piksel çizimi).",
+                    codeSnippet = "import 'package:flutter/material.dart';\n\nvoid main() {\n  // runApp() kök widget'ı Element ağacına bağlar ve RenderView'ı başlatır\n  runApp(const BenimUygulamam());\n}\n\nclass BenimUygulamam extends StatelessWidget {\n  const BenimUygulamam({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const MaterialApp(\n      debugShowCheckedModeBanner: false,\n      home: Scaffold(\n        body: Center(child: Text('Merhaba Flutter! 🚀')),\n      ),\n    );\n  }\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Scaffold: Standart Ekran İskeleti",
-                    body = "Scaffold; `appBar`, `body`, `floatingActionButton`, `bottomNavigationBar` ve `drawer` gibi Material Design ekran bileşenlerini hazır sunan temel iskelettir.",
-                    tip = "Sabit widget'ların başına `const` eklemek gereksiz build/re-render işlemlerini önler ve performansı maksimize eder."
+                    subtitle = "2. Scaffold: Material Design Ekran İskeleti",
+                    body = "Scaffold; `appBar`, `body`, `floatingActionButton`, `bottomNavigationBar` ve `drawer` gibi Material Design ekran bileşenlerini sağlayan temel iskelettir.\n\n`const` Anahtarı: Sabit widget'ların başına `const` eklemek, üst widget her yeniden inşa edildiğinde (rebuild) alt widget'ın yeniden oluşturulmasını önler ve bellek tahsisini sıfıra indirir.",
+                    tip = "Sabit tüm widget'lara `const` ekleyerek Flutter derleyicisinin derleme zamanında tekilleştirilmiş (canonicalized) nesneler üretmesini sağlayın."
                 )
             ),
             codeExample = "class AnaSayfa extends StatelessWidget {\n  const AnaSayfa({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Flutter Kursu'),\n        backgroundColor: Colors.blueAccent,\n      ),\n      body: const Center(\n        child: Text(\n          'Flutter Dünyasına Hoş Geldiniz!',\n          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),\n        ),\n      ),\n    );\n  }\n}",
@@ -174,16 +174,16 @@ object FlutterCurriculum {
                 "RenderFlex Overflow (sarı-siyah şerit) taşma hatalarını Expanded ile çözmek"
             ),
             prerequisites = listOf("runApp ve Scaffold Anatomisi"),
-            subtopics = listOf("Column (Dikey Eksen)", "Row (Yatay Eksen)", "Main & Cross Axis Alignment", "Container & BoxDecoration", "Expanded & Flexible Farkı"),
+            subtopics = listOf("Flutter Kısıt Kuralları (Constraints Go Down, Sizes Go Up)", "Column & Row Eksen Yönetimi", "Container, Padding & BoxDecoration", "RenderFlex Overflow Nedenleri", "Expanded vs Flexible Farkı (Tight vs Loose)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Eksen Hizalamaları (MainAxis vs CrossAxis)",
-                    body = "• Column: MainAxis dikey (yukarıdan aşağıya), CrossAxis yataydır.\n• Row: MainAxis yatay (soldan sağa), CrossAxis dikeydir.\n`MainAxisAlignment.spaceBetween` veya `center` ile elemanlar dağıtılır.",
-                    codeSnippet = "Row(\n  mainAxisAlignment: MainAxisAlignment.spaceBetween,\n  children: const [\n    Icon(Icons.star),\n    Text('4.9 Puan'),\n  ],\n)"
+                    subtitle = "1. Flutter'ın Altın Kuralı: Kısıtlar (Constraints)",
+                    body = "Flutter yerleşiminin temel kuralı şudur:\n• Constraints go down (Kısıtlar yukarıdan aşağıya iner)\n• Sizes go up (Boyutlar aşağıdan yukarıya bildirilir)\n• Parents decide position (Ebeveynler konumu belirler)\n\nRow ve Column (Flex tabanlı) kendi ana eksenlerinde sınırsız (unbounded) alan sunarlar; bu nedenle içlerine konan sınırsız genişlikteki elemanlar taşma hatasına yol açar.",
+                    codeSnippet = "Row(\n  mainAxisAlignment: MainAxisAlignment.spaceBetween,\n  crossAxisAlignment: CrossAxisAlignment.center,\n  children: const [\n    Icon(Icons.star),\n    Text('4.9 Puan'),\n  ],\n)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Expanded ile Taşmayı Önleme",
-                    body = "Bir Row veya Column içinde genişliği belirsiz metinler ekrandan taşarak 'A RenderFlex overflowed by ... pixels' hatası verir. Widget'ı `Expanded` ile sarmalamak kalan tüm alanı güvenle doldurmasını sağlar.",
+                    subtitle = "2. Expanded vs Flexible ve RenderFlex Taşmaları",
+                    body = "• `Expanded`: Çocuğuna `fit: FlexFit.tight` uygular; yani ebeveynin kalan tüm boşluğunu ZORLA doldurmasını sağlar. Metin taşmalarını engeller.\n• `Flexible`: Çocuğuna `fit: FlexFit.loose` uygular; çocuğun en fazla o kadar yer kaplamasına izin verir ancak çocuk daha küçükse zorlamaz.",
                     tip = "Sadece boşluk vermek için ağır Container yerine hafif `const SizedBox(height: 16)` kullanın."
                 )
             ),
@@ -257,17 +257,17 @@ object FlutterCurriculum {
                 "setState() çağrısının çalışma mantığını ve build metodunu nasıl tetiklediğini kavramak"
             ),
             prerequisites = listOf("Temel Yerleşim Widget'ları"),
-            subtopics = listOf("Stateless vs Stateful Mantığı", "State Nesnesinin Ayrılması", "initState() & Tek Seferlik Başlatma", "dispose() & Bellek Temizliği (Controllers)", "setState() Kuralları"),
+            subtopics = listOf("Neden State Nesnesi Widget'tan Ayrıdır?", "initState() & Tek Seferlik Başlatma Kuralları", "didUpdateWidget() ve didChangeDependencies()", "dispose() & Bellek Sızıntılarını Önleme", "setState() ve Render Pipeline Tetikleme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
                     subtitle = "1. Neden Widget ile State Ayrıdır?",
-                    body = "Widget'lar değişmezdir (immutable) ve her build'de yeniden oluşturulur (hafif nesnelerdir). `State` nesnesi ise ağaçta kalıcıdır ve durumu hafızada tutar.",
+                    body = "Widget'lar değişmezdir (immutable) ve her rebuild işleminde yok edilip yeniden üretilir. `State` nesnesi ise Element ağacında kalıcıdır; bellekteki durumunu (değişkenler, controller'lar) korur.\n\n`setState()` çağrıldığında o State'e bağlı Element `dirty` (kirli) olarak işaretlenir ve bir sonraki karede (frame) `build()` metodu yeniden çalıştırılır.",
                     codeSnippet = "class SayacEkran extends StatefulWidget {\n  const SayacEkran({super.key});\n  @override\n  State<SayacEkran> createState() => _SayacEkranState();\n}\n\nclass _SayacEkranState extends State<SayacEkran> {\n  int _sayac = 0;\n  void _artir() => setState(() => _sayac++);\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. initState() ve dispose() Önemi",
-                    body = "• `initState()`: Widget ağaca ilk eklendiğinde YALNIZCA BİR KEZ çalışır (Controller/Stream başlatma).\n• `dispose()`: Widget ağaçtan tamamen silindiğinde çalışır (Controller'ları kapatıp bellek sızıntısını önlemek için ZORUNLUDUR).",
-                    tip = "setState() içine asenkron (`async/await`) kodlar koymayın; asenkron işlem bittikten sonra setState çağırın."
+                    subtitle = "2. initState() ve dispose() Yaşam Döngüsü",
+                    body = "• `initState()`: Widget ağaca ilk eklendiğinde YALNIZCA BİR KEZ çalışır. Stream, AnimationController ve TextEditingController burada başlatılır.\n• `dispose()`: Widget ağaçtan kalıcı olarak silindiğinde çalışır. Bellek sızıntılarını önlemek için dinleyiciler ve controller'lar burada `.dispose()` edilmelidir.",
+                    tip = "setState() içine asenkron (`async/await`) kodlar koymayın; asenkron işlem bittikten sonra `if (mounted) setState(...)` çağrılmalıdır."
                 )
             ),
             codeExample = "class SayacUygulamasi extends StatefulWidget {\n  const SayacUygulamasi({super.key});\n  @override\n  State<SayacUygulamasi> createState() => _SayacUygulamasiState();\n}\n\nclass _SayacUygulamasiState extends State<SayacUygulamasi> {\n  int _sayac = 0;\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      appBar: AppBar(title: const Text('Sayaç')), \n      body: Center(child: Text('Tıklama: \$_sayac', style: const TextStyle(fontSize: 24))),\n      floatingActionButton: FloatingActionButton(\n        onPressed: () => setState(() => _sayac++),\n        child: const Icon(Icons.add),\n      ),\n    );\n  }\n}",
@@ -340,16 +340,16 @@ object FlutterCurriculum {
                 "Form ve GlobalKey<FormState> ile kurallı form doğrulaması (validation) yapmak"
             ),
             prerequisites = listOf("StatefulWidget ve State Yaşam Döngüsü"),
-            subtopics = listOf("ListView vs ListView.builder", "ListTile & Divider", "GridView.builder", "TextEditingController", "Form Doğrulama (Form & validator)"),
+            subtopics = listOf("ListView.builder & Sliver Sanallaştırma (Virtualization)", "ListTile & Divider", "GridView.builder ile Esnek Izgaralar", "TextEditingController & Dinleme", "Form & GlobalKey<FormState> Doğrulama"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Neden ListView.builder?",
-                    body = "Standart `ListView(children: [...])` 1000 eleman varsa binini de belleğe anında yükler. `ListView.builder` ise sadece ekranda görünen ~10 elemanı belleğe alır ve kaydırdıkça geri dönüştürür (Virtualization).",
+                    subtitle = "1. ListView.builder ve Viewport Sanallaştırması",
+                    body = "Standart `ListView(children: [...])` listedeki tüm elemanları belleğe anında yükler. `ListView.builder` ise arka planda `RenderSliverList` kullanarak sadece ekranda (Viewport) görünen elemanları oluşturur ve kaydırdıkça görünmeyenleri bellekten serbest bırakır (Virtualization).",
                     codeSnippet = "ListView.builder(\n  itemCount: ogrenciler.length,\n  itemBuilder: (context, index) {\n    return ListTile(\n      title: Text(ogrenciler[index]),\n      leading: const Icon(Icons.person),\n    );\n  },\n)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Form ve Doğrulama (Validation)",
-                    body = "`GlobalKey<FormState>` ile formun durumuna erişilir ve `_formKey.currentState!.validate()` çağrılarak tüm `TextFormField` validator'ları tek adımda denetlenir.",
+                    subtitle = "2. Form ve GlobalKey<FormState> Mimarisi",
+                    body = "`GlobalKey<FormState>` ile form ağacına dışarıdan erişilir ve `_formKey.currentState!.validate()` çağrılarak tüm alt `TextFormField`'ların validator fonksiyonları tek seferde tetiklenir.",
                     tip = "TextEditingController'ı mutlaka `dispose()` metodunda `_controller.dispose()` şeklinde serbest bırakın."
                 )
             ),
@@ -423,16 +423,16 @@ object FlutterCurriculum {
                 "Web ve mobilde Deep Linking (URL tabanlı sayfa açma) altyapısını kavramak"
             ),
             prerequisites = listOf("Listeler ve Form Yönetimi"),
-            subtopics = listOf("Navigator 1.0 (Imperative) Sınırları", "GoRouter Kurulumu & GoRoute", "context.go() vs context.push()", "Parametre Aktarımı (state.pathParameters)", "Yönlendirme Koruması (Redirect / Auth Guard)"),
+            subtopics = listOf("Navigator 1.0 vs Navigator 2.0 (Router API)", "GoRouter Bildirimsel Rota Yapısı", "context.go() vs context.push()", "Path & Query Parametreleri (state.pathParameters)", "Redirect (Auth Guard) Mimarisi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. context.go() vs context.push()",
-                    body = "• `context.go('/detay')`: Rota ağacını doğrudan hedefe taşır (Web URL'i ile birebir uyumludur).\n• `context.push('/detay')`: Mevcut yığının (stack) en üstüne yeni bir sayfa iter (Geri butonu döner).",
+                    subtitle = "1. context.go() vs context.push() Farkı",
+                    body = "• `context.go('/detay')`: Rota ağacını hedefe göre yeniden yapılandırır; tarayıcı URL adresiyle birebir eşleşir (Web ve Deep Link için zorunludur).\n• `context.push('/detay')`: Mevcut yığının (Navigation Stack) en üstüne bağımsız yeni bir sayfa iter (AppBar geri butonu ile dönülür).",
                     codeSnippet = "final router = GoRouter(\n  routes: [\n    GoRoute(path: '/', builder: (c, s) => const AnaEkran()),\n    GoRoute(\n      path: '/urun/:id',\n      builder: (c, s) => UrunDetayEkran(id: s.pathParameters['id']!),\n    ),\n  ],\n);"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Auth Guard & Redirect",
-                    body = "GoRouter'ın `redirect` fonksiyonu ile kullanıcının oturum açıp açmadığı denetlenerek giriş yapmamış kullanıcılar otomatik `/login` sayfasına yönlendirilir.",
+                    subtitle = "2. Auth Guard & Otomatik Yönlendirme (Redirect)",
+                    body = "GoRouter'ın `redirect` fonksiyonu sayesinde oturum açmamış kullanıcıların korumalı sayfalara erişmesi global düzeyde engellenerek `/login` ekranına yönlendirilir.",
                     tip = "MaterialApp.router kurucusunu `routerConfig: router` ile bağlamayı unutmayın."
                 )
             ),

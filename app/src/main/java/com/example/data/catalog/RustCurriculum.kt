@@ -91,17 +91,17 @@ object RustCurriculum {
                 "Temel skaler tipleri (i32, f64, bool, char) ve Shadowing mekanizmasını öğrenmek"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("Rust & Cargo Mimarisi", "let vs let mut", "Değişken Gölgelenme (Shadowing)", "Skaler Tipler (i32, f64, bool, char)", "Bileşik Tipler (Tuple, Array)"),
+            subtopics = listOf("Rustc Derleyicisi & LLVM Arka Ucu", "Varsayılan İmmutability Felsefesi", "let vs let mut (Bellek Mutasyonu)", "Değişken Gölgelenme (Variable Shadowing)", "Skaler & Bileşik Veri Tipleri (i32, f64, bool, char, tuple, array)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Değişmezlik Varsayılan İlkedir",
-                    body = "Rust'ta tanımlanan her değişken varsayılan olarak `immutable` (değiştirilemez)dir. Değerin sonradan değişebilmesi için açıkça `mut` anahtar kelimesi eklenmelidir.",
-                    codeSnippet = "let x = 5; // x değiştirilemez!\n// x = 6; // DERLEME HATASI\nlet mut y = 5; // y değiştirilebilir\ny = 6; // Geçerli"
+                    subtitle = "1. Rust'ın Değişmezlik (Immutability) Felsefesi",
+                    body = "Rust'ta `let` ile tanımlanan tüm değişkenler varsayılan olarak `immutable` (değiştirilemez)dir. Bu, çok iş parçacıklı (multi-threaded) ortamlarda eşzamanlılık hatalarını derleme zamanında önler.\n\nBir değişkenin değerini değiştirmek için açıkça `let mut` bildirimi yapılmalıdır; böylece derleyici bellek yazma iznini denetler.",
+                    codeSnippet = "let x = 5; // x değiştirilemez (read-only)\n// x = 6; // DERLEME HATASI (cannot assign twice to immutable variable)\nlet mut y = 5;\ny = 6; // Geçerli bellek mutasyonu"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Shadowing (Gölgelenme)",
-                    body = "Aynı isimle yeniden `let` yazarak önceki değişkeni gölgeleyebilir ve hatta tipini değiştirebilirsiniz. Bu, ara değişken adları uydurma zorunluluğunu ortadan kaldırır.",
-                    tip = "println! bir fonksiyon değil, bir derleme zamanı makrosudur (sonundaki ! işaretinden anlaşılır)."
+                    subtitle = "2. Shadowing ve İfade Tabanlı (Expression-based) Yapı",
+                    body = "Aynı isimle yeniden `let` tanımlamak (Shadowing), önceki değişkeni kapsam içinde gizler ve tür dönüşümü yaparken yeni bir değişken adı uydurma zorunluluğunu ortadan kaldırır. `println!` bir fonksiyon değil, derleme zamanında AST üzerinde çalışan bir makrodur.",
+                    tip = "`const` her zaman açık tip bildirimi gerektirir ve derleme anında sabitlenirken, `let` çalışma zamanı ifadelerini bağlayabilir."
                 )
             ),
             codeExample = "fn main() {\n    let isim = \"Deniz\";\n    let mut puan = 85;\n    puan += 10;\n    \n    // Shadowing ile tipi dönüştürelim:\n    let puan = format!(\"{} Puan\", puan);\n    \n    println!(\"Öğrenci: {}, Başarı: {}\", isim, puan);\n}",
@@ -174,17 +174,17 @@ object RustCurriculum {
                 "for döngüleri ve range (0..10, 0..=10) yapılarını öğrenmek"
             ),
             prerequisites = listOf("Rust'a Giriş & Değişkenler"),
-            subtopics = listOf("if as Expression", "loop & break with Value", "while Döngüsü", "for in Iterators & Ranges (..=)", "match Temelleri"),
+            subtopics = listOf("İfade Tabanlı if/else (Ternary Alternatifi)", "loop İfadesi & break ile Değer Döndürme", "Döngü Etiketleri ('label: loop)", "for in Ranges (0..n, 0..=n, .rev())", "match Örüntü Eşleme & Kapsayıcılık (Exhaustiveness)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. if ve loop ile Değer Döndürme",
-                    body = "Rust'ta ternary operatörü yoktur; `let x = if kosul { 1 } else { 2 };` yazılır. Benzer şekilde `loop` bloğundan `break sonuc;` ile hesaplanan değer doğrudan bir değişkene atanabilir.",
-                    codeSnippet = "let mut sayac = 0;\nlet sonuc = loop {\n    sayac += 1;\n    if sayac == 10 {\n        break sayac * 2; // 20 döner!\n    }\n};"
+                    subtitle = "1. if ve loop İfadelerinden Değer Döndürme",
+                    body = "Rust'ta ternary operatörü (`? :`) bulunmaz; çünkü `if-else` bizzat bir ifadedir (expression) ve sonuç döndürür. Benzer şekilde `loop` bloğu içinde `break deger;` yazılarak döngü kırılarak doğrudan bir değişkene sonuç atanabilir.",
+                    codeSnippet = "let mut sayac = 0;\nlet sonuc = loop {\n    sayac += 1;\n    if sayac == 10 {\n        break sayac * 2; // 20 sonuc değişkenine atanır\n    }\n};"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. for Döngüsü ve Range Aralıkları",
-                    body = "• `0..5`: 0, 1, 2, 3, 4 (5 hariç)\n• `0..=5`: 0, 1, 2, 3, 4, 5 (5 dahil)",
-                    tip = "Rust'ta C tarzı `for (int i=0; i<n; i++)` yoktur; daima güvenli iteratörler ve aralıklar (ranges) kullanılır."
+                    subtitle = "2. match Örüntü Eşleme ve Derleme Güvencesi",
+                    body = "`match` yapısı yalnızca eşitlik değil, aralıklar (`1..=10`), tuple'lar ve enum'lar üzerinde kalıp eşleştirmesi yapar. Tüm olası durumlar kapsanmak (exhaustive) zorundadır; aksi halde kod derlenmez.",
+                    tip = "Tüm durumları tek tek yazmak istemiyorsanız diğer tüm ihtimalleri yakalamak için joker `_ =>` desenini kullanın."
                 )
             ),
             codeExample = "fn main() {\n    let durum = 200;\n    let mesaj = match durum {\n        200 => \"Başarılı (OK)\",\n        404 => \"Bulunamadı\",\n        500..=599 => \"Sunucu Hatası\",\n        _ => \"Diğer Durum\",\n    };\n    println!(\"HTTP: {}\", mesaj);\n    \n    for n in (1..=3).rev() {\n        print!(\"{}.. \", n); // 3.. 2.. 1..\n    }\n}",
@@ -258,17 +258,17 @@ object RustCurriculum {
                 "Copy (Stack kopyalama) ile Clone (Heap derin kopyalama) arasındaki farkı öğrenmek"
             ),
             prerequisites = listOf("Rust Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Ownership'in 3 Kuralı", "Move Semantiği & Use-after-move Hatası", "Drop Trait & Otomatik Bellek İadesi", "Copy vs Clone", "Fonksiyonlara Sahiplik Devri"),
+            subtopics = listOf("Ownership'in 3 Altın Kuralı (Affine Type System)", "Move Semantiği & Derleme Seviyesi Geçersiz Kılma", "Drop Trait & Otomatik Deterministik Yıkım", "Copy Trait (Bitwise Kopyalama) vs Clone (Derin Kopyalama)", "Fonksiyon Çağrılarında Sahiplik Transferi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Ownership'in 3 Altın Kuralı",
-                    body = "1. Rust'ta her değerin tek bir 'sahibi' (owner) olan bir değişkeni vardır.\n2. Aynı anda yalnızca BİR sahip olabilir.\n3. Sahip kapsamdan (scope) çıktığı an, değer otomatik olarak bellekten silinir (drop edilir).",
-                    codeSnippet = "let s1 = String::from(\"merhaba\");\nlet s2 = s1; // Sahiplik s2'ye TAŞINDI (MOVE)\n// println!(\"{}\", s1); // DERLEME HATASI! s1 artık geçersizdir."
+                    subtitle = "1. Ownership'in 3 Altın Kuralı ve Bellek Güvenliği",
+                    body = "1. Rust'ta her değerin tek bir 'sahibi' (owner) olan değişkeni vardır.\n2. Aynı anda yalnızca BİR sahip olabilir.\n3. Sahip kapsamdan (scope `{ }`) çıktığı an, değerin belleği otomatik olarak Drop edilir.\n\nBu sayede Garbage Collector (GC) duraksaması olmadan C/C++ hızında bellek güvenliği sağlanır.",
+                    codeSnippet = "let s1 = String::from(\"merhaba\");\nlet s2 = s1; // Sahiplik s2'ye TAŞINDI (MOVE)\n// println!(\"{}\", s1); // DERLEME HATASI! s1 artık Stack'te geçersizdir."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Copy vs Clone",
-                    body = "• `Copy`: İlkel tipler (i32, bool, f64) Stack üzerinde sabit boyutludur ve otomatik bit kopyalanır.\n• `Clone`: Heap tahsisi yapan tiplerde (String, Vec) derin kopyalama (deep copy) yapmak için açıkça `.clone()` çağrılmalıdır.",
-                    tip = "Move semantiği C++'taki gibi nesneyi kopyalamaz; yalnızca Stack'teki pointer/len/capacity bilgisini kopyalayıp eski değişkeni derleme seviyesinde geçersiz kılar (sıfır maliyet)."
+                    subtitle = "2. Copy Trait vs Clone (Derin Kopyalama)",
+                    body = "• `Copy`: İlkel tipler (i32, bool, f64, sabit diziler) tamamen Stack üzerinde yaşar ve atandığında bit düzeyinde kopyalanır (Move olmaz).\n• `Clone`: Heap tahsisine sahip nesnelerde (String, Vec) gerçek RAM kopyalaması yapmak için açıkça `.clone()` çağrılmalıdır.",
+                    tip = "Move işlemi C++'taki gibi nesneyi kopyalamaz; yalnızca 24 baytlık (ptr, len, cap) Stack başlığını kopyalar ve eski değişkeni derleme seviyesinde siler (Sıfır Maliyetli Taşıma)."
                 )
             ),
             codeExample = "fn sahipligi_al(metin: String) {\n    println!(\"Fonksiyon sahiplendi: {}\", metin);\n} // 'metin' burada drop edilir ve Heap belleği iade edilir!\n\nfn main() {\n    let s = String::from(\"Rust\");\n    sahipligi_al(s); // Sahiplik fonksiyona devredildi\n    // println!(\"{}\", s); // HATA: s artık kullanılamaz!\n}",
@@ -341,17 +341,17 @@ object RustCurriculum {
                 "Borrow Checker'ın 2 Altın Kuralını (Çoklu Okuyucu VEYA Tek Yazıcı) uygulamak"
             ),
             prerequisites = listOf("Ownership (Sahiplik) ve Move Semantiği"),
-            subtopics = listOf("Borrowing Kavramı (&)", "Değiştirilebilir Referans (&mut)", "Borrow Checker 2 Kuralı", "Data Race Önleme", "Non-Lexical Lifetimes (NLL)"),
+            subtopics = listOf("Borrowing Mekanizması (&T)", "Değiştirilebilir Referans (&mut T)", "Borrow Checker 2 Temel Kuralı", "Data Race Önleme & Thread Güvenliği", "Non-Lexical Lifetimes (NLL) Çözümleyicisi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Borrow Checker'ın 2 Kuralı",
-                    body = "Belirli bir kapsamda bir veri için:\n1. İSTEDİĞİNİZ KADAR değişmez referansa (`&T`) sahip olabilirsiniz (Eşzamanlı Okuyucular).\n2. VEYA YALNIZCA BİR TANE değiştirilebilir referansa (`&mut T`) sahip olabilirsiniz (Tekil Yazıcı).\nİkisi aynı anda ASLA var olamaz!",
-                    codeSnippet = "let mut s = String::from(\"merhaba\");\nlet r1 = &s; // Okuyucu 1\nlet r2 = &s; // Okuyucu 2 (Geçerli)\n// let r3 = &mut s; // DERLEME HATASI! Okuyucular varken yazılamaz."
+                    subtitle = "1. Borrow Checker'ın 2 Altın Kuralı",
+                    body = "Belirli bir kapsamda bir veri kaynağı için:\n1. İSTEDİĞİNİZ KADAR değişmez referansa (`&T`) sahip olabilirsiniz (Eşzamanlı Okuyucular).\n2. VEYA YALNIZCA BİR TANE değiştirilebilir referansa (`&mut T`) sahip olabilirsiniz (Tekil Yazıcı).\nİkisi aynı anda ASLA var olamaz; bu sayede Pointer Aliasing ve Data Race derleme aşamasında tamamen engellenir.",
+                    codeSnippet = "let mut s = String::from(\"merhaba\");\nlet r1 = &s; // Okuyucu 1\nlet r2 = &s; // Okuyucu 2 (Geçerli)\n// let r3 = &mut s; // DERLEME HATASI! Okuyucular varken &mut alınamaz."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Dangling Reference (Sarkan İşaretçi) İmkansızlığı",
-                    body = "Rust derleyicisi referansın yaşam süresinin, işaret ettiği verinin ömründen daha uzun olmasına ASLA izin vermez.",
-                    tip = "Fonksiyon parametrelerinde gereksiz sahiplik devri yerine daima referans (`&String` veya tercihen `&str`) tercih edilmelidir."
+                    subtitle = "2. Sarkan İşaretçi (Dangling Reference) İmkansızlığı",
+                    body = "Rust derleyicisi bir referansın ömrünün, işaret ettiği verinin ömrünü aşmasına izin vermez. Veri Drop edildiğinde ona bağlı hiçbir referans yaşayamaz.",
+                    tip = "Non-Lexical Lifetimes (NLL) sayesinde bir referansın ömrü süslü parantezde değil, kodda en son kullanıldığı satırda otomatik sonlanır."
                 )
             ),
             codeExample = "fn uzunluk_hesapla(metin: &String) -> usize {\n    metin.len() // Sahiplik alınmadı, sadece ödünç alındı (&)\n}\n\nfn ekle(metin: &mut String) {\n    metin.push_str(\" Dünyası!\");\n}\n\nfn main() {\n    let mut s = String::from(\"Rust\");\n    let len = uzunluk_hesapla(&s); // s hala geçerli!\n    ekle(&mut s);\n    println!(\"{}, Uzunluk: {}\", s, len); // Rust Dünyası!\n}",
@@ -424,17 +424,17 @@ object RustCurriculum {
                 "std::collections::HashMap ile anahtar-değer eşlemeleri ve entry() API'sini kullanmak"
             ),
             prerequisites = listOf("Ödünç Alma ve Referanslar"),
-            subtopics = listOf("String Slices (&str)", "Dizi Dilimleri (&[T])", "Vec<T> Mimarisi & vec! Makrosu", "HashMap & entry API", "Koleksiyonlarda Sahiplik"),
+            subtopics = listOf("Fat Pointers: &str Mimarisi (ptr + len)", "Dizi Dilimleri (&[T]) & Bounds Checking", "Vec<T> Bellek Mimarisi (Kapasite İkiye Katlama)", "HashMap & entry().or_insert() API", "Deref Coercion (&String -> &str)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. String vs &str",
-                    body = "• `String`: Heap'te tahsis edilen, büyütülebilen ve sahipliği olan metin nesnesidir.\n• `&str`: Bir metnin (String veya binary'deki sabit metin) belirli bir aralığını işaret eden (pointer + len) hafif dilimdir.",
-                    codeSnippet = "let s = String::from(\"Merhaba Rust\");\nlet dilim: &str = &s[0..7]; // \"Merhaba\""
+                    subtitle = "1. String vs &str (Fat Pointer)",
+                    body = "• `String`: Heap'te tahsis edilen, büyütülebilen ve bellek sahipliğine sahip olan tiptir (ptr, len, capacity = 24 bayt).\n• `&str`: Bir metnin (String veya ikili dosyadaki statik veri) bellekteki belirli bir alt aralığını gösteren `[işaretçi, uzunluk]` (16 baytlık Fat Pointer) dilimidir.",
+                    codeSnippet = "let s = String::from(\"Merhaba Rust\");\nlet dilim: &str = &s[0..7]; // \"Merhaba\" (kopyalama yok, sadece işaretçi)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. HashMap ve entry API'si",
-                    body = "`entry()` API'si anahtarın var olup olmadığını tek adımda kontrol edip yoksa varsayılan değer atamak için harika bir yöntemdir.",
-                    tip = "Fonksiyon parametresi tasarlarken `&String` yerine daima `&str` kullanın; çünkü `&str` hem String referanslarını hem de string literallerini kabul eder (Deref Coercion)."
+                    subtitle = "2. Vec<T> Tahsisi ve HashMap entry API'si",
+                    body = "`Vec<T>` kapasitesi dolduğunda Heap'te belleği ikiye katlayarak (2x reallocation) elemanları taşır.\n\n`HashMap::entry(key).or_insert(deger)` metodu, anahtar yoksa varsayılan değeri ekleyip referansını tek bir arama maliyetiyle döner.",
+                    tip = "Fonksiyon parametrelerinde `&String` yerine daima `&str` kullanın; Deref Coercion sayesinde hem `&String` hem de `\"literal\"` metinleri kabul eder."
                 )
             ),
             codeExample = "use std::collections::HashMap;\n\nfn main() {\n    let mut sayilar: Vec<i32> = vec![10, 20, 30];\n    sayilar.push(40);\n    \n    let mut frekans = HashMap::new();\n    let metin = \"elma muz elma elma armut\";\n    \n    for kelime in metin.split_whitespace() {\n        let count = frekans.entry(kelime).or_insert(0);\n        *count += 1;\n    }\n    \n    println!(\"Frekans: {:?}\", frekans); // {\"elma\": 3, \"muz\": 1, \"armut\": 1}\n}",

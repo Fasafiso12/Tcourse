@@ -80,28 +80,35 @@ object PythonCurriculum {
             id = "py_1",
             courseId = "python",
             sectionId = "py_sec_1",
-            title = "Python'a Giriş, Değişkenler & Dinamik Tip Sistemi",
-            shortDesc = "Python felsefesi (Zen of Python), yorumlayıcı mimarisi, değişkenler, f-strings ve temel veri tipleri (int, float, str, bool).",
+            title = "CPython Mimarisi, PyObject & Değişken Modeli",
+            shortDesc = "CPython sanal makinesi (VM), PyObject C yapısı, dinamik tip bağlama, Referans Sayımı (Refcounting), Small Integer Caching ve f-strings.",
             level = CourseLevel.BEGINNER,
             order = 1,
             isPremium = false,
             learningObjectives = listOf(
-                "Python yorumlayıcısının dinamik tipleme mantığını kavramak",
-                "f-string formatlama ile temiz ve performanslı çıktılar üretmek",
-                "Temel veri tiplerini (int, float, str, bool) ve tip dönüşümlerini kullanmak"
+                "CPython yorumlayıcısının Bytecode ve yığın tabanlı (Stack-based) VM mimarisini anlamak",
+                "Python değişkenlerinin bellek kutusu değil, PyObject işaretçisi (Pointer) olduğunu kavramak",
+                "Referans Sayımı (Reference Counting) ve Small Integer Caching (-5..256) mekanizmalarını öğrenmek",
+                "f-string formatlama ve str bellek optimizasyonlarını (String Interning) kullanmak"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("Zen of Python", "Dinamik Tipleme & Nesne Etiketleri", "f-string Formatlama", "Tip Dönüşümleri (int, float, str)"),
+            subtopics = listOf("CPython, Bytecode (.pyc) & Stack VM", "PyObject C Yapısı (ob_refcnt, ob_type)", "Değişkenler: Referans İsim Etiketleri", "Small Integer Caching & String Interning", "id(), is vs == Farkı & f-strings"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Python'da Değişken Mantığı",
-                    body = "Python'da değişkenler bellek kutusu değil, nesneleri işaret eden birer etikettir (pointer/reference). 'a = 5' dendiğinde bellekte bir tamsayı nesnesi üretilir ve 'a' etiketi bu nesneye bağlanır.",
-                    tip = "Python'da kod blokları süslü parantez {} yerine girintiler (indentation - 4 boşluk) ile ayrılır."
+                    subtitle = "1. CPython Yorumlayıcısı ve PyObject Bellek Mimarisi",
+                    body = "Python standart uygulaması (CPython), kaynak kodu önce derleyerek taşınabilir **Bytecode** (.pyc) talimatlarına çevirir; ardından bu bayt kodları yığın tabanlı sanal makinede (Evaluation Loop) yürütür.\n\nPython'da her değer bellekte bir C yapısı olan `PyObject` (veya değişken boyutlular için `PyVarObject`) olarak temsil edilir. Her `PyObject` en az iki temel alan içerir:\n1. `ob_refcnt`: Nesneye işaret eden referans sayısı (Garbage Collector için).\n2. `ob_type`: Nesnenin tipini belirten tip tanımlayıcı işaretçi (`PyTypeObject*`).\n\nBu nedenle Python'da `a = 100` yazıldığında değişken bir bellek kutusu değil, Heap üzerindeki bir `PyLongObject` nesnesini gösteren bir isim etiketidir (Pointer).",
+                    codeSnippet = "import sys\n\nx = 1000\nprint(f'Bellek Adresi: {hex(id(x))}')\nprint(f'Referans Sayısı: {sys.getrefcount(x)}') # x'e işaret eden referans adedi\n\ny = x # Yeni bir referans bağlanır, nesne kopyalanmaz!\nprint(x is y) # True (Aynı bellek adresini işaret eder)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Modern f-string Formatlama",
-                    body = "f-string (f\"...\") ifadeleri Python 3.6+ ile gelen en hızlı ve okunabilir metin birleştirme yöntemidir.",
-                    codeSnippet = "ad = 'Emre'\nyas = 26\nprint(f'{ad}, {yas} yaşında ve 10 yıl sonra {yas + 10} yaşında olacak.')"
+                    subtitle = "2. Small Integer Caching ve String Interning Optimizasyonları",
+                    body = "CPython bellek tahsis maliyetini düşürmek için sık kullanılan nesneleri önceden belleğe alır (Pre-allocation):\n\n• **Small Integer Caching:** `-5` ile `256` arasındaki tüm tamsayılar CPython başlatılırken tek seferde belleğe tahsis edilir. Bu aralıktaki sayılar her istendiğinde yeni nesne üretilmez, önbellekteki aynı tekil adrese yönlendirilir.\n• **String Interning:** Değişken isimleri ve ASCII tanımlayıcılar bellekte tekilleştirilerek (intern) `is` ile O(1) hızında adres karşılaştırmasına olanak tanır.",
+                    codeSnippet = "a = 250\nb = 250\nprint(a is b) # True! (-5..256 aralığında önbellekten gelir)\n\nc = 1000\nd = 1000\nprint(c is d) # False! (Farklı Heap nesneleri üretilir, ancak c == d True'dur)"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Modern Metin Formatlama (f-strings) ve Biçimlendirme",
+                    body = "Python 3.6+ ile gelen 'Formatted String Literals' (f-strings), `str.format()` ve `%` operatörlerine kıyasla doğrudan C düzeyinde `BUILD_STRING` bayt koduna derlenir; bu sayede çalışma zamanında en yüksek hız ve okunabilirlik sağlar.",
+                    codeSnippet = "ad = 'Emre'\nmaas = 45000.758\n\n# f-string ile formatlama ve ifade çözümleme:\nprint(f'{ad.upper()} -> Aylık: {maas:,.2f} TL (Yıllık: {maas * 12:,.0f} TL)')\n# Çıktı: EMRE -> Aylık: 45,000.76 TL (Yıllık: 540,009 TL)",
+                    tip = "Python'da girintiler (indentation) sadece kod düzeni için değil, mantıksal blokların (scope) sınırlarını belirlemek için zorunludur (standart olarak 4 boşluk)."
                 )
             ),
             codeExample = "ad = 'Elif'\npuan = 94.5\ndurum = True\n\nprint(f'Öğrenci: {ad} | Not: {puan:.1f} | Geçti mi: {durum}')",
@@ -111,10 +118,10 @@ object PythonCurriculum {
             starterPlaygroundCode = "a = 10\nb = 20\nprint(f'Toplam: {a + b}')",
             miniQuestion = MiniQuestion(
                 id = "py_q_1",
-                question = "Python'da metin formatlamak için kullanılan en modern ve performanslı sözdizimi hangisidir?",
-                options = listOf("%s operatörü", "f-strings (f'...')", "str.format()", "string.concat()"),
-                correctIndex = 1,
-                explanation = "f-strings hem doğrudan ifade (expression) çalıştırabilir hem de derleme zamanında optimize edilir."
+                question = "CPython'da değişkenlerin bellekte doğrudan bir kutu yerine birer referans etiketi olmasını sağlayan temel C yapısı hangisidir?",
+                options = listOf("PyObject", "VoidPointer", "PyBox", "RefCell"),
+                correctIndex = 0,
+                explanation = "CPython'da tüm tipler en temelde 'PyObject' C yapısı olarak Heap üzerinde yönetilir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_py_1",
@@ -146,11 +153,11 @@ object PythonCurriculum {
             qaItems = listOf(
                 TopicQAItem(
                     question = "Python'da 'is' ile '==' arasındaki fark nedir?",
-                    answer = "'==' değerlerin eşitliğini (equality) kontrol ederken, 'is' iki değişkenin bellekte aynı nesneyi (identity - aynı id/pointer) işaret edip etmediğini kontrol eder."
+                    answer = "'==' nesnelerin içerik eşitliğini (`__eq__`) denetlerken, 'is' iki referansın bellekte tam olarak aynı nesneyi (aynı bellek adresi / id) gösterip göstermediğini doğrular."
                 )
             ),
             completionCriteria = listOf(
-                "Dinamik değişken tanımlamayı kavramak",
+                "Dinamik değişken tanımlamayı ve PyObject modelini kavramak",
                 "f-string formatlama yapabilmek",
                 "Temel veri tipleri arasında dönüşüm yapabilmek"
             )
@@ -163,28 +170,34 @@ object PythonCurriculum {
             id = "py_2",
             courseId = "python",
             sectionId = "py_sec_1",
-            title = "Kontrol Akışı: if-elif-else, Döngüler & range()",
-            shortDesc = "Mantıksal operatörler (and, or, not), if-elif-else karar blokları, for, while döngüleri, range() ve break/continue/else kalıpları.",
+            title = "Kontrol Akışı, İteratör Protokolü & Döngüler",
+            shortDesc = "Mantıksal operatörler, Short-Circuit değerlendirmesi, if-elif-else, İteratör Protokolü (__iter__, __next__), for-else ve range().",
             level = CourseLevel.BEGINNER,
             order = 2,
             isPremium = false,
             learningObjectives = listOf(
-                "if, elif, else blokları ile karmaşık karar mekanizmaları kurmak",
-                "for ve while döngüleri ile yineleme yapmak",
-                "range(), enumerate() ve zip() fonksiyonlarını etkin kullanmak"
+                "Python mantıksal operatörlerinin Kısa Devre (Short-Circuit) çalışma prensibini öğrenmek",
+                "Python İteratör Protokolü (__iter__, __next__, StopIteration) mimarisini kavramak",
+                "for, while ve for-else arama deseni ile algoritmik akış kurmak",
+                "enumerate() ve zip() fonksiyonlarını bellek verimli kullanmak"
             ),
             prerequisites = listOf("Python'a Giriş, Değişkenler & Veri Tipleri"),
-            subtopics = listOf("Mantıksal Karşılaştırmalar", "if, elif, else Blokları", "for Döngüsü & range()", "while Döngüsü", "Döngülerde else Bloğu"),
+            subtopics = listOf("Short-Circuit Evaluation (Kısa Devre)", "if, elif, else & Truthy/Falsy Değerler", "Python İteratör Protokolü (__iter__, __next__)", "for Döngüsü, range() & enumerate()", "Döngülerde 'else' Bloğu Arama Deseni"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Karar Blokları ve Girinti Kuralı",
-                    body = "Python'da koşul ifadeleri iki nokta `:` ile biter ve takip eden satırlar 4 boşluk girintilenir. 'and', 'or', 'not' anahtar kelimeleri mantıksal işlemleri sağlar.",
-                    codeSnippet = "puan = 85\nif puan >= 90:\n    print('Harf Notu: AA')\nelif puan >= 80:\n    print('Harf Notu: BA')\nelse:\n    print('Harf Notu: CC')"
+                    subtitle = "1. Kısa Devre (Short-Circuit) ve Truthy / Falsy Değerler",
+                    body = "Python'da koşullu değerlendirme yapılırken tüm nesneler `bool(x)` ile boolean bağlamına uyarlanır:\n• **Falsy Değerler:** `False`, `None`, `0`, `0.0`, `''`, `[]`, `()`, `{}`\n• **Truthy Değerler:** Sıfır olmayan sayılar ve boş olmayan tüm koleksiyonlar.\n\n`and` ve `or` operatörleri sadece boolean döndürmez, 'kısa devre' yaparak değerlendirmeyi durduran son nesneyi döner:\n• `A or B`: Eğer A truthy ise doğrudan `A` değerini döner (B'ye hiç bakmaz).\n• `A and B`: Eğer A falsy ise doğrudan `A` değerini döner; aksi takdirde `B`'yi döner.",
+                    codeSnippet = "kullanici_girdisi = ''\nvarsayilan_ad = kullanici_girdisi or 'Misafir' # 'Misafir'\n\n# Güvenli erişim kısa devresi:\nveritabani = None\n# veritabani.baglan() çağrılmaz çünkü sol taraf Falsy:\nsonuc = veritabani and veritabani.baglan()"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. for Döngüsü ve range() Sihri",
-                    body = "for döngüsü koleksiyonları gezer. `range(start, stop, step)` ile ardışık sayılar üretilir.",
-                    tip = "Python döngülerinde 'break' döngüyü kırar, 'continue' o adımı atlar. Döngü 'break' olmadan biterse 'else' bloğu çalışır."
+                    subtitle = "2. Python İteratör Protokolü (__iter__ & __next__)",
+                    body = "Python'da `for` döngüsü indeksli bir sayaç değildir. Herhangi bir nesne üzerinde `for x in koleksiyon:` yazıldığında arka planda şu adımlar gerçekleşir:\n1. Koleksiyonun `iter(koleksiyon)` (yani `koleksiyon.__iter__()`) metodu çağrılarak bir **Iterator** nesnesi üretilir.\n2. Döngü her adımda `next(iterator)` (yani `iterator.__next__()`) çağırır.\n3. Elemanlar bittiğinde nesne `StopIteration` istisnası fırlatır ve `for` döngüsü bu istisnayı sessizce yakalayarak döngüyü sonlandırır.",
+                    codeSnippet = "liste = [10, 20]\nit = iter(liste)\nprint(next(it)) # 10\nprint(next(it)) # 20\n# print(next(it)) # StopIteration hatası fırlatılır!"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. for-else Deseni ve Çoklu İteratörler (enumerate, zip)",
+                    body = "• **for-else:** Eğer döngü bir `break` ifadesi ile erken kesilmeden doğal olarak tamamlanırsa `else` bloğu tetiklenir. Bu sayede 'flag' değişkeni kullanmadan arama ve asal sayı algoritmaları yazılır.\n• **enumerate():** Sayacı ve değeri `(index, value)` demeti olarak tembel (lazy) üretir.\n• **zip():** Birden çok iterable nesneyi paralel eşleştirir.",
+                    codeSnippet = "# for-else Arama Deseni:\nfor n in [2, 4, 6, 8]:\n    if n == 5:\n        print('Bulundu!')\n        break\nelse:\n    print('5 sayısı listede yer almıyor.') # break çalışmadığı için çalışır"
                 )
             ),
             codeExample = "toplam = 0\nfor i in range(1, 11):\n    if i % 2 == 0:\n        toplam += i\n        print(f'{i} eklendi.')\nprint(f'1-10 arası çift sayıların toplamı: {toplam}')",
@@ -194,10 +207,10 @@ object PythonCurriculum {
             starterPlaygroundCode = "for i in range(5):\n    print(f'Adım {i}')",
             miniQuestion = MiniQuestion(
                 id = "py_q_2",
-                question = "Python'da 'range(2, 10, 2)' ifadesi hangi sayıları üretir?",
-                options = listOf("2, 3, 4, 5, 6, 7, 8, 9, 10", "2, 4, 6, 8", "2, 4, 6, 8, 10", "4, 6, 8"),
-                correctIndex = 1,
-                explanation = "range(start, stop, step) bitiş değerini (10) dahil etmez. Dolayısıyla [2, 4, 6, 8] üretilir."
+                question = "Python'da bir nesnenin for döngüsünde gezilebilmesi için hangi protokolü ve metodları desteklemesi gerekir?",
+                options = listOf("Iterator Protokolü (__iter__ ve __next__)", "Array Protokolü (get_item)", "Callable Protokolü (__call__)", "Serializable Protokolü"),
+                correctIndex = 0,
+                explanation = "Python'da yinelenebilir her nesne Iterator protokolüne (__iter__ ve __next__) uymak zorundadır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_py_2",
@@ -235,8 +248,8 @@ object PythonCurriculum {
             ),
             completionCriteria = listOf(
                 "if-elif-else bloklarını doğru kurabilmek",
-                "for ve while döngüleri ile algoritmik işlemler yapabilmek",
-                "range() parametrelerini eksiksiz kullanabilmek"
+                "İteratör protokolünün çalışma mantığını bilmek",
+                "range(), enumerate() ve zip() fonksiyonlarını kullanabilmek"
             )
         ),
 
@@ -247,28 +260,34 @@ object PythonCurriculum {
             id = "py_3",
             courseId = "python",
             sectionId = "py_sec_2",
-            title = "Fonksiyonlar, *args, **kwargs & Scope",
-            shortDesc = "def fonksiyon tanımlama, varsayılan parametreler, değişken sayıda argüman (*args, **kwargs), Lambda ifadeleri ve LEGB kapsam kuralları.",
+            title = "Fonksiyon Mimarisi, Parametreler & LEGB Kapsamı",
+            shortDesc = "Pass-by-Object-Reference, Mutable Default Trap, *args & **kwargs paket çözme, LEGB Kapsam kuralları ve global/nonlocal yönergeleri.",
             level = CourseLevel.BEGINNER,
             order = 3,
             isPremium = false,
             learningObjectives = listOf(
-                "Fonksiyon tanımlamak ve varsayılan parametreleri doğru kullanmak",
-                "*args ve **kwargs ile dinamik parametre alan fonksiyonlar yazmak",
-                "LEGB (Local, Enclosing, Global, Built-in) kapsam mantığını kavramak"
+                "Python'ın 'Pass-by-Object-Reference' (Call-by-Sharing) parametre aktarım mekanizmasını kavramak",
+                "Değiştirilebilir Varsayılan Parametre Tuzağı'ndan (Mutable Default Trap) kaçınmak",
+                "*args ve **kwargs ile esnek fonksiyon imzaları ve unpacking tasarlamak",
+                "LEGB (Local, Enclosing, Global, Built-in) kapsam arama sırasını ve nonlocal kullanımını öğrenmek"
             ),
             prerequisites = listOf("Python Kontrol Akışı & Döngüler"),
-            subtopics = listOf("def & return", "Default Parametreler", "*args (Demet Paketleme)", "**kwargs (Sözlük Paketleme)", "Lambda & Scope (LEGB)"),
+            subtopics = listOf("Pass-by-Object-Reference (Call-by-Sharing)", "Mutable Default Argument Trap", "*args (Tuple Unpacking) & **kwargs (Dict Unpacking)", "LEGB Scope Hiyerarşisi & Bayt Kod Karşılığı", "global vs nonlocal Yönergeleri"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. *args ve **kwargs ile Esneklik",
-                    body = "• `*args`: İsimlendirilmemiş fazladan argümanları bir 'tuple' olarak toplar.\n• `**kwargs`: İsimlendirilmiş argümanları bir 'dict' olarak toplar.",
-                    codeSnippet = "def log_yaz(mesaj, *ekstra, **etiketler):\n    print(f'Mesaj: {mesaj}')\n    print(f'Ekstra veriler: {ekstra}')\n    print(f'Etiketler: {etiketler}')\n\nlog_yaz('Hata', 404, 'Kritik', servis='Auth', ip='127.0.0.1')"
+                    subtitle = "1. Parametre Aktarımı: Pass-by-Object-Reference (Call-by-Sharing)",
+                    body = "Python'da argümanlar ne 'Pass-by-Value' ne de 'Pass-by-Reference' olarak geçer; **Pass-by-Object-Reference** (Nesne Referansıyla Aktarım) geçerlidir.\n\nFonksiyona parametre olarak bir nesne verildiğinde, fonksiyonun yerel değişkenine o nesnenin referansı atanır. Eğer nesne değiştirilemez (immutable: int, str, tuple) ise fonksiyon içinde yapılan değişiklikler dışarıyı etkilemez. Ancak nesne değiştirilebilir (mutable: list, dict, set) ise nesne üzerinde yapılan yerinde mutasyonlar (`list.append()`) orijinal nesneyi doğrudan değiştirir.",
+                    codeSnippet = "def listeye_ekle(l):\n    l.append(99) # Orijinal listeyi değiştirir!\n\nsayilar = [1, 2]\nlisteye_ekle(sayilar)\nprint(sayilar) # [1, 2, 99]"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Lambda (Anonim Fonksiyonlar)",
-                    body = "Tek satırlık küçük fonksiyonlar 'lambda parametreler: ifade' şeklinde tanımlanır.",
-                    tip = "Python'da mutasyonlu nesneler (örneğin boş liste []) varsayılan parametre olarak verilmemelidir; bunun yerine 'None' kullanılmalıdır."
+                    subtitle = "2. Değiştirilebilir Varsayılan Parametre Tuzağı (Mutable Default Trap)",
+                    body = "Python'da varsayılan parametreler fonksiyon çağrıldığında DEĞİL, fonksiyon ilk tanımlandığı (derlendiği) anda TEK SEFERLİK değerlendirilir ve `__defaults__` demetine kaydedilir.\n\nEğer varsayılan değer olarak `def ekle(eleman, liste=[])` yazarsanız, fonksiyonun tüm çağrıları aynı liste nesnesini paylaşır!",
+                    codeSnippet = "# ❌ HATALI KULLANIM:\ndef kuyruk_ekle(veri, kuyruk=[]):\n    kuyruk.append(veri)\n    return kuyruk\n\n# ✅ DOĞRU PYTHONIC PRATİK:\ndef kuyruk_ekle_guvenli(veri, kuyruk=None):\n    if kuyruk is None:\n        kuyruk = [] # Her çağrıda yeni bir heap listesi üretilir\n    kuyruk.append(veri)\n    return kuyruk"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. *args, **kwargs ve LEGB Kapsam Çözümlemesi",
+                    body = "• `*args`: Konumsal fazlalık argümanları bir Tuple içinde toplar.\n• `**kwargs`: İsimlendirilmiş argümanları bir Dict içinde toplar.\n• **LEGB Kuralı:** Python bir değişken adına erişirken sırasıyla **Local** (fonksiyon içi) -> **Enclosing** (dış çevreleyen fonksiyon) -> **Global** (modül seviyesi) -> **Built-in** (yerleşik: len, range) kapsamlarını tarar.",
+                    codeSnippet = "def dis_fonksiyon():\n    sayac = 0\n    def ic_fonksiyon():\n        nonlocal sayac # Enclosing kapsamındaki sayac değişkenini bağlar\n        sayac += 1\n        return sayac\n    return ic_fonksiyon\n\ns = dis_fonksiyon()\nprint(s()) # 1\nprint(s()) # 2"
                 )
             ),
             codeExample = "def topla_carp(carpan, *sayilar):\n    return [s * carpan for s in sayilar]\n\nprint(topla_carp(3, 1, 2, 3, 4)) # [3, 6, 9, 12]",
@@ -278,10 +297,10 @@ object PythonCurriculum {
             starterPlaygroundCode = "kare = lambda x: x * x\nprint(kare(7))",
             miniQuestion = MiniQuestion(
                 id = "py_q_3",
-                question = "Python'da bir fonksiyonun isimlendirilmiş tüm ekstra argümanlarını sözlük olarak yakalamak için hangi operatör kullanılır?",
-                options = listOf("*args", "**kwargs", "&params", "%args"),
-                correctIndex = 1,
-                explanation = "**kwargs (keyword arguments) isimlendirilmiş tüm ekstra argümanları dict olarak toplar."
+                question = "Python'da 'def ekle(x, l=[])' şeklinde varsayılan liste tanımlandığında yaşanan tehlikenin adı nedir?",
+                options = listOf("Mutable Default Argument Trap", "Stack Overflow", "Type Erasure", "Deadlock"),
+                correctIndex = 0,
+                explanation = "Varsayılan parametreler fonksiyon derleme anında bir kez üretildiği için mutable nesneler tüm çağrılar arasında paylaşılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_py_3",
@@ -319,7 +338,7 @@ object PythonCurriculum {
             ),
             completionCriteria = listOf(
                 "*args ve **kwargs parametrelerini ustalıkla kullanabilmek",
-                "Lambda ifadeleri yazabilmek",
+                "Mutable default argument tuzağından kaçınabilmek",
                 "LEGB kapsam kurallarını açıklayabilmek"
             )
         ),
@@ -331,28 +350,34 @@ object PythonCurriculum {
             id = "py_4",
             courseId = "python",
             sectionId = "py_sec_2",
-            title = "Veri Yapıları: List, Tuple, Set, Dict & Comprehensions",
-            shortDesc = "Listeler (mutasyon, dilimleme), Demetler (Tuple - immutability), Kümeler (Set operasyonları), Sözlükler (Dict) ve List/Dict Comprehensions.",
+            title = "Veri Yapıları & Hash Mimarisi (List, Tuple, Set, Dict)",
+            shortDesc = "List dinamik dizi over-allocation büyümesi, Tuple immutability, Dict & Set Hash Table mimarisi (O(1)) ve Comprehensions.",
             level = CourseLevel.BEGINNER,
             order = 4,
             isPremium = true,
             learningObjectives = listOf(
-                "List, Tuple, Set ve Dict veri yapılarının karmaşıklık ve kullanım senaryolarını öğrenmek",
-                "Dilimleme (slicing: [start:stop:step]) operatörünü ustaca kullanmak",
-                "List Comprehension ve Dict Comprehension ile tek satırda zarif dönüşümler yapmak"
+                "Python List'in ardışık işaretçi dizisi (Array of pointers) ve over-allocation büyüme modelini anlamak",
+                "Dict ve Set veri yapılarının Compact Hash Table mimarisini (O(1) lookup) kavramak",
+                "Tuple ve List arasındaki bellek boyutu ve değişmezlik (Immutability) farklarını bilmek",
+                "List, Dict ve Set Comprehensions ile yüksek hızlı veri dönüşümleri yapmak"
             ),
             prerequisites = listOf("Python Fonksiyonlar ve Scope"),
-            subtopics = listOf("List & Slicing [::]", "Tuple & Unpacking", "Set & Küme İşlemleri (union, intersection)", "Dict & get(), items()", "List/Dict Comprehensions"),
+            subtopics = listOf("List Mimarisi: Dinamik Dizi & Over-allocation", "Tuple İmmutability & Small Tuple Freelist", "Dict Compact Hash Table Mimarisi", "Set Hash Table (Open Addressing & Quadratic Probing)", "List/Set/Dict Comprehensions"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Temel Veri Yapıları Karşılaştırması",
-                    body = "• List `[1, 2]`: Sıralı, değiştirilebilir (mutable).\n• Tuple `(1, 2)`: Değiştirilemez (immutable), hafif ve güvenlidir.\n• Set `{1, 2}`: Benzersiz eleman tutar, O(1) arama hızı sunar.\n• Dict `{'k': 'v'}`: Anahtar-değer haritasıdır, O(1) erişim sağlar.",
-                    codeSnippet = "kullanici = {'ad': 'Deniz', 'rol': 'Admin'}\nyas = kullanici.get('yas', 18) # Key yoksa hata vermez, 18 döner"
+                    subtitle = "1. List ve Tuple: Bellek Tahsisi ve Büyüme Stratejisi",
+                    body = "• **List:** Bellekte ardışık işaretçiler dizisidir (`PyObject**`). `list.append()` yapıldığında her seferinde `realloc` çağırmamak için CPython **Over-allocation** stratejisi (yaklaşık %12 büyüme faktörü) uygular. Bu sayede sona ekleme amorti edilmiş O(1) maliyetlidir.\n• **Tuple:** Boyutu ve elemanları sabittir. Bellek tahsisi tektir ve CPython 20 elemana kadar olan tuple'lar için `free_list` önbelleği tutar.",
+                    codeSnippet = "import sys\n\nl = []\nprint(sys.getsizeof(l)) # Boş liste boyutu\nl.append(1)\nprint(sys.getsizeof(l)) # Over-allocation ile fazladan bellek rezerve edilir"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. List ve Dict Comprehension Gücü",
-                    body = "Döngü ve filtreleme işlemlerini tek satırda ifade etmenizi sağlar.",
-                    codeSnippet = "kareler = [x**2 for x in range(10) if x % 2 == 0]\nkelime_boylari = {k: len(k) for k in ['Python', 'Dart', 'Rust']}"
+                    subtitle = "2. Dict ve Set: Compact Hash Table Mimarisi (O(1))",
+                    body = "Python 3.6+ ile Dict yapısı tamamen yeniden yazılarak **Compact Hash Table** haline getirilmiştir. İki ayrı tablodan oluşur:\n1. Seyrek İndeks Tablosu (Sparse Hash Indices)\n2. Yoğun Giriş Dizisi (Dense Entries Array: `[hash, key, value]`)\n\nBu tasarım bellek kullanımını %30-40 azaltırken, elemanların ekleme sırasını (Insertion Order) varsayılan olarak garanti altına almıştır. Arama, ekleme ve silme işlemleri Hash fonksiyonu sayesinde ortalama **O(1)** karmaşıklığındadır.",
+                    codeSnippet = "kullanici = {'id': 101, 'ad': 'Deniz'}\n# get() ile güvenli erişim (KeyError fırlatmaz):\nrol = kullanici.get('rol', 'Standart')\n\n# setdefault ile yoksa ekleme:\nkullanici.setdefault('aktif', True)"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Comprehensions ile C Düzeyinde Optimize Dönüşümler",
+                    body = "Comprehensions, standart `for` döngülerine kıyasla bayt kod seviyesinde `LIST_APPEND` talimatını doğrudan yürüttüğü için hem çok daha temizdir hem de kat kat hızlı çalışır.",
+                    codeSnippet = "# List Comprehension:\ncift_kareler = [x**2 for x in range(10) if x % 2 == 0]\n\n# Dict Comprehension:\nkare_tablosu = {x: x**2 for x in range(5)}\n\n# Set Comprehension (Otomatik tekilleştirme):\ntekil_uzunluklar = {len(w) for w in ['kod', 'python', 'kod', 'dart']}"
                 )
             ),
             codeExample = "sayilar = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n# Çift sayıların küpünü alan tek satırlık comprehension:\ncift_kupler = [n**3 for n in sayilar if n % 2 == 0]\n\nprint(f'Çift Küpler: {cift_kupler}') # [8, 64, 216, 512, 1000]",
@@ -362,10 +387,10 @@ object PythonCurriculum {
             starterPlaygroundCode = "meyveler = ['elma', 'armut', 'muz']\nuzunluklar = {m: len(m) for m in meyveler}\nprint(uzunluklar)",
             miniQuestion = MiniQuestion(
                 id = "py_q_4",
-                question = "Python'da bir sözlükte (dict) bulunmayan bir anahtara doğrudan 'd[key]' ile erişilmeye çalışıldığında ne olur?",
-                options = listOf("None döner", "KeyError hatası fırlatılır", "Otomatik boş string üretilir", "Sözlük silinir"),
-                correctIndex = 1,
-                explanation = "Var olmayan anahtara doğrudan [] ile erişmek KeyError fırlatır. Güvenli erişim için `d.get(key, default)` kullanılmalıdır."
+                question = "Python 3.6+ sürümünden itibaren Dict veri yapısının eleman ekleme sırasını korumasını sağlayan mimari hangisidir?",
+                options = listOf("Compact Hash Table (Dense & Sparse Array)", "Red-Black Tree", "B-Tree", "Linked List Chain"),
+                correctIndex = 0,
+                explanation = "Python 3.6+ Compact Hash Table mimarisi seyrek hash indeksi ve yoğun giriş dizisi kullanarak ekleme sırasını korur."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_py_4",
@@ -396,12 +421,12 @@ object PythonCurriculum {
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Tuple neden List'ten daha hızlıdır?",
-                    answer = "Tuple immutable (değişmez) olduğu için CPython bellek tahsisini tek bir blokta sabitler ve gereksiz yeniden boyutlandırma (realloc) yapmaz."
+                    question = "Tuple neden List'ten daha az bellek harcar?",
+                    answer = "Tuple immutable (değişmez) olduğu için over-allocation yapmaz ve tam gereken boyutta tekil bir C struct tahsis eder."
                 )
             ),
             completionCriteria = listOf(
-                "List, Tuple, Set ve Dict arasındaki farkları bilmek",
+                "List, Tuple, Set ve Dict arasındaki bellek ve zaman karmaşıklıklarını bilmek",
                 "List ve Dict comprehension yapılarını uygulayabilmek",
                 "Dilimleme ([start:stop:step]) kurallarını etkin kullanabilmek"
             )
@@ -414,28 +439,34 @@ object PythonCurriculum {
             id = "py_5",
             courseId = "python",
             sectionId = "py_sec_3",
-            title = "Hata Yönetimi (try-except) & Dosya İşlemleri",
-            shortDesc = "try-except-else-finally blokları, Özel İstisna (Custom Exception) sınıfları, raise, dosya okuma/yazma (with open) ve JSON işlemleri.",
+            title = "İstisna Mimarisi, Context Managers & Dosya I/O",
+            shortDesc = "try-except-else-finally yaşam döngüsü, Custom Exception sınıfları, Exception Chaining, Context Manager (__enter__, __exit__) ve JSON serileştirme.",
             level = CourseLevel.INTERMEDIATE,
             order = 5,
             isPremium = true,
             learningObjectives = listOf(
-                "try-except-else-finally bloklarının tam yaşam döngüsünü kavramak",
-                "Custom Exception sınıfları miras alıp fırlatmak (raise)",
-                "'with open()' context manager kalıbı ile güvenli dosya okuma/yazma ve JSON serileştirme yapmak"
+                "try-except-else-finally bloklarının tam yürütme akışını ve istisna yakalama hiyerarşisini kavramak",
+                "Custom Exception sınıfları ve Exception Chaining ('raise ... from') mekanizmasını öğrenmek",
+                "Context Manager protokolünü (__enter__ ve __exit__) uygulayarak kaynak sızıntılarını (Resource Leak) engellemek",
+                "JSON verilerini güvenle serileştirmek ve dosyaya yazmak"
             ),
             prerequisites = listOf("Python Veri Yapıları ve Comprehensions"),
-            subtopics = listOf("try, except, else, finally", "raise & Custom Exceptions", "with open() Dosya I/O", "Metin Dosyaları (.txt) & JSON", "Otomatik Kaynak Temizliği"),
+            subtopics = listOf("try, except, else, finally Yaşam Döngüsü", "BaseException vs Exception Hiyerarşisi", "Exception Chaining (raise ... from err)", "Context Manager Protokolü (__enter__, __exit__)", "with open() & JSON Serileştirme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. try-except-else-finally Mimarisi",
-                    body = "• try: Hata çıkabilecek kod.\n• except: Hata olursa çalışan blok.\n• else: HATA ÇIKMAZSA çalışan blok.\n• finally: Hata olsa da olmasa da en son mutlaka çalışan temizlik bloğu.",
-                    codeSnippet = "try:\n    f = open('veri.txt', 'r')\nexcept FileNotFoundError:\n    print('Dosya bulunamadı!')\nelse:\n    print('Dosya başarıyla okundu.')\nfinally:\n    print('İşlem tamamlandı.')"
+                    subtitle = "1. try-except-else-finally Bloklarının Tam Yaşam Döngüsü",
+                    body = "Python'da hata yakalama 4 ayrı aşamadan oluşur:\n\n• `try`: Hata fırlatma potansiyeli olan riskli kodlar buraya yazılır.\n• `except SpesifikHata as e`: Yalnızca eşleşen istisna meydana geldiğinde çalışır.\n• `else`: Sadece ve sadece `try` bloğu hiçbir istisna fırlatmadan başarıyla bittiğinde çalışır (Başarı yolu).\n• `finally`: İster hata çıksın ister çıkmasın, fonksiyon `return` edilse dahi en son mutlaka çalışır (Kaynak serbest bırakma).",
+                    codeSnippet = "try:\n    sonuc = 10 / 2\nexcept ZeroDivisionError:\n    print('Sıfıra bölünemez!')\nelse:\n    print(f'Hesaplama Başarılı: {sonuc}') # Çalışır\nfinally:\n    print('Temizlik tamamlandı.')"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. 'with' İfadesi (Context Manager)",
-                    body = "Dosyaları 'with open(...)' ile açtığınızda işlem bitince veya hata fırlatılsa bile dosya otomatik olarak kapatılır (close).",
-                    tip = "Python'da çıplak 'except:' yazmak yerine spesifik hata tiplerini (örn: except ValueError) yakalamak en iyi pratiktir."
+                    subtitle = "2. Özel İstisnalar ve İstisna Zincirleme (Exception Chaining)",
+                    body = "Tüm kullanıcı tanımlı istisnalar `Exception` sınıfından türetilmelidir (`BaseException` doğrudan miras alınmamalıdır, çünkü KeyboardInterrupt gibi sistem sinyallerini de yakalar).\n\nBir hatayı yakalayıp daha üst seviye bir hata olarak fırlatırken orijinal hata izini kaybetmemek için `raise YeniHata(...) from eski_hata` sözdizimi kullanılır.",
+                    codeSnippet = "class VeritabaniHatasi(Exception):\n    \"\"\"Uygulama seviyesinde veritabanı istisnası.\"\"\"\n    pass\n\ntry:\n    # Düşük seviye bağlantı denemesi\n    raise ConnectionRefusedError('Port 5432 kapalı')\nexcept ConnectionRefusedError as err:\n    raise VeritabaniHatasi('Veritabanına ulaşılamadı') from err"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Context Manager Protokolü ve 'with' İfadesi",
+                    body = "İşletim sistemi kaynakları (Dosyalar, Soketler, Kilitler) açık bırakıldığında kaynak sızıntısı (Resource Leak) meydana gelir.\n\n`with open('veri.txt', 'w') as f:` kalıbı Context Manager protokolünü çalıştırır. Blok bittiğinde veya hata fırlatıldığında `f.__exit__()` çağrılarak dosya tanıtıcısı (File Descriptor) işletim sistemine anında iade edilir.",
+                    codeSnippet = "import json\n\nkullanici_verisi = {'kullanici': 'Admin', 'yetkiler': ['read', 'write']}\n\n# Güvenli dosya yazma:\nwith open('ayarlar.json', 'w', encoding='utf-8') as f:\n    json.dump(kullanici_verisi, f, indent=2, ensure_ascii=False)\n\n# Dosya otomatik kapatıldı!"
                 )
             ),
             codeExample = "class BakiyeYetersizError(Exception):\n    pass\n\ndef para_cek(bakiye: float, miktar: float) -> float:\n    if miktar > bakiye:\n        raise BakiyeYetersizError(f'Yetersiz Bakiye! Mevcut: {bakiye}, İstenen: {miktar}')\n    return bakiye - miktar\n\ntry:\n    kalan = para_cek(100.0, 150.0)\nexcept BakiyeYetersizError as err:\n    print(f'İşlem Reddedildi: {err}')",
@@ -509,16 +540,16 @@ object PythonCurriculum {
                 "Kalıtım zinciri kurup 'super()' ile üst sınıfı başlatmak"
             ),
             prerequisites = listOf("Python Hata Yönetimi ve Fonksiyonlar"),
-            subtopics = listOf("class Tanımı", "__init__ & self", "Örnek vs Sınıf Değişkenleri", "Kalıtım (Inheritance)", "super() Metodu"),
+            subtopics = listOf("class & __init__ Kurucusu", "self & cls Referansları", "Sınıf Değişkeni vs Örnek Değişkeni", "Kalıtım (Inheritance) & super()", "MRO (Method Resolution Order)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Sınıf ve self Anatomisi",
-                    body = "Python'da 'self', oluşturulan somut nesne örneğinin (instance) kendisini işaret eder. Metotlar ilk parametre olarak her zaman self alır.",
-                    codeSnippet = "class Araba:\n    def __init__(self, marka: str, model: int):\n        self.marka = marka\n        self.model = model\n    \n    def bilgi(self) -> str:\n        return f'{self.marka} ({self.model})'"
+                    subtitle = "1. Sınıf, __init__ ve 'self' Referansının Anatomisi",
+                    body = "Python'da sınıflar nesne üreten şablonlardır. Bir nesne örneklendiğinde `__init__` kurucusu otomatik tetiklenir.\n\n`self` parametresi, bellekte oluşturulan somut nesne örneğinin kendisini işaret eder. Metot çağrıldığında `nesne.bilgi()` ifadesi Python tarafından arka planda `Sinif.bilgi(nesne)` biçimine dönüştürülür.",
+                    codeSnippet = "class Araba:\n    tekerlek_sayisi = 4 # Sınıf değişkeni (Tüm arabalar paylaşır)\n    \n    def __init__(self, marka: str, model: int):\n        self.marka = marka # Örnek değişkeni (Her arabaya özel)\n        self.model = model\n    \n    def bilgi(self) -> str:\n        return f'{self.marka} ({self.model})'"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Kalıtım ve super()",
-                    body = "Bir sınıf başka bir sınıfı parantez içinde `class Alt(Ust):` şeklinde miras alır. Üst sınıfın kurucusunu çalıştırmak için `super().__init__(...)` kullanılır.",
+                    subtitle = "2. Kalıtım, super() ve Metot Arama Sırası (MRO)",
+                    body = "Alt sınıf `class Kopek(Hayvan):` üst sınıfın tüm metot ve alanlarını devralır. `super().__init__(...)` ile üst sınıf kurucusu tetiklenir.\n\nPython çoklu kalıtımı (Multiple Inheritance) destekler. İki üst sınıfta aynı metot varsa çakışma 'C3 Linearization' algoritması (MRO - Method Resolution Order) ile çözülür (`Sinif.__mro__`).",
                     tip = "Python çoklu kalıtımı (multiple inheritance) destekler ve metot arama sırasını MRO (Method Resolution Order) algoritması ile çözer."
                 )
             ),
@@ -592,16 +623,16 @@ object PythonCurriculum {
                 "abc.ABC ve @abstractmethod ile soyut arayüz kontratları oluşturmak"
             ),
             prerequisites = listOf("OOP Temelleri: Sınıflar ve Kalıtım"),
-            subtopics = listOf("__str__ vs __repr__", "Operatör Aşırı Yükleme (__add__, __eq__)", "Kapsülleme (@property)", "Koleksiyon Protokolü (__len__, __getitem__)", "Soyut Taban Sınıflar (abc.ABC)"),
+            subtopics = listOf("Python Data Model & Dunder Metotlar", "__str__ vs __repr__", "Operatör Aşırı Yükleme (__add__, __eq__, __lt__)", "Kapsülleme (@property & @setter)", "Soyut Taban Sınıflar (abc.ABC)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Python Veri Modeli ve Dunder Metotlar",
-                    body = "`__str__` kullanıcıya gösterilecek metni, `__repr__` ise geliştiriciye yönelik debug çıktısını üretir. `__len__` tanımlandığında nesne üzerinde `len(obj)` çalıştırılabilir.",
-                    codeSnippet = "class Nokta:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n    def __repr__(self):\n        return f'Nokta({self.x}, {self.y})'\n    def __eq__(self, other):\n        return self.x == other.x and self.y == other.y"
+                    subtitle = "1. Python Veri Modeli ve Dunder (Magic) Metotlar",
+                    body = "Python'da yerleşik operatör ve fonksiyonlar (`len()`, `+`, `[]`, `in`, `==`), sınıflara eklenen 'Dunder' (Double Underscore) metotlar üzerinden çalışır:\n\n• `__repr__`: Geliştirici için teknik temsil (kod ile yeniden oluşturulabilir format).\n• `__str__`: Son kullanıcı için okunabilir metin.\n• `__len__`: `len(nesne)` çağrıldığında dönecek tamsayı.\n• `__getitem__`: `nesne[key]` indeksleme yeteneği.\n• `__eq__`, `__lt__`: `==` ve `<` karşılaştırmaları.",
+                    codeSnippet = "class Sepet:\n    def __init__(self):\n        self.urunler = []\n    def __len__(self):\n        return len(self.urunler)\n    def __getitem__(self, index):\n        return self.urunler[index]\n    def __repr__(self):\n        return f'Sepet({self.urunler})'"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. @property ile Şık Kapsülleme",
-                    body = "Java tarzı `get_yas()` veya `set_yas()` yerine Python'da `@property` kullanılır. Dışarıdan normal alan gibi görünürken arkada validasyon çalışır.",
+                    subtitle = "2. @property ile Modern Kapsülleme ve abc.ABC Soyut Sınıfları",
+                    body = "Java'daki hantal `get_fiyat()` / `set_fiyat()` metotları yerine Python'da `@property` dekoratörü kullanılır. Kullanıcı `urun.fiyat = 100` yazar fakat arka planda doğrulama kuralları (validation) çalışır.\n\n`abc.ABC` ve `@abstractmethod` ise alt sınıfların belirli metotları ezmesini zorunlu kılan soyut arayüz sözleşmeleridir.",
                     tip = "Soyut sınıflar için `from abc import ABC, abstractmethod` kullanılır."
                 )
             ),
@@ -675,16 +706,17 @@ object PythonCurriculum {
                 "yield anahtar kelimesi ile gigabaytlarca veriyi RAM'i doldurmadan akıtan jeneratörler inşa etmek"
             ),
             prerequisites = listOf("Python Fonksiyonlar, Scope & Dunder Metotlar"),
-            subtopics = listOf("First-Class Functions & Closures", "Fonksiyon Dekoratörleri", "functools.wraps Önemi", "Parametreli Dekoratörler", "yield & Generator İfadeleri"),
+            subtopics = listOf("First-Class Functions & Closures", "Fonksiyon Dekoratörleri (@)", "functools.wraps ile Metadata Korunumu", "Parametreli Dekoratörler", "yield & Lazy Evaluation Jeneratörler"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Dekoratör (@) Nedir?",
-                    body = "Dekoratör, bir fonksiyonu girdi olarak alıp onun kaynak kodunu değiştirmeden davranışını genişleten ve yeni bir fonksiyon döndüren yapıdır.",
-                    codeSnippet = "import time\nfrom functools import wraps\n\ndef zaman_olc(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        t0 = time.perf_counter()\n        res = func(*args, **kwargs)\n        print(f'{func.__name__} {time.perf_counter()-t0:.4f} sn sürdü.')\n        return res\n    return wrapper"
+                    subtitle = "1. Dekoratör Deseni (@) ve Closure Mekanizması",
+                    body = "Python'da fonksiyonlar birinci sınıf vatandaştır (First-Class Citizens); değişkenlere atanabilir, başka fonksiyonlara argüman olarak iletilebilir ve fonksiyonlardan döndürülebilir.\n\nDekoratör, bir fonksiyonun gövdesini değiştirmeden önüne ve arkasına ek davranışlar (loglama, yetkilendirme, süre ölçümü, önbellekleme) ekleyen sarmalayıcı bir fonksiyondur. `@functools.wraps(func)` dekoratörü ise orijinal fonksiyonun `__name__` ve `__doc__` meta bilgilerini wrapper fonksiyona aktarır.",
+                    codeSnippet = "import time\nfrom functools import wraps\n\ndef sure_olc(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        baslangic = time.perf_counter()\n        sonuc = func(*args, **kwargs)\n        print(f'{func.__name__} {time.perf_counter() - baslangic:.4f} sn sürdü.')\n        return sonuc\n    return wrapper"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Jeneratörler ve 'yield' ile Sonsuz Akış",
-                    body = "'return' fonksiyonu sonlandırır; 'yield' ise fonksiyonun durumunu dondurup bir sonraki değere kadar bekletir. Milyonlarca satırlık büyük dosyalarda RAM tüketimini sıfıra indirir.",
+                    subtitle = "2. Jeneratörler (Generators) ve 'yield' ile Sonsuz Bellek Tasarrufu",
+                    body = "Standart bir fonksiyon `return` ile tüm listeyi bellekte (RAM) tek seferde oluşturup döner. Eğer 10 milyon satırlık bir CSV okuyorsanız RAM tükenir.\n\n`yield` anahtar kelimesi, fonksiyonun durumunu dondurur (freeze) ve sadece bir sonraki değer talep edildiğinde (`next()` veya for döngüsü) sonraki adıma geçer (Lazy Evaluation). Bellek tüketimi O(N)'den O(1)'e düşer.",
+                    codeSnippet = "def buyuk_dosya_oku(dosya_yolu):\n    with open(dosya_yolu, 'r') as f:\n        for satir in f:\n            yield satir.strip() # Sadece 1 satır bellekte tutulur",
                     tip = "Jeneratörler tembeldir (lazy evaluation); değer talep edilene (next()) kadar hesaplama yapılmaz."
                 )
             ),
@@ -758,16 +790,16 @@ object PythonCurriculum {
                 "asyncio.gather ve asyncio.create_task ile binlerce I/O işlemini eşzamanlı yürütmek"
             ),
             prerequisites = listOf("Python Jeneratörler ve Dekoratörler"),
-            subtopics = listOf("Cooperative Multitasking", "Event Loop Çalışma Prensibi", "async & await", "asyncio.create_task", "asyncio.gather"),
+            subtopics = listOf("Cooperative Multitasking & Event Loop", "async def & Coroutine Nesneleri", "await ile Bloke Etmeyen Bekleme", "asyncio.create_task vs asyncio.gather", "I/O-Bound Optimizasyonu"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. AsyncIO Neden Gereklidir?",
-                    body = "Standart Python kodunda bir veritabanı veya ağ sorgusu beklerken tüm program durur. AsyncIO, bekleyen işlemi Event Loop'a devreder ve o sırada başka bir coroutine'i çalıştırarak tek thread üzerinde on binlerce eşzamanlı bağlantıyı yönetir.",
-                    codeSnippet = "import asyncio\n\nasync def api_cagrisi(servis: str):\n    print(f'{servis} başladı...')\n    await asyncio.sleep(1) # Bloke etmeyen asenkron bekleme\n    return f'{servis} sonucu'"
+                    subtitle = "1. AsyncIO Mimarisi ve Event Loop Çalışma Prensibi",
+                    body = "Geleneksel senkron kodda bir ağ isteği veya disk okuması yapıldığında CPU hiçbir şey yapmadan bekler (Blocking I/O).\n\nAsyncIO, tek bir thread üzerinde 'Event Loop' (Olay Döngüsü) koşturur. Bir coroutine `await` gördüğünde kontrolü Event Loop'a geri devreder; döngü bekleyen başka bir görevi çalıştırır. Veri hazır olduğunda duraklayan iş kaldığı yerden devam eder (Cooperative Multitasking).",
+                    codeSnippet = "import asyncio\n\nasync def api_istegi(servis_adi: str, gecikme: float):\n    print(f'{servis_adi} isteği yollandı...')\n    await asyncio.sleep(gecikme) # Asenkron non-blocking bekleme\n    print(f'{servis_adi} yanıtı alındı!')\n    return {servis_adi: 'Başarılı'}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. asyncio.gather ile Paralel I/O",
-                    body = "Birden fazla asenkron görevi aynı anda ateşleyip sonuçlarını liste olarak toplar.",
+                    subtitle = "2. asyncio.gather ve asyncio.create_task ile Paralel I/O",
+                    body = "• `asyncio.create_task(coro)`: Görevi Event Loop'a derhal planlayıp arka planda başlatır (Future döner).\n• `asyncio.gather(*tasks)`: Onlarca veya binlerce asenkron görevi eşzamanlı ateşler ve sonuçları liste olarak toplar.\n\n*Önemli Not:* AsyncIO içinde senkron `time.sleep()` çağrılmamalıdır; bu tüm Event Loop'u dondurur. Daima `await asyncio.sleep()` kullanılmalıdır.",
                     tip = "AsyncIO içinde senkron `time.sleep()` çağrılmamalıdır; bu tüm Event Loop'u kilitler. Daima `await asyncio.sleep()` kullanılmalıdır."
                 )
             ),
@@ -841,16 +873,16 @@ object PythonCurriculum {
                 "concurrent.futures (ThreadPoolExecutor & ProcessPoolExecutor) ile havuz yönetimi yapmak"
             ),
             prerequisites = listOf("Asenkron Python & AsyncIO"),
-            subtopics = listOf("Global Interpreter Lock (GIL)", "threading & Race Conditions", "multiprocessing & IPC", "concurrent.futures", "CPU-bound vs I/O-bound"),
+            subtopics = listOf("Global Interpreter Lock (GIL) Mimarisi", "threading vs multiprocessing", "Race Condition & Lock/RLock", "concurrent.futures Havuzları", "CPU-Bound vs I/O-Bound Stratejileri"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. GIL (Global Interpreter Lock) Gerçeği",
-                    body = "CPython bellek yönetiminde (özellikle referans sayacı) thread-safe olmadığı için tek bir Python bayt kodunu aynı anda yalnızca BİR işletim sistemi thread'inin çalıştırmasına izin verir. Bu nedenle standart threading CPU-bound işlemlerde çekirdekleri paralel kullanamaz.",
-                    codeSnippet = "# CPU-bound işlerde gerçek paralellik için multiprocessing:\nfrom multiprocessing import Pool\n\ndef agir_hesap(n):\n    return sum(i * i for i in range(n))\n\nwith Pool() as pool:\n    sonuclar = pool.map(agir_hesap, [1000000, 2000000, 3000000])"
+                    subtitle = "1. GIL (Global Interpreter Lock) ve Threading Gerçeği",
+                    body = "CPython bellek yönetiminde (özellikle `ob_refcnt` referans sayacı) thread-safe olmadığı için tek bir Python bayt kodunu aynı anda yalnızca BİR işletim sistemi thread'inin çalıştırmasına izin veren 'Global Interpreter Lock' (GIL) kilidini kullanır.\n\nBu nedenle standart Python thread'leri CPU-bound (yoğun matematik/hesaplama) işlerde birden fazla çekirdeği paralel kullanamaz.",
+                    codeSnippet = "# Threading CPU-bound işleri hızlandırmaz!\n# Çoklu çekirdeği tam kullanmak için Multiprocessing:\nfrom multiprocessing import Pool\n\ndef agir_hesap(n: int) -> int:\n    return sum(i * i for i in range(n))\n\nif __name__ == '__main__':\n    with Pool() as pool:\n        sonuclar = pool.map(agir_hesap, [5000000, 5000000, 5000000])"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Threading vs Multiprocessing Seçim Tablosu",
-                    body = "• I/O-bound (Ağ/Dosya): `asyncio` veya `ThreadPoolExecutor` (Düşük bellek maliyeti).\n• CPU-bound (Görüntü işleme/ML/Şifreleme): `ProcessPoolExecutor` (Ayrı bellek ve bağımsız GIL).",
+                    subtitle = "2. Mimari Seçim Kriterleri & concurrent.futures",
+                    body = "• **I/O-Bound (Ağ/Disk/Veritabanı):** `asyncio` veya `concurrent.futures.ThreadPoolExecutor` (Düşük bellek tüketimi, thread'ler GIL'i I/O anında serbest bırakır).\n• **CPU-Bound (Görüntü İşleme, Makine Öğrenimi, Şifreleme):** `concurrent.futures.ProcessPoolExecutor` (Ayrı bellek alanları ve her çekirdeğe bağımsız GIL).\n\n*İş parçacığı güvenliği (Thread-Safety):* Ortak değişkenlere eşzamanlı yazmada veri bozulmasını önlemek için `threading.Lock()` ile kritik bölgeler kilitlenmelidir.",
                     tip = "Multiprocessing işlemler arası iletişimde (IPC) verileri serialize (pickle) ettiği için küçük veri transferlerinde tercih edilmelidir."
                 )
             ),
@@ -924,16 +956,16 @@ object PythonCurriculum {
                 "Metaclass yazarak alt sınıfların API kurallarına uyup uymadığını derleme anında denetlemek"
             ),
             prerequisites = listOf("İleri OOP & Concurrency"),
-            subtopics = listOf("Descriptor Protocol (__get__, __set__)", "Data vs Non-Data Descriptors", "type as Metaclass", "Custom Metaclass (__new__)", "ORM & Validation Mimarisi"),
+            subtopics = listOf("Descriptor Protokolü (__get__, __set__, __set_name__)", "Data vs Non-Data Descriptors", "Dinamik Sınıf Üretimi (type(name, bases, dict))", "Özel Metaclass Mimarisi (__new__ & __init__)", "ORM & Validasyon Sistemleri Tasarımı"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Descriptor Protokolü (ORM'lerin Temeli)",
-                    body = "Bir sınıf niteliğine erişildiğinde araya giren nesnelerdir. Django modellerindeki `models.CharField` veya Python'ın yerleşik `@property` ve `@classmethod` dekoratörleri birer Descriptor'dır.",
-                    codeSnippet = "class PozitifSayi:\n    def __set_name__(self, owner, name):\n        self.name = name\n    def __get__(self, instance, owner):\n        return instance.__dict__.get(self.name, 0)\n    def __set__(self, instance, value):\n        if value < 0:\n            raise ValueError(f'{self.name} negatif olamaz!')\n        instance.__dict__[self.name] = value"
+                    subtitle = "1. Descriptor Protokolü (ORM ve Framework Motoru)",
+                    body = "Bir sınıf niteliğine erişildiğinde (`obj.alan`), atama yapıldığında (`obj.alan = 5`) veya silindiğinde araya giren protokoldür.\n\nDjango ORM modellerindeki `models.CharField`, SQLAlchemy sütunları veya `@property` / `@classmethod` gibi tüm yerleşik dekoratörler birer Descriptor'dır.",
+                    codeSnippet = "class PozitifSayi:\n    def __set_name__(self, owner, name):\n        self.name = name\n    def __get__(self, instance, owner):\n        if instance is None: return self\n        return instance.__dict__.get(self.name, 0)\n    def __set__(self, instance, value):\n        if value < 0:\n            raise ValueError(f'{self.name} negatif olamaz!')\n        instance.__dict__[self.name] = value"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Metaclasses (Sınıfların Sınıfı)",
-                    body = "Python'da sınıflar da birer nesnedir ve 'type' metasınıfının örnekleridir. Metaclass tanımlayarak sınıflar tanımlandığı anda araya girip kuralları zorlayabilirsiniz.",
+                    subtitle = "2. Metaclasses (Sınıf Üreten Sınıflar)",
+                    body = "Python'da nesneleri sınıflar üretir, sınıfları ise 'Metaclass' üretir. Varsayılan metasınıf `type`'tır (`class X:` aslında `type('X', (), {})` çağrısıdır).\n\nÖzel bir Metaclass tanımlayarak (`class Meta(type):`), alt sınıflar tanımlandığı anda (import sırasında) araya girip kuralları (zorunlu metotlar, isimlendirme standartları, otomatik alan kayıtları) zorunlu kılabilirsiniz.",
                     tip = "Zen of Python: 'Metaclasses are deeper magic than 99% of users should ever worry about.'"
                 )
             ),
@@ -1007,16 +1039,17 @@ object PythonCurriculum {
                 "dis modülü ile Python Bytecode komutlarını analiz edip performans darboğazlarını çözmek"
             ),
             prerequisites = listOf("Metaprogramming & Eşzamanlılık"),
-            subtopics = listOf("PyObject Anatomisi", "sys.getrefcount & Bellek Tahsisi", "Cyclic Garbage Collector (Gen 0, 1, 2)", "dis Modülü & Bytecode Analizi", "C Uzantıları (ctypes / CFFI)"),
+            subtopics = listOf("PyObject C Struct Anatomisi", "sys.getrefcount & Bellek İdaresi", "Cyclic Garbage Collector (Gen 0, 1, 2)", "dis Modülü & Bytecode Talimatları", "C Uzantıları & Performans Optimizasyonu"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. CPython Bellek Modeli & PyObject",
-                    body = "CPython'da her nesne bir C struct'ıdır: `typedef struct _object { _PyObject_HEAD_EXTRA Py_ssize_t ob_refcnt; struct _typeobject *ob_type; } PyObject;`. ob_refcnt sıfırlandığında bellek derhal serbest bırakılır.",
-                    codeSnippet = "import sys\na = []\nb = a\nprint(sys.getrefcount(a)) # 3 (a, b ve getrefcount parametresi)"
+                    subtitle = "1. CPython Bellek Modeli & PyObject C Yapısı",
+                    body = "CPython'da tam sayılardan fonksiyonlara kadar her nesne bir C struct'ıdır:\n\n`typedef struct _object { Py_ssize_t ob_refcnt; struct _typeobject *ob_type; } PyObject;`\n\n• `ob_refcnt`: Nesneyi gösteren referans sayısı. Sıfıra düştüğünde bellek anında işletim sistemine geri verilir (Immediate deallocation).",
+                    codeSnippet = "import sys\na = [1, 2, 3]\nb = a # Referans sayısı 2 oldu\nprint(sys.getrefcount(a)) # 3 basar (getrefcount argümanı geçici bir referanstır)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Cyclic Garbage Collector (Döngüsel Çöp Toplayıcı)",
-                    body = "Birbirini işaret eden nesnelerde (a.child = b; b.parent = a) referans sayacı asla sıfıra inmez. Python bu döngüleri çözmek için Gen 0, Gen 1 ve Gen 2 olmak üzere 3 jenerasyonlu periyodik çöp toplayıcı koşturur.",
+                    subtitle = "2. Cyclic Garbage Collector ve Python Bytecode (dis)",
+                    body = "Döngüsel referanslarda (`a.child = b; b.parent = a`) nesneler silinse dahi referans sayıları asla sıfıra inmez. Bu bellek sızıntısını engellemek için CPython, 3 jenerasyonlu (Generation 0, 1, 2) 'Cyclic Garbage Collector' algoritmasını çalıştırır.\n\n`dis` modülü ise yazdığınız Python fonksiyonlarının sanal makinede (CPython VM) hangi yığın (stack) komutlarına dönüştüğünü gösterir.",
+                    codeSnippet = "import dis\n\ndef topla(x, y):\n    return x + y\n\ndis.dis(topla) # LOAD_FAST, BINARY_OP, RETURN_VALUE",
                     tip = "Bytecode seviyesinde optimizasyon analizi için yerleşik `dis` modülü kullanılır."
                 )
             ),

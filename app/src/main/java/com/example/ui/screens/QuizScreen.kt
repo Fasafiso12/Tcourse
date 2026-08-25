@@ -37,6 +37,11 @@ fun QuizScreen(
     val currentQuestion = quizState.questions.getOrNull(quizState.currentIndex)
     val totalCount = quizState.questions.size
     val currentNumber = quizState.currentIndex + 1
+    val scrollState = rememberScrollState()
+
+    androidx.compose.runtime.LaunchedEffect(quizState.currentIndex) {
+        scrollState.scrollTo(0)
+    }
 
     Scaffold(
         topBar = {
@@ -103,7 +108,7 @@ fun QuizScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {

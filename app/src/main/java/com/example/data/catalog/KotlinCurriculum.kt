@@ -91,17 +91,22 @@ object KotlinCurriculum {
                 "String şablonları ve akıllı tip dönüşümlerini (Smart Cast) kullanmak"
             ),
             prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("val vs var", "Temel Veri Tipleri", "Null Güvenliği (?)", "Elvis Operatörü (?:)", "Smart Casts (is)"),
+            subtopics = listOf("val vs var ve Değişmezlik (Immutability)", "Kotlin Tip Sistemi & Type Inference", "Nullable vs Non-Nullable Tipler", "Elvis Operatörü (?:) & Safe Call (?.)", "Smart Casts ve Derleyici Veri Akışı Analizi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Null Safety: NullPointerException Tarihe Karışıyor",
-                    body = "Kotlin'de tipler varsayılan olarak `null` değer ALAMAZ. Null alabilecek değişkenler sonuna `?` konularak açıkça belirtilir. Bu sayede derleyici çalışma zamanında çökebilecek tüm null risklerini derleme anında yakalar.",
-                    codeSnippet = "var isim: String = \"Ahmet\" // Asla null olamaz\nvar soyisim: String? = null // Null alabilir\n\nval uzunluk = soyisim?.length ?: 0 // Elvis: null ise 0 ata"
+                    subtitle = "1. Null Safety Mimarisi ve Derleme Zamanı Garantisi",
+                    body = "Kotlin'in en devrimsel özelliklerinden biri, 'Milyar Dolarlık Hata' olarak bilinen `NullPointerException` (NPE) krizini derleme zamanında engellemesidir.\n\nKotlin tip sistemi ikiye ayrılır:\n• Non-Nullable Tipler: `String`, `Int` gibi tipler asla `null` değer tutamaz. Derleyici null atanmasına izin vermez.\n• Nullable Tipler: `String?`, `User?` gibi sonuna `?` eklenen tipler null tutabilir.\n\nJVM Bytecode Düzeyinde: Non-null bir parametreye sahip fonksiyon çağrıldığında, Kotlin derleyicisi metodun en başına otomatik olarak `Intrinsics.checkNotNullParameter()` byte komutunu yerleştirerek güvenliği garanti altına alır.",
+                    codeSnippet = "var isim: String = \"Ahmet\" // Derleyici null atanmasını kesinlikle reddeder\nvar soyisim: String? = null // Null alabilir\n\nval uzunluk = soyisim?.length ?: 0 // Elvis: soyisim null ise 0 döner"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. val vs var Tercihi",
-                    body = "Kotlin felsefesi gereği değişkenler varsayılan olarak `val` (immutable / salt okunur) tanımlanmalıdır. Sadece değeri değişmek zorunda olan durumlar için `var` kullanılmalıdır.",
-                    tip = "Asla zorunlu kalmadıkça `!!` (not-null assertion) kullanmayın; bu operatör null durumunda uygulamanızı anında çökertir."
+                    subtitle = "2. val (Salt-Okunur) vs var (Değişken) ve Referans Değişmezliği",
+                    body = "• `val`: Java'daki `final` anahtar kelimesine karşılık gelir. Referans bir kez atandıktan sonra başka bir nesneye yönlendirilemez. Değişmezlik (immutability) eşzamanlı (multi-threaded) programlamada yarış durumlarını (race condition) önler.\n• `var`: Değeri veya işaret ettiği nesne sonradan değiştirilebilir.",
+                    tip = "Temel Kural: Değişkenlerinizi daima `val` ile başlatın; yalnızca değeri gerçekten değişmek zorunda olan durumlarda `var` kullanın."
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Smart Cast (Akıllı Tip Çıkarımı)",
+                    body = "Kotlin derleyicisi veri akışı analizi (Dataflow Analysis) yaparak değişkenin null olmadığını veya belirli bir tipe ait olduğunu anladığı anda otomatik cast işlemi uygular.\n\nÖrneğin `if (metin != null)` kontrolü yapıldıktan sonra `metin` değişkeni blok içinde doğrudan non-null `String` olarak kabul edilir ve `metin.length` güvenle çağrılabilir.",
+                    codeSnippet = "fun yazdir(nesne: Any) {\n    if (nesne is String) {\n        // 'nesne' bu blokta otomatik olarak String'e dönüştürülmüştür (Smart Cast)\n        println(\"Metin uzunluğu: \" + nesne.length)\n    }\n}"
                 )
             ),
             codeExample = "fun main() {\n    val kullaniciAdi: String? = \"Zeynep\"\n    val mesaj = \"Hoş geldin, \" + (kullaniciAdi ?: \"Misafir\")\n    val harfSayisi = kullaniciAdi?.length ?: 0\n    \n    println(\"\$mesaj (Karakter: \$harfSayisi)\")\n}",
@@ -175,17 +180,17 @@ object KotlinCurriculum {
                 "downTo, step ve until ile for döngülerini kurmak"
             ),
             prerequisites = listOf("Kotlin'e Giriş, Değişkenler ve Null Safety"),
-            subtopics = listOf("if as Expression", "when İfadesi & Exhaustiveness", "Ranges (1..10, until, downTo, step)", "for in Koleksiyonlar", "while ve do-while"),
+            subtopics = listOf("if as Expression (Ternary Alternatifi)", "when İfadesi & Exhaustiveness Kapsamı", "Ranges (1..10, until, downTo, step)", "for in Koleksiyonlar & İteratör Protokolü", "while ve do-while"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. if ve when Değer Döndürür",
-                    body = "Kotlin'de ternary (`?:`) operatörü yoktur; çünkü `val max = if (a > b) a else b` doğrudan sonuç üretir. Benzer şekilde `when` her daldan bir değer döndürebilir.",
-                    codeSnippet = "val sonuc = when (not) {\n    in 90..100 -> \"AA\"\n    in 80..89 -> \"BA\"\n    is Int -> \"Geçerli Sayı\"\n    else -> \"Kaldı\"\n}"
+                    subtitle = "1. if ve when: İfade Tabanlı (Expression-Based) Yaklaşım",
+                    body = "Kotlin'de `if` ve `when` sadece kod akışını yönlendiren bir deyim (statement) değil, bir sonuç değeri üreten ifadedir (expression). Bu sayede C/Java tarzı `? :` üçlü ternary operatörüne ihtiyaç duyulmaz.\n\n`when` yapısı Java'daki `switch`'e göre çok daha gelişmiştir: Sabit değerler yerine aralıklar (`in 1..10`), tip kontrolleri (`is String`), çoklu koşullar ve keyfi boolean ifadeler sınanabilir.",
+                    codeSnippet = "val sonuc = when (not) {\n    in 90..100 -> \"AA (Üstün Başarı)\"\n    in 80..89 -> \"BA\"\n    is Int -> \"Geçerli Sayısal Not\"\n    else -> \"Tekrar Deneyiniz\"\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Ranges ve İterasyonlar",
-                    body = "• `1..5`: 1, 2, 3, 4, 5\n• `1 until 5`: 1, 2, 3, 4 (5 hariç)\n• `10 downTo 1 step 2`: 10, 8, 6, 4, 2",
-                    tip = "when bir ifade olarak kullanıldığında derleyici tüm dalların kapsanmasını (`else` veya enum/sealed tiplerde tüm durumları) zorunlu kılar."
+                    subtitle = "2. Ranges (Aralıklar) ve İteratör Bytecode Optimizasyonu",
+                    body = "• `1..5`: 1, 2, 3, 4, 5 (Kapalı aralık, `ClosedRange`)\n• `1 until 5`: 1, 2, 3, 4 (5 hariç, yarı açık aralık)\n• `10 downTo 1 step 2`: 10, 8, 6, 4, 2\n\nKotlin derleyicisi temel tiplerde (Int, Long) `for (i in 1..n)` döngüsünü JVM seviyesinde nesne tahsisi yapmadan doğrudan saf C tarzı `for (int i = 1; i <= n; i++)` byte komutlarına dönüştürür.",
+                    tip = "when bir ifade olarak değişkene atanıyorsa veya return ediliyorsa derleyici tüm dalların kapsanmasını (`else` veya enum/sealed hiyerarşisinin tamamını) zorunlu kılar."
                 )
             ),
             codeExample = "fun sinavDegerlendir(puan: Int): String {\n    return when (puan) {\n        in 90..100 -> \"Mükemmel\"\n        in 70..89 -> \"Başarılı\"\n        in 50..69 -> \"Orta\"\n        in 0..49 -> \"Tekrar Deneyin\"\n        else -> \"Geçersiz Puan\"\n    }\n}\n\nfun main() {\n    for (i in 1..3) {\n        print(\"\$i. Derece: \" + sinavDegerlendir(i * 30) + \" | \")\n    }\n}",
@@ -259,17 +264,22 @@ object KotlinCurriculum {
                 "Higher-Order Functions ve Trailing Lambda sözdizimini kavramak"
             ),
             prerequisites = listOf("Kotlin Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Named & Default Arguments", "Single-Expression Functions", "Vararg Parametreleri", "Lambda İfadeleri & 'it'", "Higher-Order Functions (Fonksiyon Alan Fonksiyonlar)"),
+            subtopics = listOf("Named & Default Arguments", "Single-Expression Functions", "Vararg & Spread Operatörü (*)", "Lambda İfadeleri & Örtük 'it'", "Higher-Order Functions & Inline Mekanizması"),
             detailedExplanation = listOf(
                 LessonContentBlock(
                     subtitle = "1. Default & Named Arguments",
-                    body = "Parametrelere varsayılan değer vererek Java'daki aşırı yükleme (overloading) karmaşasını bitirebilirsiniz. Çağırırken parametre adını belirterek sırayı serbestçe değiştirebilirsiniz.",
-                    codeSnippet = "fun baglan(url: String, timeout: Int = 5000, retry: Boolean = true) { ... }\n// Çağrı:\nbaglan(\"https://api.com\", retry = false)"
+                    body = "Parametrelere varsayılan değer tanımlayarak onlarca constructor veya method overloading yazma ihtiyacını ortadan kaldırır. Çağrı esnasında parametre adı belirtilerek (`timeout = 5000`) argüman sırası esnetilebilir.",
+                    codeSnippet = "fun baglan(url: String, timeout: Int = 5000, retry: Boolean = true) {\n    println(\"\$url adresine \${timeout}ms timeout ile baglaniliyor...\")\n}\n// Çağrı:\nbaglan(\"https://api.com\", retry = false)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Trailing Lambda Sözdizimi",
-                    body = "Bir fonksiyonun SON parametresi bir lambda ise, o lambda parantezlerin DIŞINA süslü parantez `{ }` olarak yazılabilir. Tek parametreli lambdalarda parametre adı `it` olur.",
-                    codeSnippet = "val sayilar = listOf(1, 2, 3, 4)\nval ciftler = sayilar.filter { it % 2 == 0 }"
+                    subtitle = "2. Trailing Lambda ve 'it' Parametresi",
+                    body = "Bir fonksiyonun son parametresi fonksiyonel bir tip (`(T) -> R`) ise, çağrı yapılırken lambda gövdesi normal parantezlerin dışına `{ ... }` şeklinde yazılabilir. Tek parametre alan lambdalarda parametre tanımlamadan doğrudan `it` kullanılabilir.",
+                    codeSnippet = "val sayilar = listOf(1, 2, 3, 4)\n// Trailing lambda:\nval ciftler = sayilar.filter { it % 2 == 0 }"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Higher-Order Functions ve inline Anahtarı",
+                    body = "Parametre olarak fonksiyon alan veya fonksiyon döndüren fonksiyonlara Higher-Order Function denir. Normalde her lambda bir JVM nesnesi oluştururken, `inline` anahtar kelimesiyle işaretlenen fonksiyonlar derleme anında doğrudan çağrı yerine yapıştırılarak sıfır nesne tahsisiyle çalışır.",
+                    tip = "Jetpack Compose'un `@Composable` fonksiyonları ve Kotlin standart kütüphanesindeki `filter`, `map`, `apply` gibi fonksiyonların çoğu `inline` olarak tanımlıdır."
                 )
             ),
             codeExample = "fun calismaZamaniHesapla(islemAdi: String, blok: () -> Unit) {\n    val baslangic = System.currentTimeMillis()\n    blok() // Lambdayı çalıştır\n    val sure = System.currentTimeMillis() - baslangic\n    println(\"\$islemAdi tamamlandı: \${sure}ms\")\n}\n\nfun main() {\n    // Trailing lambda kullanımı:\n    calismaZamaniHesapla(\"Veri İndirme\") {\n        Thread.sleep(50)\n    }\n}",
@@ -342,17 +352,22 @@ object KotlinCurriculum {
                 "reduce ve fold ile liste elemanlarını akümülatörle toplamak"
             ),
             prerequisites = listOf("Fonksiyonlar ve Higher-Order Lambdalar"),
-            subtopics = listOf("List vs MutableList", "Set & Map Yapıları", "map, filter & find", "groupBy & associateBy", "fold vs reduce"),
+            subtopics = listOf("List vs MutableList Hiyerarşisi", "Set & Map Veri Yapıları", "map, filter, find & any/all", "groupBy & associateBy", "Sequence vs Iterable (Lazy vs Eager)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Read-Only vs Mutable Koleksiyonlar",
-                    body = "Kotlin standart kütüphanesinde `listOf(...)` salt okunurdur (`add`/`remove` metotları yoktur). Değiştirilebilir liste için açıkça `mutableListOf(...)` oluşturulmalıdır.",
-                    codeSnippet = "val okunur = listOf(\"A\", \"B\")\n// okunur.add(\"C\") // DERLEME HATASI\nval degisir = mutableListOf(\"A\", \"B\")\ndegisir.add(\"C\") // Geçerli"
+                    subtitle = "1. Read-Only (List) vs Mutable Koleksiyon Ayrımı",
+                    body = "Kotlin koleksiyon hiyerarşisinde `List<T>` salt okunur bir arayüzdür; `add()`, `remove()` metodları sunmaz. Bu sayede thread-safe ve güvenli veri akışı sağlanır. Değiştirilebilir koleksiyon için açıkça `MutableList<T>` (`mutableListOf()`) kullanılır.",
+                    codeSnippet = "val okunur: List<String> = listOf(\"Kotlin\", \"Compose\")\n// okunur.add(\"Android\") // DERLEME HATASI - API seviyesinde engellenir\n\nval degisir: MutableList<String> = mutableListOf(\"Kotlin\")\ndegisir.add(\"Compose\") // Geçerli"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Güçlü Koleksiyon Operatörleri",
-                    body = "• `groupBy { it.kategori }`: Elemanları kategoriye göre `Map<Kategori, List<T>>` yapar.\n• `flatMap { it.dersler }`: İç içe listeleri tek bir düz listeye açar.",
-                    tip = "Büyük veri setlerinde ara liste kopyalarını engellemek için koleksiyonun başına `.asSequence()` ekleyin (Tembel/Lazy değerlendirme)."
+                    subtitle = "2. Güçlü Fonksiyonel Dönüşüm Zincirleri",
+                    body = "• `filter { ... }`: Koşulu sağlayan elemanları süzer.\n• `map { ... }`: Her elemanı yeni bir tipe/değere dönüştürür.\n• `flatMap { ... }`: İç içe koleksiyonları tek bir düz listeye indirger.\n• `groupBy { ... }`: Elemanları bir kritere göre `Map<K, List<V>>` yapısına ayırır.",
+                    codeSnippet = "val gruplu = urunler.groupBy { it.kategori }"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Sequence: Tembel (Lazy) Değerlendirme ile Bellek Optimizasyonu",
+                    body = "Standart Iterable zincirinde (`filter { }.map { }`) her adımda yeni bir ara liste (Intermediate List) tahsis edilir. Büyük veri setlerinde `.asSequence()` kullanarak işlem adımları eleman bazında tembel (lazy) yürütülür ve bellekte gereksiz nesne oluşturulması önlenir.",
+                    tip = "Büyük boyutlu (>1000 eleman) veya çok adımlı koleksiyon zincirlerinde mutlaka `.asSequence()` tercih edin."
                 )
             ),
             codeExample = "data class Urun(val ad: String, val fiyat: Double, val kategori: String)\n\nfun main() {\n    val urunler = listOf(\n        Urun(\"Telefon\", 25000.0, \"Elektronik\"),\n        Urun(\"Kulaklık\", 1500.0, \"Elektronik\"),\n        Urun(\"Kitap\", 120.0, \"Kültür\")\n    )\n    \n    // Elektronik ürünlerin toplam fiyatını hesaplayalım:\n    val elektronikToplam = urunler\n        .filter { it.kategori == \"Elektronik\" }\n        .map { it.fiyat }\n        .sum()\n        \n    println(\"Elektronik Toplam: \$elektronikToplam TL\")\n}",
@@ -425,17 +440,22 @@ object KotlinCurriculum {
                 "Sealed Class/Interface ile MVI/MVVM State makinelerini tip güvenli tasarlamak"
             ),
             prerequisites = listOf("Koleksiyonlar ve Fonksiyonel Dönüşümler"),
-            subtopics = listOf("Primary vs Secondary Constructor", "Data Classes & .copy()", "Sealed Classes / Interfaces", "when ile Sealed Class Exhaustiveness", "object & Companion Object"),
+            subtopics = listOf("Primary Constructor & init Bloğu", "Data Classes, .copy() & Destructuring Declarations", "Sealed Interfaces & Sınıf Hiyerarşisi Kısıtlama", "when ile Exhaustive State Yönetimi", "object (Singleton) & Companion Object"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Data Class: Otomatik Kod Üretimi",
-                    body = "`data class` başına eklenen tek kelimeyle derleyici; `equals()`, `hashCode()`, `toString()`, `copy()` ve `componentN()` metotlarını arka planda otomatik üretir.",
-                    codeSnippet = "data class Kullanici(val id: Long, val ad: String)\nval k1 = Kullanici(1, \"Ali\")\nval k2 = k1.copy(ad = \"Veli\") // İmmutable güncelleme"
+                    subtitle = "1. Data Class: Otomatik Kod Üretimi ve Destructuring",
+                    body = "`data class` tanımlandığında Kotlin derleyicisi birincil kurucudaki tüm alanlar için otomatik olarak `equals()`, `hashCode()`, `toString()`, `copy()` ve `component1()..componentN()` metotlarını üretir.\nBu sayede `val (id, isim) = kullanici` şeklinde ayrıştırma (Destructuring) doğrudan yapılabilir.",
+                    codeSnippet = "data class Kullanici(val id: Long, val ad: String)\nval k1 = Kullanici(1, \"Ali\")\nval k2 = k1.copy(ad = \"Veli\") // İmmutable güncelleme\nval (id, ad) = k2 // Destructuring"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Sealed Classes: Modern UI State Deseni",
-                    body = "Kalıtım hiyerarşisini kısıtlayan cebirsel veri tipidir. `when` içinde kullanıldığında `else` dalına gerek kalmadan tüm durumları (Loading, Success, Error) derleme seviyesinde eksiksiz yönetir.",
-                    tip = "Android ve Compose projelerinde UI State modellemesi için `sealed interface UiState` endüstri standardıdır."
+                    subtitle = "2. Sealed Class / Interface: Cebirsel Veri Tipleri & Exhaustive Kontrol",
+                    body = "Sealed yapılar kalıtım hiyerarşisini aynı paket/modül içinde kısıtlar. Derleyici tüm alt sınıfları kesin olarak bilir. `when(state)` ifadesinde tüm alt tipler ele alındığında `else` dalına gerek kalmaz. Gelecekte yeni bir alt tip eklendiğinde derleyici tüm `when` bloklarında hata vererek eksik durum kalmasını imkansız kılar.",
+                    codeSnippet = "sealed interface UiState {\n    object Loading : UiState\n    data class Success(val veri: List<String>) : UiState\n    data class Error(val hataKodu: Int, val mesaj: String) : UiState\n}"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. object (Thread-Safe Singleton) ve companion object",
+                    body = "Kotlin'de `object DatabaseHelper { ... }` ifadesi JVM seviyesinde thread-safe lazy bir Singleton oluşturur. Sınıf içi statik benzeri fabrika metodları için `companion object` kullanılır.",
+                    tip = "Jetpack Compose ve Android ViewModel state yönetiminde her ekran durumu bir `sealed interface` ile modellenir."
                 )
             ),
             codeExample = "sealed interface UiState {\n    object Loading : UiState\n    data class Success(val veri: String) : UiState\n    data class Error(val mesaj: String) : UiState\n}\n\nfun renderUi(state: UiState): String = when (state) {\n    is UiState.Loading -> \"Yükleniyor... ⏳\"\n    is UiState.Success -> \"Başarılı: \" + state.veri\n    is UiState.Error -> \"Hata Oluştu: \" + state.mesaj\n}\n\nfun main() {\n    val state: UiState = UiState.Success(\"Profil Yüklendi\")\n    println(renderUi(state))\n}",

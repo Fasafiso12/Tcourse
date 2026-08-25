@@ -239,6 +239,8 @@ fun CodeEditorComponent(
     minEditorHeight: Int = 180,
     showSymbolsToolbar: Boolean = true,
     showConsoleInitially: Boolean = true,
+    showRunButton: Boolean = true,
+    showOutputTerminal: Boolean = true,
     customEditorTheme: EditorTheme? = null,
     testTagPrefix: String = "code_editor"
 ) {
@@ -252,7 +254,11 @@ fun CodeEditorComponent(
 
     var editorFontSizeSp by remember { mutableIntStateOf(13) }
     var isRunning by remember { mutableStateOf(false) }
-    var executionResult by remember(initialOutput) { mutableStateOf(initialOutput) }
+    var executionResult by remember { mutableStateOf(initialOutput) }
+
+    LaunchedEffect(initialOutput) {
+        executionResult = initialOutput
+    }
     var isConsoleExpanded by remember { mutableStateOf(showConsoleInitially) }
     var showThemeMenu by remember { mutableStateOf(false) }
     var showFontSizeMenu by remember { mutableStateOf(false) }
@@ -467,39 +473,41 @@ fun CodeEditorComponent(
                     }
 
                     // Run / Compile Button
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                isRunning = true
-                                isConsoleExpanded = true
-                                val res = if (onExecuteCode != null) {
-                                    onExecuteCode(code, language)
-                                } else {
-                                    CodeExecutionEngine.executePlaygroundCode(code, language)
+                    if (showRunButton) {
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    isRunning = true
+                                    isConsoleExpanded = true
+                                    val res = if (onExecuteCode != null) {
+                                        onExecuteCode(code, language)
+                                    } else {
+                                        CodeExecutionEngine.executePlaygroundCode(code, language)
+                                    }
+                                    executionResult = res
+                                    isRunning = false
                                 }
-                                executionResult = res
-                                isRunning = false
+                            },
+                            enabled = !isRunning,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AccentEmerald,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 9.dp, vertical = 4.dp),
+                            modifier = Modifier.height(28.dp).testTag("${testTagPrefix}_run_btn")
+                        ) {
+                            if (isRunning) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(12.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(13.dp))
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text("Çalıştır", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
-                        },
-                        enabled = !isRunning,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AccentEmerald,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 9.dp, vertical = 4.dp),
-                        modifier = Modifier.height(28.dp).testTag("${testTagPrefix}_run_btn")
-                    ) {
-                        if (isRunning) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(12.dp),
-                                color = Color.White,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(13.dp))
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text("Çalıştır", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -619,7 +627,7 @@ fun CodeEditorComponent(
             }
 
             // 4. Integrated Compiler Terminal / Console Output Pane
-            if (executionResult != null) {
+            if (showOutputTerminal && executionResult != null) {
                 val res = executionResult!!
                 Column(
                     modifier = Modifier

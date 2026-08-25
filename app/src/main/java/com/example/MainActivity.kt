@@ -252,7 +252,8 @@ fun AppRootContent(viewModel: MainViewModel, isDarkTheme: Boolean) {
             PremiumPaywallDialog(
                 appLanguage = appLanguage,
                 onDismiss = { viewModel.closePremiumDialog() },
-                onUpgradeSuccess = { viewModel.activatePremiumPlan() }
+                onUpgradeSuccess = { viewModel.activatePremiumPlan() },
+                onToggleDevMode = { viewModel.setPremiumDevMode(true) }
             )
         }
 

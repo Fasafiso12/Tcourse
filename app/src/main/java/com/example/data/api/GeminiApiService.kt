@@ -194,6 +194,7 @@ object LocalIntelligentTutor {
             AiShortcut.SUMMARIZE -> buildSummaryExplanation(lang, lesson, query, context)
             AiShortcut.EXPLAIN_SENTENCE -> buildSentenceExplanation(lang, lesson, query, context)
             AiShortcut.ANALOGY_EXAMPLE -> buildAnalogyExplanation(lang, lesson, query, context)
+            AiShortcut.CHECK_CODE -> buildCodeCheckExplanation(lang, lesson, query, context)
             null -> buildGeneralTutorResponse(lang, lesson, query, context)
         }
     }
@@ -334,6 +335,29 @@ object LocalIntelligentTutor {
 
             3. **Nasıl İlerlemelisin?**
                İstersen bu konuyu yukarıdaki kısayollardan **Adım Adım**, **Derinlemesine** veya **Benzetme ile** de açıklayabilirim!
+        """.trimIndent()
+    }
+
+    private fun buildCodeCheckExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
+        return """
+            ### 🩺 AI Kod İncelemesi & Pedagojik İpucu
+
+            **İncelenen Ders / Görev:** $lesson ($lang)
+
+            Yazdığın kodu ve görev beklentilerini dikkatle inceledim. Kodun çözüm mantığına doğru ilerliyor, ancak hatayı gidermen için şu noktalara odaklanmalısın:
+
+            1. **Sözdizimi ve Blok Yapısı:**
+               * Fonksiyon ve blok süslü parantezlerinin `{ }` eksiksiz açılıp kapandığından emin ol.
+               * $lang sözdiziminde satır sonu noktalı virgülleri `;` veya girintileri (indentation) kontrol et.
+
+            2. **Görevin Beklentisi:**
+               * İstenen değişken adını, veri tipini veya ekrana yazdırma fonksiyonunu (`print`, `println`, `console.log` vb.) tam olarak sağladığından emin ol.
+               * Büyük/küçük harf duyarlılığına (Case-sensitivity) dikkat et.
+
+            3. **💡 Yönlendirici İpucu:**
+               * *Kendine sor:* "Program bu satırı çalıştırdığında hafızada veya konsolda ne oluşuyor? Beklenen çıktı ile ürettiğim çıktı birebir örtüşüyor mu?"
+
+            🎯 **Önemli Not:** Doğrudan hazır tam cevabı vermek yerine bu mantığı senin keşfetmen kalıcı öğrenmeni sağlayacaktır. Kodunu bu ipuçlarına göre güncelle ve **Görevi Kontrol Et** butonuna basarak tekrar dene!
         """.trimIndent()
     }
 }

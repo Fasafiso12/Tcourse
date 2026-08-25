@@ -47,6 +47,14 @@ enum class AiShortcut(
         iconEmoji = "💡",
         description = "Gerçek hayat analojileri ve somut benzetmelerle konuyu zihinde canlandırır.",
         promptPrefix = "Lütfen bu programlama kavramını günlük hayattan çok eğlenceli ve akılda kalıcı bir benzetme (analoji) ile anlat:"
+    ),
+    CHECK_CODE(
+        id = "check_code",
+        title = "Kodu Kontrol Et & İpucu Ver",
+        shortLabel = "Kodu Kontrol Et",
+        iconEmoji = "🩺",
+        description = "Yazdığınız koddaki hataları doğrudan cevabı söylemeden pedagojik ipuçlarıyla gösterir.",
+        promptPrefix = "Lütfen kullanıcının yazdığı kodu incele. Kodundaki hataları, eksik veya hatalı sözdizimini pedagojik olarak açıkla. KESİNLİKLE doğrudan hazır tam çözümü veya çalışan bitmiş kodu verme; kullanıcının kendisinin bulması için yol gösterici ipuçları ve yönlendirmeler ver:"
     )
 }
 

@@ -94,14 +94,21 @@ object CCurriculum {
             subtopics = listOf("main() Fonksiyonu", "#include <stdio.h>", "Format Belirteçleri", "Değişkenler ve Tipler", "scanf ile Girdi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. C Program Yapısı ve stdio.h",
-                    body = "C dilinde programın giriş noktası `int main()` fonksiyonudur. Ekrana metin yazdırmak için `<stdio.h>` başlık dosyasında tanımlı `printf()` fonksiyonu kullanılır.",
-                    codeSnippet = "#include <stdio.h>\n\nint main(void) {\n    printf(\"Merhaba C Dili!\\n\");\n    return 0;\n}"
+                    subtitle = "1. C Derleme Süreci (The 4-Stage Compilation Pipeline)",
+                    body = "C dili doğrudan makine koduna derlenen (compiled) statik bir dildir. Bir .c kaynak dosyası 4 aşamadan geçerek çalıştırılabilir ikili (executable binary) dosyaya dönüşür:\n\n1. Preprocessing (Önişleme - gcc -E): `#include`, `#define` gibi `#` ile başlayan direktifler çözümlenir, başlık dosyaları koda yapıştırılır ve yorum satırları temizlenir.\n2. Compilation (Derleme - gcc -S): C kodu hedef CPU mimarisinin Assembly (montaj) diline dönüştürülür.\n3. Assembly (Montaj - gcc -c): Assembly kodu makine koduna (0 ve 1'ler) çevrilerek yer değiştirilebilir nesne dosyası (.o / .obj) oluşturulur.\n4. Linking (Bağlama - gcc): Farklı .o dosyaları ve C Standart Kütüphaneleri (libc) bağlanarak nihai çalıştırılabilir ELF/PE ikili dosyası elde edilir.",
+                    codeSnippet = "// Derleme aşamalarını terminalde izleme:\n// 1. gcc -E main.c > main.i   (Önişleme)\n// 2. gcc -S main.i            (Assembly üretimi -> main.s)\n// 3. gcc -c main.s            (Makine kodu -> main.o)\n// 4. gcc main.o -o program    (Bağlama -> çalıştırılabilir binary)",
+                    tip = "GCC veya Clang kullanırken `-Wall -Wextra -Werror -pedantic` bayraklarını eklemek, gizli hataları derleme anında yakalamanızı sağlar."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Format Belirteçleri ve scanf",
-                    body = "• %d: İşaretli tamsayı (int)\n• %f: Ondalıklı sayı (float)\n• %lf: Çift duyarlıklı ondalıklı sayı (double)\n• %c: Tek karakter (char)\n• %s: Karakter dizisi (string)\n\nscanf ile değer okurken değişkenin bellek adresini bildirmek için başına '&' işareti konur.",
-                    tip = "scanf(\"%d\", &yas); şeklinde '&' adres işaretini unutmak tanımsız davranışa (Segmentation fault) yol açar."
+                    subtitle = "2. Bellek Düzeni ve main() Fonksiyonu",
+                    body = "İşletim sistemi bir C programını başlattığında sanal bellek 5 temel bölüme ayrılır:\n• Text (Code) Segment: Derlenmiş makine komutları (Read-only).\n• Data Segment: İlk değer atanmış global ve static değişkenler.\n• BSS Segment: İlk değer atanmamış (0 ile başlayan) global ve static değişkenler.\n• Heap: `malloc` ile çalışma zamanında yönetilen dinamik bellek.\n• Stack: Yerel değişkenler ve fonksiyon çağrı çerçeveleri (Stack frames).\n\nProgramın giriş noktası `int main(int argc, char* argv[])` fonksiyonudur. `return 0;` işletim sistemine programın hatasız tamamlandığını bildirir.",
+                    codeSnippet = "#include <stdio.h>\n\nint main(void) {\n    printf(\"Sistem Mimarisi ve C Dili\\n\");\n    return 0;\n}"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Format Belirteçleri, stdout Tamponlama ve scanf Güvenliği",
+                    body = "• %d / %i: 32-bit işaretli tamsayı (int)\n• %u: İşaretsiz tamsayı (unsigned int)\n• %ld / %zu: long int ve size_t tipleri\n• %f / %lf: float ve double ondalık sayılar\n• %p: Bellek adresi (Hexadecimal gösterim)\n• %c / %s: Karakter ve Null sonlandırıcılı karakter dizisi\n\n`printf` varsayılan olarak satır tamponlamalıdır (Line-buffered); ekrana anında basılması için `\\n` veya `fflush(stdout)` gereklidir.\n`scanf` fonksiyonu klavyeden veri okurken değişkenin bellek adresine ihtiyaç duyar (`&` adres operatörü).",
+                    codeSnippet = "#include <stdio.h>\n\nint main(void) {\n    int yas = 0;\n    printf(\"Lutfen yasinizi girin: \");\n    if (scanf(\"%d\", &yas) == 1) {\n        printf(\"Girilen yas: %d, Bellek Adresi: %p\\n\", yas, (void*)&yas);\n    } else {\n        printf(\"Gecersiz girdi!\\n\");\n    }\n    return 0;\n}",
+                    tip = "scanf'in dönüş değeri başarıyla okunan eleman sayısını verir. Güvenli kod için daima `if (scanf(...) == 1)` kontrolü yapılmalıdır."
                 )
             ),
             codeExample = "#include <stdio.h>\n\nint main(void) {\n    int yas = 24;\n    float puan = 95.5f;\n    char notHarfi = 'A';\n    \n    printf(\"Yas: %d, Puan: %.1f, Not: %c\\n\", yas, puan, notHarfi);\n    return 0;\n}",
@@ -150,17 +157,22 @@ object CCurriculum {
                 "break ve continue ifadeleriyle döngü akışını yönetmek"
             ),
             prerequisites = listOf("C'ye Giriş & Temel Tipler"),
-            subtopics = listOf("if-else Karar Yapıları", "switch-case ve break", "for Döngüsü", "while ve do-while", "Mantıksal Operatörler (&&, ||, !)"),
+            subtopics = listOf("if-else Karar Yapıları", "switch-case ve Jump Table", "for Döngüsü ve Optimizasyon", "while ve do-while", "Kısa Devre Değerlendirmesi (Short-Circuit)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. C'de Boolean Mantığı",
-                    body = "Geleneksel C'de (C99 öncesi) ayrı bir bool tipi yoktur; 0 değeri YANLIŞ (false), sıfır dışındaki tüm değerler DOĞRU (true) kabul edilir. Modern C'de `<stdbool.h>` ile `bool`, `true`, `false` kullanılabilir.",
-                    codeSnippet = "#include <stdio.h>\n#include <stdbool.h>\n\nint main(void) {\n    int not = 85;\n    if (not >= 90) {\n        printf(\"AA\\n\");\n    } else if (not >= 80) {\n        printf(\"BA\\n\");\n    } else {\n        printf(\"Gecer\\n\");\n    }\n    return 0;\n}"
+                    subtitle = "1. C'de Boolean Mantığı ve Kısa Devre Değerlendirmesi",
+                    body = "Geleneksel C'de (C99 öncesi) ayrı bir bool tipi yoktur; 0 değeri YANLIŞ (false), sıfır dışındaki tüm pozitif/negatif değerler DOĞRU (true) kabul edilir. Modern C'de `<stdbool.h>` ile `bool`, `true`, `false` kullanılabilir.\n\nMantıksal operatörlerde (`&&` ve `||`) 'Short-Circuit Evaluation' uygulanır. `(ptr != NULL && *ptr == 10)` ifadesinde, `ptr` NULL ise sağ taraf asla çalıştırılmaz; bu da Segmentation Fault çökmesini engeller.",
+                    codeSnippet = "#include <stdio.h>\n#include <stdbool.h>\n\nint main(void) {\n    int not = 85;\n    if (not >= 90) {\n        printf(\"Harf Notu: AA\\n\");\n    } else if (not >= 80) {\n        printf(\"Harf Notu: BA\\n\");\n    } else {\n        printf(\"Gecer\\n\");\n    }\n    return 0;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. for ve while Döngüleri",
-                    body = "for döngüsü: `for (başlangıç; koşul; artış)` yapısına sahiptir.\nwhile döngüsü koşul doğru olduğu sürece çalışır.",
-                    tip = "switch-case bloklarında her case sonuna `break;` koymayı unutmayın, aksi halde 'fall-through' (aşağıya akma) gerçekleşir."
+                    subtitle = "2. switch-case Mimarisi ve Jump Table Mekanizması",
+                    body = "C derleyicileri çok sayıda ardışık `case` bulunan switch bloklarını zincirleme `if-else` yerine doğrudan O(1) hızında Assembly 'Jump Table' (atlama tablosu) olarak derler.\n\nHer `case` bloğu sonuna `break;` konulmalıdır; aksi halde 'fall-through' (aşağıya akma) gerçekleşerek altındaki tüm case'ler çalıştırılır.",
+                    tip = "Fall-through kasıtlı olarak birleştirilmiş case durumları için (örn: case 'a': case 'A':) güçlü bir tasarım modelidir."
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Döngü Çeşitleri, Loop Unrolling ve Duff's Device",
+                    body = "• for (başlangıç; koşul; artış): Sayısal döngüler için en ideal formdur.\n• while (koşul): Koşul doğru kaldıkça döngü gövdesini işletir.\n• do-while (koşul): Koşul en altta kontrol edilir; gövde en az bir kez kesinlikle çalışır.\n\nDerleyiciler (gcc -O3) döngü sayaç kontrollerini azaltmak için 'Loop Unrolling' (Döngü Açma) optimizasyonu uygulayarak komut akışını hızlandırır.",
+                    codeSnippet = "int sayac = 0;\ndo {\n    printf(\"do-while calisti: %d\\n\", sayac);\n    sayac++;\n} while (sayac < 3);"
                 )
             ),
             codeExample = "#include <stdio.h>\n\nint main(void) {\n    for (int i = 1; i <= 5; i++) {\n        printf(\"Adim: %d\\n\", i);\n    }\n    return 0;\n}",
@@ -212,14 +224,19 @@ object CCurriculum {
             subtopics = listOf("Fonksiyon Prototipleri", "Değerle Parametre Aktarımı", "Header Dosyaları (.h)", "static & extern Belirteçleri", "Stack Çerçevesi (Stack Frame)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Fonksiyon Prototipi ve Tanımı",
-                    body = "C derleyicisi kaynak kodları yukarıdan aşağıya tek geçişte okur. Eğer `main()` içinde çağrılan bir fonksiyon `main()` sonrasında tanımlanmışsa, en üste fonksiyon prototipi eklenmelidir.",
-                    codeSnippet = "#include <stdio.h>\n\n// Fonksiyon Prototipi\nint kareAl(int sayi);\n\nint main(void) {\n    printf(\"Sonuc: %d\\n\", kareAl(6));\n    return 0;\n}\n\n// Fonksiyon Tanımı\nint kareAl(int sayi) {\n    return sayi * sayi;\n}"
+                    subtitle = "1. Fonksiyon Çağrı Çerçevesi (Stack Frame) ve Prototip Mantığı",
+                    body = "Bir fonksiyon çağrıldığında, CPU mimarisinin ABI (Application Binary Interface) kurallarına göre Stack üzerinde yeni bir 'Stack Frame' oluşturulur. Parametreler, yerel değişkenler ve dönüş adresi (Return Address) bu çerçeveye yazılır.\n\nC derleyicisi tek geçişli (single-pass) olduğundan, çağrılan fonksiyonun dönüş tipi ve parametre listesini önceden bilmelidir. Bu nedenle başlıkta fonksiyon prototipi tanımlanır.",
+                    codeSnippet = "#include <stdio.h>\n\n// Fonksiyon Prototipi (Bildirim)\nint kareAl(int sayi);\n\nint main(void) {\n    int sonuc = kareAl(6);\n    printf(\"Sonuc: %d\\n\", sonuc);\n    return 0;\n}\n\n// Fonksiyon Tanımı (Gövde)\nint kareAl(int sayi) {\n    return sayi * sayi;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. static Değişkenler",
-                    body = "Bir fonksiyon içindeki `static` değişken fonksiyon sonlansa bile bellekteki değerini korur. Dosya seviyesindeki `static` fonksiyon ise yalnızca o .c dosyası içinde görünür (private) kalır.",
-                    tip = "Header (.h) dosyalarında fonksiyon bildirimleri, .c dosyalarında ise gerçek gövde tanımları yer alır."
+                    subtitle = "2. Parametre Aktarımı: Değerle Aktarım (Pass by Value)",
+                    body = "C dilinde fonksiyona geçirilen her parametre kopyalanarak aktarılır. Fonksiyon içinde parametrenin değerini değiştirmek, çağıran taraftaki orijinal değişkeni etkilemez. Orijinal değişkeni değiştirmek için bellek adresini (pointer) aktarmak şarttır.",
+                    codeSnippet = "void degerDegistir(int x) {\n    x = 999; // Yalnızca yerel kopyayı değiştirir!\n}"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. static ve extern: Bağlantı (Linkage) ve Ömür",
+                    body = "• static yerel değişken: Değeri Stack'te değil Data segmentinde saklanır, fonksiyon kapansa bile değerini korur.\n• static fonksiyon/global: Yalnızca tanımlandığı .c dosyasından erişilebilir (Internal Linkage / Private).\n• extern: Başka bir .c dosyasında tanımlanmış global değişkene erişim sağlar (External Linkage).",
+                    tip = "Büyük C kütüphanelerinde dışa açılmayan tüm yardımcı fonksiyonlar 'static' tanımlanarak sembol tablosu temiz tutulur."
                 )
             ),
             codeExample = "#include <stdio.h>\n\nvoid sayacArttir(void) {\n    static int sayac = 0;\n    sayac++;\n    printf(\"Sayac Degeri: %d\\n\", sayac);\n}\n\nint main(void) {\n    sayacArttir();\n    sayacArttir();\n    sayacArttir();\n    return 0;\n}",
@@ -271,14 +288,19 @@ object CCurriculum {
             subtopics = listOf("Tek Boyutlu Diziler", "Matrisler (2D Arrays)", "char[] ve '\\0' Null Terminator", "string.h Fonksiyonları", "Dizi Sınır Güvenliği"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. C Stringleri ve Null Karakteri",
-                    body = "C dilinde yerleşik bir string tipi yoktur. Stringler, sonu `\\0` (ASCII 0) karakteri ile biten `char` dizileridir. 5 harfli bir kelime için en az 6 byte'lık dizi gereklidir.",
-                    codeSnippet = "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char isim[] = \"KodAkademi\";\n    printf(\"Metin: %s, Uzunluk: %zu\\n\", isim, strlen(isim));\n    return 0;\n}"
+                    subtitle = "1. Bellekte Bitişik (Contiguous) Diziler ve İndeksleme",
+                    body = "C dilinde diziler bellekte kesintisiz bitişik hücreler olarak saklanır. `dizi[i]` ifadesi derleyici tarafından doğrudan `*(dizi + i)` pointer aritmetiğine dönüştürülür.\n\nİki boyutlu `matris[satir][sutun]` yapıları bellekte Satır-Öncelikli (Row-Major Order) olarak düzleştirilir (`offset = satir * toplam_sutun + sutun`).",
+                    codeSnippet = "int sayilar[5] = {10, 20, 30, 40, 50};\n// dizi adı ilk elemanın adresini gösterir:\nint* p = sayilar;\nprintf(\"sayilar[2] == *(p + 2): %d\\n\", *(p + 2)); // 30"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Güvenlik Uyarısı: Buffer Overflow",
-                    body = "C dizilerinde sınır kontrolü yapılmaz. Tanımlanan boyuttan fazla veri yazmak bellek taşmasına (Buffer Overflow) yol açar.",
-                    tip = "strcpy yerine her zaman güvenli olan strncpy veya snprintf tercih edilmelidir."
+                    subtitle = "2. C Stringleri ve Null Sonlandırıcı ('\\0')",
+                    body = "C dilinde stringler, sonunda `\\0` (ASCII NUL = 0) baytı bulunan `char` dizileridir. N karakterlik metin için `N + 1` byte alan ayrılmalıdır. Eğer `\\0` karakteri eksikse veya üzerine yazılırsa, string fonksiyonları bellekte rastgele alanlara doğru okumaya devam ederek çökme veya güvenlik açığı oluşturur.",
+                    codeSnippet = "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char isim[10] = \"KodAkademi\"; // 10 karakter + 1 null sonlandırıcı\n    printf(\"Metin: %s, Uzunluk: %zu, sizeof: %zu\\n\", isim, strlen(isim), sizeof(isim));\n    return 0;\n}"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Güvenlik ve Buffer Overflow: strcpy yerine snprintf",
+                    body = "Standart `strcpy` ve `strcat` fonksiyonları hedef dizinin sınırlarını denetlemez. Bu durum tarihteki en büyük güvenlik açıklarının (Buffer Overflow & Remote Code Execution) temel sebebidir.",
+                    tip = "Daima sınır denetimi yapan `snprintf(hedef, sizeof(hedef), \"%s\", kaynak)` veya `strncpy` kullanın."
                 )
             ),
             codeExample = "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char kaynak[] = \"Sistem Programlama\";\n    char hedef[50];\n    strcpy(hedef, kaynak);\n    printf(\"Kopyalanan: %s\\n\", hedef);\n    return 0;\n}",
@@ -327,17 +349,22 @@ object CCurriculum {
                 "Pointer aritmetiği (ptr + 1) ile bellek adımlaması yapmak"
             ),
             prerequisites = listOf("Diziler ve C Stringleri"),
-            subtopics = listOf("Bellek Adresleri (&)", "Pointer Tanımlama (*)", "Dereferencing", "Pass by Pointer (Swap)", "Pointer Aritmetiği"),
+            subtopics = listOf("Bellek Adresleri (&)", "Pointer Tanımlama (*)", "Dereferencing Mantığı", "Pass by Pointer (Swap)", "Pointer Aritmetiği (Scale Factor)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Pointer Nedir?",
-                    body = "Pointer, başka bir değişkenin bellekteki adresini tutan özel bir değişkendir. `int* ptr = &sayi;` ifadesinde `ptr` değişkeni `sayi`'nın bellek adresini tutar.",
-                    codeSnippet = "#include <stdio.h>\n\nint main(void) {\n    int x = 42;\n    int* ptr = &x;\n    \n    printf(\"x'in Degeri: %d\\n\", x);\n    printf(\"x'in Adresi: %p\\n\", (void*)ptr);\n    printf(\"ptr ile x'e erisim: %d\\n\", *ptr);\n    \n    *ptr = 100;\n    printf(\"Yeni x: %d\\n\", x);\n    return 0;\n}"
+                    subtitle = "1. Pointer Mimarisi ve Bellek Adresi Kavramı",
+                    body = "Bilgisayarın RAM belleği numaralandırılmış byte hücrelerinden oluşur. Her değişken bellekte belirli bir başlangıç adresine sahiptir. Pointer, doğrudan bu RAM adresini saklayan 64-bitlik (veya 32-bitlik) özel bir değişkendir.\n\n• `&` (Address-of): Değişkenin RAM adresini döndürür.\n• `*` (Dereference): Pointer'ın işaret ettiği adresteki gerçek veriyi okur veya üzerine yeni değer yazar.",
+                    codeSnippet = "#include <stdio.h>\n\nint main(void) {\n    int x = 42;\n    int* ptr = &x; // ptr, x'in adresini tutar\n    \n    printf(\"x'in Degeri: %d\\n\", x);\n    printf(\"x'in RAM Adresi: %p\\n\", (void*)ptr);\n    printf(\"ptr uzerinden x'i oku: %d\\n\", *ptr);\n    \n    *ptr = 100; // x'in adresteki degerini degistirir\n    printf(\"Yeni x: %d\\n\", x); // 100\n    return 0;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Pass by Pointer ile Swap",
-                    body = "C dilinde referansla aktarım yoktur; fonksiyonların çağıran tarafın değişkenini değiştirebilmesi için pointer parametreleri kullanılır.",
-                    tip = "Asla başlatılmamış (wild pointer) veya NULL olan bir pointer'ı dereference (*ptr) etmeyin."
+                    subtitle = "2. Pointer Aritmetiği ve Ölçekleme Faktörü (Scale Factor)",
+                    body = "Bir pointer'a `+ 1` eklendiğinde adres matematiksel olarak 1 artmaz; işaret ettiği veri tipinin boyutu kadar (`sizeof(T)`) ilerler!\nÖrneğin `int* p` (4 byte) `p + 1` yapıldığında adres +4 byte ileri kayar.",
+                    codeSnippet = "int arr[3] = {10, 20, 30};\nint* p = arr;\nprintf(\"Ilk eleman: %d, Ikinci eleman: %d\\n\", *p, *(p + 1));"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Pass by Pointer ile Fonksiyon Yan Etkisi (Side-Effect)",
+                    body = "C dilinde referans tipi (reference type) bulunmaz; çağıran fonksiyondaki değişkenleri değiştirmek için değişkenin adresi fonksiyona geçirilir.",
+                    tip = "Asla başlatılmamış (Wild Pointer) veya NULL olan bir pointer dereference (*ptr) edilmemelidir. Önce `if (ptr != NULL)` kontrolü yapılmalıdır."
                 )
             ),
             codeExample = "#include <stdio.h>\n\nvoid swap(int* a, int* b) {\n    int gecici = *a;\n    *a = *b;\n    *b = gecici;\n}\n\nint main(void) {\n    int x = 10, y = 20;\n    swap(&x, &y);\n    printf(\"x: %d, y: %d\\n\", x, y);\n    return 0;\n}",
@@ -386,17 +413,22 @@ object CCurriculum {
                 "free() kullanarak bellek sızıntılarını (Memory Leaks) ve Dangling Pointer hatalarını engellemek"
             ),
             prerequisites = listOf("Pointerlar ve Bellek Adresleri"),
-            subtopics = listOf("Stack vs Heap", "malloc() ve sizeof", "calloc() ile Sıfırlama", "realloc() ile Boyutlandırma", "free() ve Bellek Sızıntıları"),
+            subtopics = listOf("Stack vs Heap Bellek Alanı", "malloc() ve sizeof() İle Tahsis", "calloc() ile Sıfırlanmış Tahsis", "realloc() Bellek Boyutlandırma", "free(), Bellek Sızıntısı (Leak) & ASan"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Heap Bellek Tahsisi",
-                    body = "Çalışma anında boyutu belirlenen veriler için `<stdlib.h>` kütüphanesindeki `malloc` fonksiyonu kullanılır. `malloc(n * sizeof(int))` Heap'ten n adet int için yer ayırır.",
-                    codeSnippet = "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n = 5;\n    int* dizi = (int*)malloc(n * sizeof(int));\n    if (dizi == NULL) {\n        printf(\"Bellek yetersiz!\\n\");\n        return 1;\n    }\n    \n    for (int i = 0; i < n; i++) dizi[i] = (i + 1) * 10;\n    for (int i = 0; i < n; i++) printf(\"%d \", dizi[i]);\n    printf(\"\\n\");\n    \n    free(dizi); // Bellek serbest bırakılır\n    dizi = NULL;\n    return 0;\n}"
+                    subtitle = "1. Heap Bellek Tahsisi ve malloc / calloc Farkı",
+                    body = "Stack belleğin boyutu sabittir (genellikle 8 MB) ve fonksiyon bittiğinde temizlenir. Çalışma zamanında boyutu değişen yapılar için Heap kullanılır.\n\n• `malloc(size)`: Belirtilen byte kadar yer ayırır, içindeki veri tanımsızdır (çöp değerler içerir).\n• `calloc(num, size)`: Belirtilen adette byte ayırır ve tüm bitleri sıfırlar (`0x00`).\n\nTahsis başarısız olursa (yetersiz RAM) fonksiyonlar `NULL` döner. Dönen pointer mutlaka `if (ptr == NULL)` ile kontrol edilmelidir.",
+                    codeSnippet = "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    size_t n = 5;\n    int* dizi = (int*)malloc(n * sizeof(int));\n    if (dizi == NULL) {\n        fprintf(stderr, \"Hata: Yetersiz bellek!\\n\");\n        return 1;\n    }\n    \n    for (size_t i = 0; i < n; i++) dizi[i] = (int)(i + 1) * 10;\n    free(dizi);\n    dizi = NULL;\n    return 0;\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Altın Kural: Her malloc için bir free",
-                    body = "Heap'ten ayrılan her bellek bloğu işi bittiğinde `free()` ile sisteme iade edilmelidir. free edildikten sonra pointer'a `NULL` atanması en iyi uygulamadır.",
-                    tip = "free(ptr) çağrıldıktan sonra ptr kullanılmaya devam edilirse 'Use-After-Free' güvenlik açığı oluşur."
+                    subtitle = "2. realloc() ile Dinamik Büyüme Mantığı",
+                    body = "`realloc(eski_ptr, yeni_boyut)` mevcut bloğu büyütmeye veya küçültmeye yarar. Eğer mevcut bellek bloğunun hemen ardında boş yer varsa genişletir; yoksa Heap'te yeni bir alan tahsis edip eski verileri kopyalar ve eski bloğu serbest bırakır.",
+                    codeSnippet = "int* yeni_dizi = realloc(dizi, 10 * sizeof(int));\nif (yeni_dizi != NULL) {\n    dizi = yeni_dizi; // Güvenli atama\n}"
+                ),
+                LessonContentBlock(
+                    subtitle = "3. Altın Kural: Bellek Sızıntıları, Dangling Pointer ve AddressSanitizer",
+                    body = "Ayrılan her bellek `free(ptr)` ile işletim sistemine iade edilmelidir. Serbest bırakılan pointer'a `ptr = NULL;` atanmalıdır, aksi halde 'Dangling Pointer' (boşta kalan işaretçi) veya 'Use-After-Free' açığı oluşur.",
+                    tip = "GCC/Clang derlerken `-fsanitize=address -g` bayrakları eklenerek AddressSanitizer (ASan) ile bellek sızıntıları anında tespit edilebilir."
                 )
             ),
             codeExample = "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int* sayilar = calloc(3, sizeof(int)); // Tüm elemanlar 0 ile başlar\n    sayilar[0] = 100;\n    printf(\"sayilar[0]: %d, sayilar[1]: %d\\n\", sayilar[0], sayilar[1]);\n    free(sayilar);\n    return 0;\n}",

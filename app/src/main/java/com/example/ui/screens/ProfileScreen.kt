@@ -414,6 +414,63 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
+                            .border(1.dp, if (userProfile.isPremium) AccentEmeraldBorder else DarkCardBorder, RoundedCornerShape(16.dp)),
+                        colors = CardDefaults.cardColors(containerColor = DarkSurface)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Text("🧪", fontSize = 22.sp)
+                                    Column {
+                                        Text(
+                                            text = "Test & Geliştirici Modu",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextPrimary
+                                        )
+                                        Text(
+                                            text = if (userProfile.isPremium) "PRO özellikleri aktif (Tüm kilitler açık)" else "Ücretsiz mod (PRO kilitleri aktif)",
+                                            fontSize = 12.sp,
+                                            color = if (userProfile.isPremium) AccentEmeraldLight else TextSecondary
+                                        )
+                                    }
+                                }
+                                Switch(
+                                    checked = userProfile.isPremium,
+                                    onCheckedChange = { isChecked ->
+                                        viewModel.setPremiumDevMode(isChecked)
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color.White,
+                                        checkedTrackColor = AccentEmerald,
+                                        uncheckedThumbColor = TextMuted,
+                                        uncheckedTrackColor = DarkSurfaceVariant
+                                    )
+                                )
+                            }
+
+                            Text(
+                                text = "Bu ayarı açarak tüm kilitli dersleri, yapay zeka ipuçlarını ve sınırsız can özelliklerini hiçbir ücret ödemeden anında test edebilir, istediğinizde tekrar kapatabilirsiniz.",
+                                fontSize = 11.sp,
+                                color = TextMuted,
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
                             .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
                         colors = CardDefaults.cardColors(containerColor = DarkSurface)
                     ) {

@@ -56,7 +56,8 @@ data class PlanPricingInfo(
 fun PremiumPaywallDialog(
     appLanguage: AppLanguage = AppLanguage.TR,
     onDismiss: () -> Unit,
-    onUpgradeSuccess: () -> Unit
+    onUpgradeSuccess: () -> Unit,
+    onToggleDevMode: () -> Unit = onUpgradeSuccess
 ) {
     var selectedCurrency by remember {
         mutableStateOf(if (appLanguage == AppLanguage.EN) PricingCurrency.USD else PricingCurrency.TRY)
@@ -469,9 +470,41 @@ fun PremiumPaywallDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Developer / Testing Mode Sandbox Toggle Button
+                OutlinedButton(
+                    onClick = onToggleDevMode,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .testTag("dev_mode_test_premium_button"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = AccentEmeraldLight
+                    ),
+                    border = CardDefaults.outlinedCardBorder().copy(
+                        brush = androidx.compose.ui.graphics.SolidColor(AccentEmeraldBorder)
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text("🧪", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (isTr) "Test & Geliştirici Modu: PRO Kilidini Aç" else "Sandbox / Dev Mode: Unlock PRO Free",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AccentEmeraldLight
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (isTr) "Güvenli ödeme altyapısı • İstediğin zaman iptal edebilirsin" else "Secure payment • Cancel anytime",
+                    text = if (isTr) "Güvenli ödeme altyapısı • İstediğin zaman test edebilir ve iptal edebilirsin" else "Secure payment • Test or cancel anytime",
                     color = TextMuted,
                     fontSize = 11.sp
                 )
