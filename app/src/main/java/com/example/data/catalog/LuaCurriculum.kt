@@ -3,9 +3,8 @@ package com.example.data.catalog
 import com.example.model.*
 
 /**
- * Lua Dili Kapsamlı Resmi Müfredatı (12 Sıralı Ders):
- * BEGINNER -> FUNDAMENTAL -> INTERMEDIATE -> ADVANCED -> EXPERT
- * Temel sözdizimi, tablolardan metatable OOP sistemine, Coroutines, Lua C API ve Roblox/Oyun Motoru mimarisine.
+ * Lua Kolay & Anlaşılır Müfredatı (12 Adım):
+ * Roblox'un, oyun modlama dünyasının ve gömülü sistemlerin tüy kadar hafif dili Lua'yı eğlenceli örneklerle öğrenin!
  */
 object LuaCurriculum {
 
@@ -13,797 +12,1006 @@ object LuaCurriculum {
         CourseSection(
             id = "lua_sec_1",
             courseId = "lua",
-            title = "Seviye 1 – Lua Temelleri, print() & Kontrol Akışı",
+            title = "Bölüm 1: Lua Temelleri ve Kontrol Akışı",
             level = CourseLevel.BEGINNER,
             order = 1,
-            description = "Lua yorumlayıcı yapısı, print, dinamik tipler (nil, number, string, boolean), if-then-else, while, repeat-until ve sayısal for.",
-            learningObjectives = listOf("Lua çalışma mantığı ve dinamik tipler", "print() ve string birleştirme (..)", "if-then-else koşullu ifadeleri", "while, repeat-until ve sayısal for döngüleri"),
-            prerequisites = listOf("Temel bilgisayar bilgisi")
+            description = "print(), değişkenler, metin birleştirme (..), if-then ve döngüler.",
+            learningObjectives = listOf("print() ile ekrana yazdırmak", "local değişken tanımlamak", "if-then ve for döngüleri kurmak"),
+            prerequisites = listOf("Ön koşul gerekmez! Sıfırdan başlar.")
         ),
         CourseSection(
             id = "lua_sec_2",
             courseId = "lua",
-            title = "Seviye 2 – Fonksiyonlar & Tablolar (Tables Mimarisi)",
+            title = "Bölüm 2: Fonksiyonlar ve Tablolar (Tables)",
             level = CourseLevel.BEGINNER,
             order = 2,
-            description = "Fonksiyonlar, birden fazla değer döndürme (Multiple Returns), Değişken argümanlar (...), Tabloların dizi ve sözlük olarak kullanımı.",
-            learningObjectives = listOf("Birinci sınıf (First-Class) fonksiyonlar", "Çoklu değer döndürme mekanizması", "Lua tablolarının (Tables) mimarisi", "ipairs ve pairs ile tablo döngüleri"),
-            prerequisites = listOf("Lua Temelleri ve Kontrol Akışı")
+            description = "Tek fonksiyondan 2 sonuç döndürme ve Lua'nın tek ama efsanevi veri yapısı: Tablolar.",
+            learningObjectives = listOf("Birden fazla değer döndüren fonksiyon yazmak", "Tabloları liste ve sözlük olarak kullanmak", "ipairs ve pairs ile tabloyu gezmek"),
+            prerequisites = listOf("Lua Temelleri")
         ),
         CourseSection(
             id = "lua_sec_3",
             courseId = "lua",
-            title = "Seviye 3 – Metatables & Nesne Yönelimli Programlama (OOP)",
+            title = "Bölüm 3: Metatable ve Nesne Yönelimli Lua (OOP)",
             level = CourseLevel.INTERMEDIATE,
             order = 3,
-            description = "Metatables, Metamethods (__index, __newindex, __tostring, __add), Prototip tabanlı OOP, Sınıf tanımlama ve self/noktalı virgül (:) sözdizimi.",
-            learningObjectives = listOf("setmetatable ve getmetatable kullanımı", "__index ile fallback ve kalıtım zinciri", "Lua'da Sınıf (Class) ve Nesne üretimi", "İki nokta (:) ile self gizli parametresi"),
+            description = "Tablolara sihirli güçler katan Metatable, __index ve iki nokta (:) ile self kullanımı.",
+            learningObjectives = listOf("setmetatable ve __index mantığını anlamak", "Sınıf ve nesne üretmek"),
             prerequisites = listOf("Tablolar ve Fonksiyonlar")
         ),
         CourseSection(
             id = "lua_sec_4",
             courseId = "lua",
-            title = "Seviye 4 – Kapanışlar (Closures) & Eşyordamlar (Coroutines)",
+            title = "Bölüm 4: Eşyordamlar (Coroutines) ve Metin Arama",
             level = CourseLevel.INTERMEDIATE,
             order = 4,
-            description = "Lexical Scoping, Closure kalıpları, State saklama, Coroutines (coroutine.create, resume, yield, status) ve İşbirlikçi Çoklu Görev (Cooperative Multitasking).",
-            learningObjectives = listOf("Closure ile özel durum (state) saklama", "coroutine.yield ile akışı duraklatma", "coroutine.resume ile veri alışverişi", "Asenkron oyun akışları ve zamanlayıcılar"),
-            prerequisites = listOf("Metatables ve OOP")
+            description = "Fonksiyonu ortada duraklatıp (yield) sonra devam ettirme (resume) ve string.match.",
+            learningObjectives = listOf("coroutine ile oyun akışlarını yönetmek", "string.match ile metin ayıklamak"),
+            prerequisites = listOf("Metatable ve OOP")
         ),
         CourseSection(
             id = "lua_sec_5",
             courseId = "lua",
-            title = "Seviye 5 – Desen Eşleme (Pattern Matching) & Modüler Mimari",
+            title = "Bölüm 5: Modüller ve require()",
             level = CourseLevel.ADVANCED,
             order = 5,
-            description = "string.match, string.gmatch, string.gsub, Lua Desen (Pattern) kuralları (%d, %a, %s, %b), Modüller, paketleme ve require() sistemi.",
-            learningObjectives = listOf("Regex benzeri Lua Pattern Matching sözdizimi", "Metin ayrıştırma ve yakalama grupları ()", "Modül tanımlama ve require() ile yükleme", "Global vs Local kapsam hijyeni"),
-            prerequisites = listOf("Coroutines ve Tablo Mimarisi")
+            description = "Kodları dosyalara bölme, require() ile yükleme ve local kapsam disiplini.",
+            learningObjectives = listOf("Modül dosyası oluşturup çağırmak", "Global kirliliği önlemek"),
+            prerequisites = listOf("Coroutines ve Tablolar")
         ),
         CourseSection(
             id = "lua_sec_6",
             courseId = "lua",
-            title = "Seviye 6 – Lua C API, Roblox & Oyun Motoru Mimarisi",
+            title = "Bölüm 6: Roblox, Oyunlar ve Lua Ustalığı",
             level = CourseLevel.EXPERT,
             order = 6,
-            description = "Lua C Stack Mimarisi (lua_State, lua_push, lua_call), C fonksiyonlarını Lua'ya bağlama, Entity-Component System (ECS) ve Roblox Game State Machine.",
-            learningObjectives = listOf("Lua C API sanal yığınını (Virtual Stack) yönetmek", "C ve Lua arasında veri köprüsü kurmak", "Oyun motorlarında script entegrasyonu", "Entity Component System (ECS) mimarisi"),
-            prerequisites = listOf("İleri Lua Modülleri ve Pattern Matching")
+            description = "Roblox Studio kodlama mantığı, oyun motorları ve profesyonel Lua ipuçları.",
+            learningObjectives = listOf("Roblox ve oyun motoru mantığını kavramak", "Hızlı ve temiz Lua scriptleri yazmak"),
+            prerequisites = listOf("Tüm Seviyeler")
         )
     )
 
     fun getLessons(): List<Lesson> = listOf(
         // ==========================================
-        // DERS 1: TEMEL SÖZDİZİMİ & DİNAMİK TİPLER (ÜCRETSİZ)
+        // DERS 1: PRINT VE DEĞİŞKENLER
         // ==========================================
         Lesson(
             id = "lua_1",
             courseId = "lua",
             sectionId = "lua_sec_1",
-            title = "Lua'ya Giriş, print() & Dinamik Tipler",
-            shortDesc = "Lua'nın hafif mimarisi, print fonksiyonu, dinamik veri tipleri (nil, boolean, number, string), local değişkenler ve string birleştirme (..).",
+            title = "Lua Diline Giriş: print() ve Değişkenler",
+            shortDesc = "Roblox ve oyun dünyasının en hafif dili! print(), local değişkenler ve .. ile metin birleştirme.",
             level = CourseLevel.BEGINNER,
             order = 1,
             isPremium = false,
             learningObjectives = listOf(
-                "Lua'nın dinamik tür sistemini (nil, number, string, boolean) anlamak",
-                "local anahtar kelimesiyle güvenli ve hızlı değişkenler tanımlamak",
-                "String birleştirme (..) operatörünü ve type() fonksiyonunu kullanmak"
+                "print() fonksiyonu ile ekrana yazdırmak",
+                "local anahtar kelimesi ile güvenli değişken tanımlamak",
+                ".. (iki nokta) operatörü ile metinleri birleştirmek"
             ),
-            prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("Lua Register-Based VM", "local vs global ve _ENV", "Dinamik Tip Sistemi (8 Temel Tip)", "String Interning & Bellek", "type() ve tostring() Fonksiyonları"),
+            prerequisites = listOf("Ön koşul gerekmez."),
+            subtopics = listOf("Lua Neden Çok Hafif?", "print()", "local Değişkenler", ".. Metin Birleştirme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Lua'nın Mimarisi ve Register-Based Sanal Makinesi",
-                    body = "Lua, C diliyle yazılmış olağanüstü hafif (~200-300 KB) ve hızlı bir script dilidir. Çoğu sanal makinenin aksine (JVM, Python stack-based iken), Lua VM register-based (yazmaç tabanlı) bir mimariye sahiptir. Bu sayede daha az CPU komutuyla çok yüksek bytecode yürütme hızına ulaşır.\n\nLua'da 8 temel veri tipi bulunur:\n1. `nil`: Değersizlik / yokluk durumu\n2. `boolean`: true / false\n3. `number`: IEEE 754 Çift duyarlıklı float veya 64-bit integer\n4. `string`: Değiştirilemez (immutable) ve bellekte tekilleştirilmiş (interned) karakter dizileri\n5. `table`: Dizi, hashmap ve nesne temsil eden tek bileşik yapı\n6. `function`: Birinci sınıf vatandaş (first-class closure)\n7. `userdata`: C veri yapılarını sarmalayan ham bellek bloğu\n8. `thread`: Eşyordamlar (Coroutines)",
-                    codeSnippet = "-- local anahtar kelimesi değişkeni doğrudan VM register'ına atar (En hızlı erişim):\nlocal isim = \"Lua\"\nlocal versiyon = 5.4\nlocal aktif = true\n\nprint(\"Dil: \" .. isim .. \" v\" .. tostring(versiyon))\nprint(\"Tip: \" .. type(versiyon)) -- number",
-                    tip = "Global değişkenler `_G` tablosu üzerinde hash araması gerektirir. Daima `local` değişken kullanın; local değişkenler CPU register eşdeğeri slotlarda saklanır ve 30-50% daha hızlıdır."
+                    subtitle = "1. Tüy Kadar Hafif Bir Dil: Lua",
+                    body = "Lua, dünyadaki en hızlı ve en hafif betik dillerinden biridir. Roblox oyunları, World of Warcraft eklentileri, Angry Birds ve Neovim Lua ile kodlanır.\n\nEkrana yazı yazmak için `print()` kullanılır."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Lua'da Doğruluk Mantığı (Truthy / Falsy Kuralları)",
-                    body = "Lua'da mantıksal olarak YANLIŞ sayılan yalnızca iki değer vardır:\n• `nil`\n• `false`\n\nDiğer tüm dillerin aksine sayı `0` ve boş metin `\"\"` Lua'da KESİNLİKLE DOĞRU (true) kabul edilir! Bu durum diğer dillerden gelenler için sık yapılan bir hata kaynağıdır.",
-                    codeSnippet = "local sayi = 0\nif sayi then\n    print(\"0 degeri Lua'da TRUE kabul edilir!\")\nend"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. String Interning ve Bellek Verimliliği",
-                    body = "Lua sanal makinesinde tüm stringler global bir hash tablosunda tekilleştirilir (String Interning). Aynı metne sahip iki string bellekte tek bir adreste tutulur; bu sayede string karşılaştırmaları (`str1 == str2`) O(1) hızında pointer karşılaştırmasıyla gerçekleşir.",
-                    tip = "Stringleri birleştirmek için '+' matematiksel toplama yapar (ör: \"5\" + 2 -> 7). Metin birleştirmek için mutlaka '..' operatörü kullanılmalıdır."
+                    subtitle = "2. local Değişkenler ve .. Birleştirme",
+                    body = "Lua'da değişken tanımlarken başına mutlaka `local` yazarız. İki metni yan yana yapıştırmak için ise araya `..` koyarız.",
+                    codeSnippet = "local isim = \"Deniz\"\nlocal yas = 20\n\nprint(\"Merhaba \" .. isim .. \", Yaş: \" .. yas)"
                 )
             ),
-            codeExample = "local oyuncuAdi = \"Kahraman\"\nlocal seviye = 12\nlocal altin = 1500.5\n\nprint(\"Oyuncu: \" .. oyuncuAdi)\nprint(\"Seviye: \" .. seviye)\nprint(\"Altin: \" .. altin)",
-            codeExplanation = "local değişkenler tanımlanır ve '..' operatörü ile metinler birleştirilerek ekrana yazdırılır.",
-            realWorldExample = "Roblox, World of Warcraft, Angry Birds ve Redis, gömülü mantıkları çalıştırmak için ana script dili olarak Lua kullanır.",
-            practicalTask = "Adınızı ve yaşınızı iki local değişkende tutup ekrana formatlı yazdıran bir Lua kodu yazın.",
-            starterPlaygroundCode = "local baslik = \"Kod Akademi Lua\"\nlocal dersSayisi = 12\nprint(baslik .. \" - Toplam Ders: \" .. dersSayisi)",
+            codeExample = "local skor = 100\nprint(\"Puanınız: \" .. skor)",
+            codeExplanation = "local değişken tanımlandı ve .. operatörü ile metne bağlandı.",
+            realWorldExample = "Roblox Studio'da bir bloğa dokunulduğunda kapının açılmasını sağlayan scriptler Lua ile yazılır.",
+            practicalTask = "Adınızı ve favori oyununuzu print ile ekrana yazdırın.",
+            starterPlaygroundCode = "local ad = \"Ali\"\nprint(\"Oyuncu: \" .. ad)",
             miniQuestion = MiniQuestion(
                 id = "lua_q_1",
-                question = "Lua dilinde stringleri birbirine bağlamak (concatenate) için hangi operatör kullanılır?",
-                options = listOf("..", "+", "&", "$"),
+                question = "Lua'da iki metni (string) birbirine bağlayıp birleştirmek için hangi operatör kullanılır?",
+                options = listOf(".. (İki Nokta)", "+", "&", "."),
                 correctIndex = 0,
-                explanation = "Lua'da string birleştirme iki nokta (..) operatörü ile yapılır."
+                explanation = "Lua'da metin birleştirme için '..' operatörü kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_1",
                 lessonId = "lua_1",
-                title = "İki Sayıyı Toplama",
-                instructions = "Verilen a ve b sayılarını toplayıp döndüren topla(a, b) fonksiyonunu yazın.",
-                exampleInput = "a = 20, b = 30",
-                exampleOutput = "50",
-                starterCode = "function topla(a, b)\n    -- Kodunu buraya yaz:\n    return 0\nend",
+                title = "İki Sayıyı Topla",
+                instructions = "İki sayıyı toplayıp döndüren topla(a, b) fonksiyonunu yazın.",
+                exampleInput = "topla(10, 20)",
+                exampleOutput = "30",
+                starterCode = "function topla(a, b)\n    -- Kodunu yaz:\n    return 0\nend",
                 solutionCode = "function topla(a, b)\n    return a + b\nend",
-                hints = listOf("return a + b yazarak sonucu döndürün."),
+                hints = listOf("return a + b yazın."),
                 testCases = listOf(
-                    TestCase("topla(20, 30)", "50", "Temel toplama")
+                    TestCase("topla(10, 20)", "30", "Toplam testi")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_1_1",
+                    lessonId = "lua_1",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da değişken tanımlarken başına 'local' yazmazsanız ne olur?",
+                    options = listOf("Değişken global olur ve tüm programdan kontrolsüzce erişilebilir", "Hata verir", "Sabit olur", "Silinir"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Başına local konmayan değişkenler global olur; bu yüzden hep local tercih edilir.",
+                    explanationWrong = "Global olur.",
+                    reviewTopic = "Lua Değişkenler"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Lua'da tek satırlık yorum nasıl yazılır?",
+                    answer = "-- (iki tire) işaretiyle yazılır (Örn: -- Bu bir yorumdur)."
+                )
+            ),
+            completionCriteria = listOf(
+                "print() ve local kullanımını bilmek",
+                ".. operatörü ile metin birleştirebilmek"
             )
         ),
 
         // ==========================================
-        // DERS 2: KONTROL AKIŞI & DÖNGÜLER (ÜCRETSİZ)
+        // DERS 2: KOŞULLAR VE DÖNGÜLER
         // ==========================================
         Lesson(
             id = "lua_2",
             courseId = "lua",
             sectionId = "lua_sec_1",
-            title = "Kontrol Akışı: if-then-else, while, repeat-until & for",
-            shortDesc = "Koşul blokları (if then elseif else end), while döngüsü, repeat-until yapısı, Sayısal for (Numeric for) ve break anahtarı.",
+            title = "Kararlar (if-then-end) ve Döngüler (for, while)",
+            shortDesc = "then ve end blokları ile koşullar, sayısal for döngüsü ve repeat-until.",
             level = CourseLevel.BEGINNER,
             order = 2,
             isPremium = false,
             learningObjectives = listOf(
-                "if ... then ... elseif ... else ... end sözdizimini hatasız kullanmak",
-                "Sayısal for (for i = start, stop, step do) döngüsü kurmak",
-                "repeat ... until döngüsünün koşul mantığını öğrenmek"
+                "if ... then ... else ... end kalıbını öğrenmek",
+                "for i = 1, 5 do ... end sayısal döngüsünü kullanmak",
+                "while ve repeat-until döngülerini kavramak"
             ),
-            prerequisites = listOf("Lua'ya Giriş & Tipler"),
-            subtopics = listOf("if-then-else ve end Blokları", "Mantıksal Operatörler (and, or, not) İle Kısa Devre", "Sayısal for ve JIT Optimizasyonu", "while do ... end", "repeat ... until Döngü Mantığı"),
+            prerequisites = listOf("Lua Değişkenleri"),
+            subtopics = listOf("if then else end", "Sayısal for", "repeat until"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Koşul Yapısı ve Blok Kapatma",
-                    body = "Lua'da bloklar süslü parantez `{}` yerine `end` anahtar kelimesiyle kapatılır. `if ... then ... elseif ... else ... end` yapısı kullanılır (`elseif` bitişik yazılır).",
-                    codeSnippet = "local can = 75\n\nif can > 80 then\n    print(\"Durum: Mukemmel\")\nelseif can > 40 then\n    print(\"Durum: Normal\")\nelse\n    print(\"Durum: Kritik!\")\nend"
+                    subtitle = "1. if-then-end Yapısı",
+                    body = "Lua'da süslü parantez `{}` yoktur; bloklar `then` ile başlar ve `end` ile biter.",
+                    codeSnippet = "local can = 80\n\nif can <= 0 then\n    print(\"Elendiniz! 💀\")\nelseif can < 50 then\n    print(\"Canınız az!\")\nelse\n    print(\"Durumunuz iyi! 🛡️\")\nend"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. and / or İle Kısa Devre ve Ternary Operatör Simülasyonu",
-                    body = "Lua'da C/Java benzeri `? :` üçlü operatörü yoktur. Bunun yerine `a and b or c` deyimi kullanılır. `a` true ise `b` döner, false ise `c` döner.\n\n`local deger = girdi or \"varsayilan\"` kalıbı Lua'da varsayılan parametre atamanın standart yoludur.",
-                    codeSnippet = "local kullanici = nil\nlocal isim = kullanici or \"Misafir\"\nprint(\"Hosgeldin: \" .. isim) -- Hosgeldin: Misafir"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. Sayısal for (Numeric for) ve repeat-until",
-                    body = "• `for i = start, stop, step do ... end`: `start`, `stop` ve `step` döngüye girmeden önce yalnızca bir kez hesaplanır (önbelleğe alınır).\n• `repeat ... until kosul`: Gövde en az 1 kez çalışır; koşul `true` olana kadar (while'ın tersine) tekrarlar. repeat bloğunda tanımlanan yerel değişkenler `until` koşulunda da görünür!",
-                    tip = "repeat-until döngüsünde `until` koşulu, döngü gövdesinde tanımlanan `local` değişkenlere erişebilir."
+                    subtitle = "2. for Döngüsü",
+                    body = "1'den 5'e kadar saymak için: `for i = 1, 5 do` yazılır.",
+                    codeSnippet = "for i = 1, 5 do\n    print(\"Adım: \" .. i)\nend"
                 )
             ),
-            codeExample = "local toplam = 0\nfor i = 1, 5 do\n    toplam = toplam + i\n    print(\"Adim \" .. i .. \" -> Toplam: \" .. toplam)\nend",
-            codeExplanation = "for döngüsü 1'den 5'e kadar sayar ve her adımda toplam değişkenini günceller.",
-            realWorldExample = "Oyunlarda NPC yapay zekası düşmanın menzilde olup olmadığını her karede if-then kontrolleriyle denetler.",
-            practicalTask = "10'dan geriye doğru 1'e kadar sayıp en son \"Ateş!\" yazan bir for döngüsü yazın.",
-            starterPlaygroundCode = "for i = 10, 1, -1 do\n    print(\"Geri Sayim: \" .. i)\nend\nprint(\"Ates!\")",
+            codeExample = "local top = 0\nfor i = 1, 5 do\n    top = top + i\nend\nprint(\"Toplam: \" .. top) -- 15",
+            codeExplanation = "for döngüsüyle 1-5 arası sayılar toplandı.",
+            realWorldExample = "Roblox oyunlarında geri sayım sayacı yaparken 'for i = 10, 1, -1 do' döngüsü kullanılır.",
+            practicalTask = "1'den 10'a kadar olan çift sayıları yazdıran bir for döngüsü kurun.",
+            starterPlaygroundCode = "for i = 2, 10, 2 do print(i) end",
             miniQuestion = MiniQuestion(
                 id = "lua_q_2",
-                question = "Lua dilinde bir if veya for bloğunu sonlandırmak için hangi anahtar kelime kullanılır?",
-                options = listOf("end", "done", "close", "}"),
+                question = "Lua'da if veya for bloklarının sona erdiğini belirtmek için hangi anahtar kelime kullanılır?",
+                options = listOf("end", "stop", "finish", "done"),
                 correctIndex = 0,
-                explanation = "Lua'da if, for, while, function gibi tüm bloklar 'end' ile kapatılır."
+                explanation = "Lua blokları 'end' kelimesiyle kapatılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_2",
                 lessonId = "lua_2",
-                title = "Çift Sayıların Toplamı",
-                instructions = "1'den n'e kadar olan sayılar arasındaki çift sayıların toplamını döndüren ciftToplami(n) fonksiyonunu yazın.",
-                exampleInput = "n = 6",
-                exampleOutput = "12 (2 + 4 + 6)",
-                starterCode = "function ciftToplami(n)\n    -- Kodunu buraya yaz:\n    return 0\nend",
-                solutionCode = "function ciftToplami(n)\n    local toplam = 0\n    for i = 2, n, 2 do\n        toplam = toplam + i\n    end\n    return toplam\nend",
-                hints = listOf("for i = 2, n, 2 do döngüsü kurup toplamı arttırın."),
+                title = "Pozitif Sayı Kontrolü",
+                instructions = "sayi > 0 ise 'Pozitif', değilse 'Sıfır veya Negatif' döndüren kontrol(sayi) fonksiyonunu yazın.",
+                exampleInput = "kontrol(5)",
+                exampleOutput = "\"Pozitif\"",
+                starterCode = "function kontrol(sayi)\n    -- Kodunu yaz:\n    return \"\"\nend",
+                solutionCode = "function kontrol(sayi)\n    if sayi > 0 then\n        return \"Pozitif\"\n    else\n        return \"Sıfır veya Negatif\"\n    end\nend",
+                hints = listOf("if sayi > 0 then return \"Pozitif\" else return \"Sıfır veya Negatif\" end yazın."),
                 testCases = listOf(
-                    TestCase("ciftToplami(6)", "12", "Çift toplam testi")
+                    TestCase("kontrol(5)", "Pozitif", "Pozitif sayı"),
+                    TestCase("kontrol(-2)", "Sıfır veya Negatif", "Negatif sayı")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_2_1",
+                    lessonId = "lua_2",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da 'Eşit Değildir' karşılaştırma operatörü hangisidir?",
+                    options = listOf("~=", "!=", "<>", "!=="),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Lua'da eşit değil kontrolü '~=' ile yapılır.",
+                    explanationWrong = "~= operatörü kullanılır.",
+                    reviewTopic = "Lua Operatörler"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Lua'da 0 (sıfır) boolean olarak true mudur false mu?",
+                    answer = "Lua'da SADECE 'false' ve 'nil' değerleri false sayılır. 0 ve boş metin (\"\") TRUE kabul edilir!"
+                )
+            ),
+            completionCriteria = listOf(
+                "if-then-end yapısını kurabilmek",
+                "for ve while döngülerini bilmek"
             )
         ),
 
         // ==========================================
-        // DERS 3: FONKSİYONLAR & MULTIPLE RETURNS (ÜCRETSİZ)
+        // DERS 3: FONKSİYONLAR VE ÇOKLU DÖNÜŞ
         // ==========================================
         Lesson(
             id = "lua_3",
             courseId = "lua",
             sectionId = "lua_sec_2",
-            title = "Fonksiyonlar: Çoklu Dönüş Değerleri & Varargs (...)",
-            shortDesc = "Fonksiyon tanımlama, Birinci sınıf vatandaşlık (First-Class Functions), Birden fazla değer döndürme (Multiple Returns) ve Değişken sayıda argüman (...).",
+            title = "Fonksiyonlar ve Çoklu Değer Döndürme",
+            shortDesc = "Tek bir fonksiyondan virgülle birden fazla sonuç döndürme süper gücü.",
             level = CourseLevel.BEGINNER,
             order = 3,
             isPremium = false,
             learningObjectives = listOf(
-                "Lua fonksiyonlarının birden fazla değeri virgülle döndürebilme yeteneğini kavramak",
-                "Çoklu atama (Multiple Assignment) ile dönen değerleri yakalamak",
-                "Değişken sayıda argüman alan (... varargs) fonksiyonlar yazmak"
+                "function ... end ile fonksiyon yazmak",
+                "return sonuc1, sonuc2 ile birden fazla değer döndürmek",
+                "Fonksiyonları değişken gibi parametre olarak aktarmak"
             ),
-            prerequisites = listOf("Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Fonksiyon Tanımlama", "Çoklu Dönüş (return a, b)", "Çoklu Atama (x, y = fn())", "Varargs (...) ve select()", "Upvalues ve Closures (Kapanışlar)"),
+            prerequisites = listOf("Lua Koşulları ve Döngüleri"),
+            subtopics = listOf("Fonksiyon Tanımlama", "Çoklu Değer Döndürme", "Anonim Fonksiyonlar"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Çoklu Dönüş Değerleri ve Çoklu Atama",
-                    body = "Lua'da bir fonksiyon tek seferde birden fazla değeri `return x, y, z` şeklinde dönebilir. Dönen değerler `local a, b = fn()` şeklinde doğrudan yakalanır. Eğer fonksiyon çağrısı başka bir fonksiyonun son argümanı ise tüm değerler iletilir.",
-                    codeSnippet = "local function minMax(a, b)\n    if a < b then\n        return a, b\n    else\n        return b, a\n    end\nend\n\nlocal enKucuk, enBuyuk = minMax(45, 12)\nprint(\"Min: \" .. enKucuk .. \", Max: \" .. enBuyuk)"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Varargs (...) ve select() Fonksiyonu",
-                    body = "Değişken sayıda parametre almak için `...` (üç nokta) kullanılır. `select('#', ...)` gelen parametre sayısını verir; `select(i, ...)` i'nci parametreden sonrasını döndürür. `{...}` ifadesi parametreleri anında bir Lua tablosuna dönüştürür.",
-                    codeSnippet = "local function logla(etiket, ...)\n    print(\"[\" .. etiket .. \"] Toplam Parametre: \" .. select('#', ...))\nend\nlogla(\"DEBUG\", 1, 2, \"test\")"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. Birinci Sınıf Fonksiyonlar, Kapanışlar (Closures) ve Upvalue",
-                    body = "Lua'da fonksiyonlar birinci sınıf değerlerdir. Bir fonksiyon başka bir fonksiyon içinde tanımlandığında, dış fonksiyondaki yerel değişkenleri saklar (Upvalue) ve fonksiyon sonlansa bile erişmeye devam eder (Lexical Scoping).",
-                    tip = "Upvalue'lar Lua'da veri gizleme (private field simülasyonu) ve durum koruyan sayaçlar için en yaygın tekniktir."
+                    subtitle = "1. Tek Seferde Birden Çok Sonuç",
+                    body = "Bir fonksiyon hem minimumu hem maksimumu aynı anda döndürebilir!",
+                    codeSnippet = "function min_ve_max(a, b)\n    if a < b then\n        return a, b\n    else\n        return b, a\n    end\nend\n\nlocal kucuk, buyuk = min_ve_max(10, 5)\nprint(\"Küçük: \" .. kucuk .. \", Büyük: \" .. buyuk)"
                 )
             ),
-            codeExample = "local function toplaHepsi(...)\n    local toplam = 0\n    for _, sayi in ipairs({...}) do\n        toplam = toplam + sayi\n    end\n    return toplam\nend\n\nprint(\"Sonuc: \" .. toplaHepsi(10, 20, 30, 40))",
-            codeExplanation = "toplaHepsi fonksiyonu sınırsız sayıda parametreyi {...} tablosuna çevirip toplar.",
-            realWorldExample = "Oyun içi fizik motorlarında bir nesnenin 2D veya 3D koordinatları `return x, y, z` olarak çoklu döndürülür.",
-            practicalTask = "Verilen iki sayının hem toplamını hem de farkını aynı anda döndüren bir Lua fonksiyonu yazın.",
-            starterPlaygroundCode = "local function toplaVeCikar(a, b)\n    return a + b, a - b\nend\n\nlocal t, f = toplaVeCikar(20, 8)\nprint(\"Toplam: \" .. t .. \", Fark: \" .. f)",
+            codeExample = "function kare_ve_kup(x)\n    return x*x, x*x*x\nend\n\nlocal k, ku = kare_ve_kup(3) -- 9, 27",
+            codeExplanation = "kare_ve_kup tek çağrıda iki farklı hesaplama sonucunu döndürdü.",
+            realWorldExample = "Oyunlarda oyuncunun hem (X, Y) koordinatını tek fonksiyondan almak için çoklu return kullanılır.",
+            practicalTask = "İki sayının toplamını ve farkını döndüren bir fonksiyon yazın.",
+            starterPlaygroundCode = "function topla_cikar(a, b) return a+b, a-b end",
             miniQuestion = MiniQuestion(
                 id = "lua_q_3",
-                question = "Lua'da bir fonksiyonun aynı anda birden fazla değer döndürmesi nasıl sağlanır?",
-                options = listOf("return deger1, deger2 şeklinde virgülle ayırarak", "Sadece dizi içine sararak", "Pointer parametresi kullanarak", "Tuple tanımlayarak"),
+                question = "Lua'da bir fonksiyon aynı anda birden fazla değer geri döndürebilir mi?",
+                options = listOf("Evet, return a, b şeklinde virgülle döndürebilir", "Hayır, sadece tek değer döner", "Sadece dizi ile döner", "Hata verir"),
                 correctIndex = 0,
-                explanation = "Lua yerel olarak return val1, val2 şeklinde çoklu dönüşü destekler."
+                explanation = "Lua fonksiyonları 'return a, b' ile birden çok değer döndürebilir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_3",
                 lessonId = "lua_3",
-                title = "Kare ve Küp Hesaplayıcı",
-                instructions = "Verilen bir sayının karesini ve küpünü aynı anda döndüren kareVeKup(n) fonksiyonunu yazın.",
-                exampleInput = "n = 3",
-                exampleOutput = "9, 27",
-                starterCode = "function kareVeKup(n)\n    -- Kodunu buraya yaz:\n    return 0, 0\nend",
-                solutionCode = "function kareVeKup(n)\n    return n * n, n * n * n\nend",
-                hints = listOf("return n * n, n * n * n yazın."),
+                title = "Küp Hesaplayıcı",
+                instructions = "Verilen sayının küpünü (x * x * x) hesaplayan kup(x) fonksiyonunu yazın.",
+                exampleInput = "kup(3)",
+                exampleOutput = "27",
+                starterCode = "function kup(x)\n    -- Kodunu yaz:\n    return 0\nend",
+                solutionCode = "function kup(x)\n    return x * x * x\nend",
+                hints = listOf("return x * x * x yazın."),
                 testCases = listOf(
-                    TestCase("kareVeKup(3)", "9, 27", "Çoklu dönüş testi")
+                    TestCase("kup(3)", "27", "3'ün küpü"),
+                    TestCase("kup(2)", "8", "2'nin küpü")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_3_1",
+                    lessonId = "lua_3",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da yerel (local) bir fonksiyon tanımlamanın en temiz yolu hangisidir?",
+                    options = listOf("local function topla() ... end", "def topla()", "fn topla()", "func topla()"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! 'local function' kullanımı en yaygın standarttır.",
+                    explanationWrong = "local function kullanılır.",
+                    reviewTopic = "Lua Fonksiyonlar"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Lua'da fonksiyonlar First-Class mıdır?",
+                    answer = "Evet! Fonksiyonları bir değişkene atayabilir, tablolara koyabilir veya başka fonksiyona parametre verebilirsiniz."
+                )
+            ),
+            completionCriteria = listOf(
+                "Fonksiyon tanımlayabilmek",
+                "Çoklu return mantığını kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 4: TABLOLARIN GÜCÜ (TABLES) (PRO)
+        // DERS 4: TABLOLAR (TABLES)
         // ==========================================
         Lesson(
             id = "lua_4",
             courseId = "lua",
             sectionId = "lua_sec_2",
-            title = "Tabloların Gücü: Dizi, Sözlük, pairs & ipairs",
-            shortDesc = "Lua'nın tek ve en güçlü veri yapısı olan Tablolar (Tables), 1-tabanlı indeksleme, Dizi vs Key-Value sözlükleri, table kütüphanesi ve döngüler.",
+            title = "Lua'nın Süper Gücü: Tablolar (Tables)",
+            shortDesc = "Dizi, liste, sözlük ve nesne... Hepsi tek bir yapıda: { }. Dikkat: Lua'da indeks 1'den başlar!",
             level = CourseLevel.BEGINNER,
             order = 4,
             isPremium = true,
             learningObjectives = listOf(
-                "Lua'da dizilerin indeksinin 1'den başladığını öğrenmek",
-                "Tabloları hem dizi (Array) hem sözlük (Dictionary/Hashmap) olarak kullanmak",
-                "Sıralı diziler için ipairs, genel tablolar için pairs döngüsünü doğru seçmek"
+                "Tabloların (Tables) Lua'daki tek veri saklama yapısı olduğunu anlamak",
+                "Önemli kural: Lua dizi indekslerinin 0'dan değil 1'den başladığını öğrenmek",
+                "Tabloyu hem liste hem sözlük (Key-Value) olarak kullanmak"
             ),
-            prerequisites = listOf("Fonksiyonlar ve Çoklu Dönüş"),
-            subtopics = listOf("Tablo Mimarisi (Array Part vs Hash Part)", "1-Tabanlı İndeksleme Mantığı", "Key-Value Çiftleri", "ipairs vs pairs Performansı", "table.insert / remove / sort"),
+            prerequisites = listOf("Fonksiyonlar ve Değişkenler"),
+            subtopics = listOf("Tablo Tanımlama { }", "1-Tabanlı İndeks Kuralı", "Sözlük Kullanımı"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Tablonun İç Yapısı: Array Part & Hash Part",
-                    body = "Lua tabloları C düzeyinde iki bileşenden oluşur:\n• Dizi Bölümü (Array Part): 1'den N'e kadar sıralı tamsayı indeksler için C dizisi hızında O(1) erişim sağlar.\n• Hash Bölümü (Hash Part): String veya diğer anahtarlar için hash tablosu üzerinde çalışır.\n\nBu melez yapı sayesinde tek bir `{}` hem optimize bir dizi hem de esnek bir sözlüktür.",
-                    codeSnippet = "local tablo = {\"Birinci\", \"Ikinci\", ad = \"Lua\", puan = 100}\nprint(tablo[1])   -- Dizi bolumunden gelir: Birinci\nprint(tablo.ad)    -- Hash bolumunden gelir: Lua"
+                    subtitle = "1. Lua'da Her Şey Tablodur!",
+                    body = "Lua'da ayrı ayrı array, list, dictionary veya object yoktur; hepsi `{ }` tablosudur.\n\n⚠️ **Çok Önemli:** Lua'da listelerin ilk elemanı `dizi[1]`'dir (0 değil!)."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. 1-Tabanlı İndeksleme ve # Uzunluk Operatörü",
-                    body = "Lua dizileri geleneksel olarak 1'den başlar (`dizi[1]`). `#dizi` operatörü tablodaki ardışık sıralı elemanların uzunluğunu döndürür.\n\nEğer dizide aralara `nil` değerler girerse (delikli dizi / sparse array), `#` operatörünün sonucu tanımsız olabilir!",
-                    tip = "Diziyi temizlemek için `for i = #d, 1, -1 do table.remove(d, i) end` geriye doğru döngü kurmak indeks kaymalarını önler."
-                ),
-                LessonContentBlock(
-                    subtitle = "3. İterasyon: ipairs vs pairs",
-                    body = "• `ipairs(t)`: Yalnızca t[1], t[2], ... sıralı sayısal indeksleri dolaşır ve ilk `nil` değerde anında durur. (Hızlıdır)\n• `pairs(t)`: Tablodaki tüm anahtarları (string, boolean, sayı) hash sırasına göre dolaşır.",
-                    codeSnippet = "for anahtar, deger in pairs(tablo) do\n    print(tostring(anahtar) .. \" => \" .. tostring(deger))\nend"
+                    subtitle = "2. Liste ve Sözlük Örneği",
+                    body = "Nokta ile veya köşeli parantezle erişebilirsiniz.",
+                    codeSnippet = "-- 1. Liste:\nlocal meyveler = {\"Elma\", \"Armut\", \"Muz\"}\nprint(meyveler[1]) -- \"Elma\" (1'den başlar!)\n\n-- 2. Sözlük (Dictionary):\nlocal oyuncu = {\n    isim = \"Barbaros\",\n    can = 100,\n    seviye = 5\n}\nprint(oyuncu.isim .. \" Can: \" .. oyuncu.can)"
                 )
             ),
-            codeExample = "local oyuncu = {\n    isim = \"Gölge Savaşçı\",\n    can = 100,\n    envanter = {\"Kılıç\", \"İksir\", \"Kalkan\"}\n}\n\nprint(\"Oyuncu: \" .. oyuncu.isim)\nprint(\"İlk Eşya: \" .. oyuncu.envanter[1])",
-            codeExplanation = "Tablolar iç içe nesneler ve diziler barındırarak karmaşık JSON benzeri ağaçlar oluşturur.",
-            realWorldExample = "Roblox oyun dünyasında tüm modeller, envanter verileri ve oyuncu istatistikleri Lua tablolarında saklanır.",
-            practicalTask = "Bir meyve fiyat sözlüğü oluşturup pairs ile tüm meyveleri ve fiyatlarını ekrana yazdırın.",
-            starterPlaygroundCode = "local fiyatlar = { elma = 15, muz = 30, cilek = 45 }\nfor meyve, fiyat in pairs(fiyatlar) do\n    print(meyve .. \" -> \" .. fiyat .. \" TL\")\nend",
+            codeExample = "local envanter = {}\nenvanter.kilic = \"Ateş Kılıcı\"\nprint(envanter.kilic)",
+            codeExplanation = "Boş tablo oluşturulup içine anahtar-değer atandı.",
+            realWorldExample = "Roblox oyunlarında bir oyuncunun sahip olduğu tüm eşyalar bir Tablo içinde tutulur.",
+            practicalTask = "3 elemanlı bir liste tablosu açıp ilk elemanını print ile yazdırın.",
+            starterPlaygroundCode = "local renkler = {\"Kırmızı\", \"Yeşil\", \"Mavi\"}\nprint(renkler[1])",
             miniQuestion = MiniQuestion(
                 id = "lua_q_4",
-                question = "Lua dilinde standart sıralı bir dizinin ilk elemanının indeksi kaçtır?",
-                options = listOf("1", "0", "-1", "Herhangi bir sayı olabilir"),
+                question = "Lua programlama dilinde bir listenin (dizi) İLK elemanının indeksi kaçtır?",
+                options = listOf("1", "0", "-1", "Tanımsız"),
                 correctIndex = 0,
-                explanation = "Lua dizileri geleneksel olarak 1-tabanlıdır (1-based indexing)."
+                explanation = "Lua'da dizi indeksleri 1'den başlar (dizi[1])."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_4",
                 lessonId = "lua_4",
-                title = "Tablo Eleman Sayıcı",
-                instructions = "Sayı dizisi alan ve içindeki elemanların toplamını döndüren toplaTablo(t) fonksiyonunu yazın.",
-                exampleInput = "t = {10, 20, 30}",
-                exampleOutput = "60",
-                starterCode = "function toplaTablo(t)\n    -- Kodunu buraya yaz:\n    return 0\nend",
-                solutionCode = "function toplaTablo(t)\n    local toplam = 0\n    for _, v in ipairs(t) do\n        toplam = toplam + v\n    end\n    return toplam\nend",
-                hints = listOf("ipairs(t) döngüsüyle elemanları toplayın."),
+                title = "İlk Elemanı Al",
+                instructions = "Verilen dizi tablosunun ilk elemanını (1. indeks) döndüren ilk_eleman(dizi) fonksiyonunu yazın.",
+                exampleInput = "ilk_eleman({\"A\", \"B\"})",
+                exampleOutput = "\"A\"",
+                starterCode = "function ilk_eleman(dizi)\n    -- Kodunu yaz:\n    return nil\nend",
+                solutionCode = "function ilk_eleman(dizi)\n    return dizi[1]\nend",
+                hints = listOf("return dizi[1] yazın."),
                 testCases = listOf(
-                    TestCase("toplaTablo({10, 20, 30})", "60", "Tablo toplam testi")
+                    TestCase("ilk_eleman({\"Lua\", \"Python\"})", "Lua", "İlk eleman testi")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_4_1",
+                    lessonId = "lua_4",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da bir dizi tablosunun eleman sayısını hızlıca öğrenmek için hangi operatör kullanılır?",
+                    options = listOf("# (Diyez) örn: #meyveler", "len()", "count()", "size()"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Uzunluk için tablonun önüne '#' konur (#tablo).",
+                    explanationWrong = "# operatörü kullanılır.",
+                    reviewTopic = "Lua Tablo Uzunluğu"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "table.insert ne işe yarar?",
+                    answer = "table.insert(liste, \"Yeni\") ile listenin sonuna yeni bir eleman eklersiniz."
+                )
+            ),
+            completionCriteria = listOf(
+                "Tablo tanımlayıp eleman ekleyebilmek",
+                "1-tabanlı indeks kuralını unutmamak"
             )
         ),
 
         // ==========================================
-        // DERS 5: METATABLES & METAMETHODS (PRO)
+        // DERS 5: İPAIRS VE PAIRS
         // ==========================================
         Lesson(
             id = "lua_5",
             courseId = "lua",
-            sectionId = "lua_sec_3",
-            title = "Metatables & Metamethods (__index, __add, __tostring)",
-            shortDesc = "Metatable kavramı, setmetatable/getmetatable, operatör aşırı yükleme (__add, __sub, __mul), __tostring ve __index fallback zinciri.",
-            level = CourseLevel.INTERMEDIATE,
+            sectionId = "lua_sec_2",
+            title = "Tablo İteratörleri: ipairs ve pairs",
+            shortDesc = "Sıralı listeleri gezmek için 'ipairs', sözlük ve anahtarları gezmek için 'pairs'.",
+            level = CourseLevel.BEGINNER,
             order = 5,
             isPremium = true,
             learningObjectives = listOf(
-                "Metatable ile tablolara özel davranışlar ve operatör desteği kazandırmak",
-                "__add, __mul gibi metamethodlar ile operatör aşırı yüklemek (Operator Overloading)",
-                "__index metamethodunu fallback ve prototip kalıtımı için yapılandırmak"
+                "ipairs ile sıralı listelerde (1, 2, 3...) döngü kurmak",
+                "pairs ile anahtar-değer (Key-Value) sözlüklerini gezmek"
             ),
-            prerequisites = listOf("Tablolar ve Fonksiyonlar"),
-            subtopics = listOf("setmetatable & getmetatable", "Operatör Metamethodları (__add, __sub, __mul, __eq)", "__tostring ile Metin Temsili", "__index Metamethodu ve Prototip Kalıtımı", "Veri Koruması (__newindex)"),
+            prerequisites = listOf("Tablolar"),
+            subtopics = listOf("ipairs (Sıralı Liste)", "pairs (Sözlük Gezici)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Metatable Mimarisi ve Operatör Aşırı Yükleme",
-                    body = "Metatable, sıradan bir tablonun operatörlerle karşılaştığında (+, -, *, ==, ..) veya özel durumlarda nasıl tepki vereceğini yöneten kural tablosudur.\n\n• `__add`: `+` operatörü\n• `__sub`: `-` operatörü\n• `__mul`: `*` operatörü\n• `__eq`: `==` operatörü\n• `__tostring`: `print()` veya `tostring()` çağrıldığında dönen metin",
-                    codeSnippet = "local Vektor = {}\nlocal mt = {\n    __add = function(v1, v2)\n        return setmetatable({x = v1.x + v2.x, y = v1.y + v2.y}, mt)\n    },\n    __tostring = function(v)\n        return \"Vektor(\" .. v.x .. \", \" .. v.y .. \")\"\n    }\n}\n\nlocal v1 = setmetatable({x = 10, y = 20}, mt)\nlocal v2 = setmetatable({x = 5, y = 15}, mt)\nlocal v3 = v1 + v2\nprint(tostring(v3)) -- Vektor(15, 35)"
+                    subtitle = "1. Hangisini Ne Zaman Kullanmalı?",
+                    body = "• **ipairs (Index-Pairs):** Sayısal sıralı listelerde kullanılır (`1, 2, 3...`). Hızlıdır ve sırayı garanti eder.\n• **pairs:** İsimli anahtarlara sahip sözlüklerde kullanılır (`isim, yas, skor...`)."
                 ),
                 LessonContentBlock(
-                    subtitle = "2. __index Metamethodu ve Fallback Mekanizması",
-                    body = "Bir tabloda aranan bir alan bulunamadığında (`nil`), Lua sanal makinesi metatable'daki `__index` alanına bakar. `__index` bir fonksiyon veya başka bir tablo olabilir.\nBu kural zinciri Lua'da Sınıf (Class) ve Prototip tabanlı Nesne Yönelimli Programlamanın (OOP) temel direğidir.",
-                    codeSnippet = "local NesneSinifi = { can = 100, seviye = 1 }\nNesneSinifi.__index = NesneSinifi\n\nlocal yeniNesne = setmetatable({ isim = \"Savasci\" }, NesneSinifi)\nprint(yeniNesne.can) -- NesneSinifi'ndan gelir: 100"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. __newindex ile Salt-Okunur (Read-Only) Tablolar",
-                    body = "Var olmayan bir anahtara yeni değer atanmaya çalışıldığında `__newindex` tetiklenir. Bu metamethod ile tablolar salt-okunur (immutable) yapılabilir veya atanacak değerlerin tip güvenliği denetlenebilir.",
-                    tip = "Bir tabloyu kilitlemek için `__newindex = function() error(\"Bu tablo salt okunurdur!\") end` yazabilirsiniz."
+                    subtitle = "2. Örnek Kullanım",
+                    body = "for anahtar, deger in pairs(tablo) do",
+                    codeSnippet = "local sehirler = {\"Ankara\", \"İstanbul\", \"İzmir\"}\nfor indeks, sehir in ipairs(sehirler) do\n    print(indeks .. \". Şehir: \" .. sehir)\nend\n\nlocal skorlar = { Ahmet = 90, Canan = 100 }\nfor isim, puan in pairs(skorlar) do\n    print(isim .. \" -> \" .. puan)\nend"
                 )
             ),
-            codeExample = "local Varsayilanlar = { can = 100, seviye = 1 }\nlocal mt = { __index = Varsayilanlar }\n\nlocal yeniOyuncu = setmetatable({ isim = \"Can\" }, mt)\nprint(\"Oyuncu: \" .. yeniOyuncu.isim)\nprint(\"Can (Varsayilan): \" .. yeniOyuncu.can) -- Varsayilanlar'dan gelir",
-            codeExplanation = "yeniOyuncu tablosunda 'can' alanı yoktur, __index sayesinde Varsayilanlar tablosundan otomatik bulunur.",
-            realWorldExample = "Oyun motorlarında 2D/3D Vektör ve Matris matematiği metatable'lar ile sezgisel matematiksel formüllere dönüştürülür.",
-            practicalTask = "İki kesirli sayıyı toplayan __add metamethoduna sahip bir Kesir metatable'ı yazın.",
-            starterPlaygroundCode = "local mt = { __tostring = function(t) return \"Ozel Tablo: \" .. t.ad end }\nlocal nesne = setmetatable({ ad = \"Nesne-1\" }, mt)\nprint(tostring(nesne))",
+            codeExample = "local t = {10, 20, 30}\nlocal top = 0\nfor _, v in ipairs(t) do top = top + v end\nprint(\"Toplam: \" .. top) -- 60",
+            codeExplanation = "ipairs ile sayısal liste elemanları toplandı.",
+            realWorldExample = "Roblox haritasındaki tüm blokları tek tek boyamak için pairs(workspace:GetChildren()) kullanılır.",
+            practicalTask = "ipairs ile 3 meyve adını yazdıran döngüyü inceleyin.",
+            starterPlaygroundCode = "for i, v in ipairs({\"A\", \"B\"}) do print(v) end",
             miniQuestion = MiniQuestion(
                 id = "lua_q_5",
-                question = "Bir tabloda olmayan bir anahtara erişildiğinde devreye giren ve kalıtımı sağlayan en temel metamethod hangisidir?",
-                options = listOf("__index", "__newindex", "__call", "__metatable"),
+                question = "Lua'da 1, 2, 3 şeklinde sıralı indekslere sahip bir diziyi sırayla gezmek için hangi iteratör fonksiyonu tercih edilir?",
+                options = listOf("ipairs", "pairs", "each", "enumerate"),
                 correctIndex = 0,
-                explanation = "__index metamethodu tabloda bulunamayan anahtarların aranacağı yeri belirler."
+                explanation = "Sıralı indeksli diziler için 'ipairs' kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_5",
                 lessonId = "lua_5",
-                title = "Metatable ile Varsayılan Değer",
-                instructions = "Verilen bir tabloya bulunamayan tüm anahtarlar için \"Yok\" döndüren bir metatable atayıp tabloyu döndüren varsayilanAta(t) fonksiyonunu yazın.",
-                exampleInput = "t = { a = 1 }, t.b sorgusu",
-                exampleOutput = "\"Yok\"",
-                starterCode = "function varsayilanAta(t)\n    -- Kodunu buraya yaz:\n    return t\nend",
-                solutionCode = "function varsayilanAta(t)\n    local mt = { __index = function() return \"Yok\" end }\n    return setmetatable(t, mt)\nend",
-                hints = listOf("setmetatable(t, { __index = function() return \"Yok\" end }) kullanın."),
+                title = "Tablo Elemanları Toplamı",
+                instructions = "ipairs kullanarak verilen sayılar tablosunun toplamını hesaplayan tablo_toplami(t) fonksiyonunu yazın.",
+                exampleInput = "tablo_toplami({5, 10, 15})",
+                exampleOutput = "30",
+                starterCode = "function tablo_toplami(t)\n    -- Kodunu yaz:\n    return 0\nend",
+                solutionCode = "function tablo_toplami(t)\n    local top = 0\n    for _, v in ipairs(t) do\n        top = top + v\n    end\n    return top\nend",
+                hints = listOf("for _, v in ipairs(t) do top = top + v end return top yazın."),
                 testCases = listOf(
-                    TestCase("varsayilanAta({a=1}).b", "Yok", "Fallback testi")
+                    TestCase("tablo_toplami({5, 10, 15})", "30", "Tablo toplamı")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_5_1",
+                    lessonId = "lua_5",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "for i, v in ipairs(tablo) döngüsünde 'i' değerini kullanmak istemiyorsanız yerine ne yazmak iyi bir gelenektir?",
+                    options = listOf("_ (Alt çizgi)", "x", "ignore", "pass"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Kullanılmayan değişkenler için '_' yazılır.",
+                    explanationWrong = "_ kullanılır.",
+                    reviewTopic = "Lua İteratörler"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "ipairs tabloda nil görünce ne yapar?",
+                    answer = "ipairs sıralı gider ve karşılaştığı ilk nil değerde döngüyü hemen sonlandırır."
+                )
+            ),
+            completionCriteria = listOf(
+                "ipairs ve pairs farkını kavramak",
+                "Tablo döngüleri kurabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 6: NESNE YÖNELİMLİ LUA (OOP & SELF) (PRO)
+        // DERS 6: METATABLE VE OOP
         // ==========================================
         Lesson(
             id = "lua_6",
             courseId = "lua",
             sectionId = "lua_sec_3",
-            title = "Lua ile Nesne Yönelimli Programlama (OOP, Sınıflar & self)",
-            shortDesc = "Prototip tabanlı sınıflar, Kurucu metot (Constructor / new), Noktalı virgül (:) sözdizimi ile gizli self parametresi ve Kalıtım (Inheritance).",
+            title = "Metatable ve Nesne Yönelimli Lua (OOP)",
+            shortDesc = "Tablolara sihirli güçler katan setmetatable ve aranan alan bulunamazsa devreye giren __index.",
             level = CourseLevel.INTERMEDIATE,
             order = 6,
             isPremium = true,
             learningObjectives = listOf(
-                "Lua'da tablolar ve __index kullanarak Sınıf ve Nesne (Instance) üretmek",
-                "İki nokta (nesne:metot()) sözdiziminin `self` parametresini nasıl aktardığını kavramak",
-                "Bir üst sınıftan (BaseClass) türetilen alt sınıflar (Subclass) ile kalıtım kurmak"
+                "setmetatable ile iki tabloyu birbirine bağlamak",
+                "__index metametodu ile kalıtım ve sınıf şablonu oluşturmak",
+                "Lua'da prototip tabanlı nesneler üretmek"
             ),
-            prerequisites = listOf("Metatables ve Metamethods"),
-            subtopics = listOf("Sınıf Tanımlama Kalıbı", "new() Kurucu Metodu", "Nokta (.) vs İki Nokta (:)", "self Parametresi", "Kalıtım (Inheritance) Mimarisi"),
+            prerequisites = listOf("Tablolar ve pairs"),
+            subtopics = listOf("setmetatable()", "__index Metametodu", "Sınıf Deseni"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Lua OOP Kalıbı",
-                    body = "Lua'da `class` anahtar kelimesi yoktur; sınıflar bir tablo ve onun `__index`'i olarak tasarlanır.",
-                    codeSnippet = "local Karakter = {}\nKarakter.__index = Karakter\n\nfunction Karakter.new(isim, can)\n    local self = setmetatable({}, Karakter)\n    self.isim = isim\n    self.can = can\n    return self\nend\n\nfunction Karakter:hasarAl(miktar)\n    self.can = self.can - miktar\n    print(self.isim .. \" hasar aldi! Kalan can: \" .. self.can)\nend\n\nlocal k1 = Karakter.new(\"Savasci\", 100)\nk1:hasarAl(25) -- İki nokta ile çağrılır"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. İki Nokta (:) Sözdizimi",
-                    body = "`k1:hasarAl(25)` çağrısı arka planda `k1.hasarAl(k1, 25)` olarak çalışır ve `self` değişkenini otomatik bağlar.",
-                    tip = "Kalıtım için alt sınıfın metatable'ının __index değeri üst sınıfa yönlendirilir."
+                    subtitle = "1. Metatable: Tablonun Kullanım Kılavuzu",
+                    body = "Bir tablonun içinde olmayan bir değişkeni veya fonksiyonu aradığınızda, Lua metatable içindeki `__index` tablosuna bakar. Bu sayede tüm nesneler tek bir sınıftan metotları miras alabilir!",
+                    codeSnippet = "local Araba = {}\nAraba.__index = Araba\n\nfunction Araba.yeni(marka)\n    local self = setmetatable({}, Araba)\n    self.marka = marka\n    return self\nend\n\nfunction Araba:korna()\n    print(self.marka .. \": Düt düt! 🚗\")\nend"
                 )
             ),
-            codeExample = "local Dusman = setmetatable({}, { __index = Karakter })\nDusman.__index = Dusman\n\nfunction Dusman.new(isim, can, guc)\n    local self = Karakter.new(isim, can)\n    setmetatable(self, Dusman)\n    self.guc = guc\n    return self\nend\n\nlocal d1 = Dusman.new(\"Goblin\", 50, 10)\nd1:hasarAl(15)",
-            codeExplanation = "Dusman sınıfı Karakter'den kalıtım alır ve onun tüm metotlarını miras kullanır.",
-            realWorldExample = "Roblox oyunlarında tüm karakter kontrolcüleri, silah sınıfları ve UI bileşenleri bu OOP kalıbıyla yazılır.",
-            practicalTask = "BankaHesabi adında paraYatir ve paraCek metotları olan bir Lua sınıfı kodlayın.",
-            starterPlaygroundCode = "local Araba = {}\nAraba.__index = Araba\nfunction Araba.new(model) return setmetatable({model = model, hiz = 0}, Araba) end\nfunction Araba:gazla() self.hiz = self.hiz + 20 end\nlocal a = Araba.new(\"Spor\"); a:gazla(); print(\"Hiz: \" .. a.hiz)",
+            codeExample = "local a = Araba.yeni(\"Tesla\")\na:korna() -- Tesla: Düt düt!",
+            codeExplanation = "Araba sınıfından yeni bir nesne üretildi ve metodu çağrıldı.",
+            realWorldExample = "Roblox oyunlarındaki tüm silah ve canavar sınıfları metatable ile yazılır.",
+            practicalTask = "setmetatable ile basit bir sınıf şablonunu inceleyin.",
+            starterPlaygroundCode = "local Sinif = {}; Sinif.__index = Sinif",
             miniQuestion = MiniQuestion(
                 id = "lua_q_6",
-                question = "Lua'da bir nesne metodunu çağırırken nesnenin kendisini fonksiyona gizli `self` parametresi olarak aktaran sözdizimi hangisidir?",
-                options = listOf("İki nokta (nesne:metot())", "Nokta (nesne.metot())", "Ok (nesne->metot())", "Çift iki nokta (nesne::metot())"),
+                question = "Lua'da bir tabloda bulunamayan bir anahtarın üst şablonda (prototipte) aranmasını sağlayan sihirli metametod hangisidir?",
+                options = listOf("__index", "__newindex", "__tostring", "__call"),
                 correctIndex = 0,
-                explanation = "İki nokta (:) sözdizimi metodu çağırırken birinci parametre olarak çağıran nesneyi (self) otomatik iletir."
+                explanation = "Kalıtım ve şablon arama için '__index' metametodu kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_6",
                 lessonId = "lua_6",
-                title = "Sayaç Sınıfı",
-                instructions = "Sayac adında new() ile başlatılan ve :arttir() metodu çağrıldığında deger alanını 1 arttıran sınıfı yazın.",
-                exampleInput = "s = Sayac.new(), s:arttir()",
-                exampleOutput = "s.deger == 1",
-                starterCode = "Sayac = {}\nSayac.__index = Sayac\nfunction Sayac.new()\n    -- Kodunu buraya yaz:\nend\nfunction Sayac:arttir()\n    -- Kodunu buraya yaz:\nend",
-                solutionCode = "Sayac = {}\nSayac.__index = Sayac\nfunction Sayac.new()\n    return setmetatable({deger = 0}, Sayac)\nend\nfunction Sayac:arttir()\n    self.deger = self.deger + 1\nend",
-                hints = listOf("self.deger = self.deger + 1 yazın."),
+                title = "Nesne Üretici",
+                instructions = "deger alanına sahip ve sablon tablosunu metatable olarak bağlayan nesne_yap(sablon, deger) fonksiyonunu yazın.",
+                exampleInput = "nesne_yap(S, 10)",
+                exampleOutput = "{ deger = 10 }",
+                starterCode = "function nesne_yap(sablon, deger)\n    -- Kodunu yaz:\n    return {}\nend",
+                solutionCode = "function nesne_yap(sablon, deger)\n    local obj = { deger = deger }\n    setmetatable(obj, sablon)\n    return obj\nend",
+                hints = listOf("local obj = { deger = deger } setmetatable(obj, sablon) return obj yazın."),
                 testCases = listOf(
-                    TestCase("s:arttir()", "1", "Sayaç sınıf testi")
+                    TestCase("nesne_yap({}, 5).deger", "5", "Nesne üretimi")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_6_1",
+                    lessonId = "lua_6",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da iki tabloyu '+' işaretiyle toplamaya olanak tanıyan metametod hangisidir?",
+                    options = listOf("__add", "__sum", "__plus", "__concat"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Toplama işlemi için __add metametodu kullanılır.",
+                    explanationWrong = "__add kullanılır.",
+                    reviewTopic = "Lua Metamethods"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "__tostring ne işe yarar?",
+                    answer = "Tabloyu print(tablo) ile ekrana bastığınızda 'table: 0x...' yerine anlamlı bir yazı çıkmasını sağlar."
+                )
+            ),
+            completionCriteria = listOf(
+                "setmetatable ve __index kullanımını kavramak",
+                "Lua'da OOP mantığını anlamak"
             )
         ),
 
         // ==========================================
-        // DERS 7: CLOSURES & FONKSİYONEL PROGRAMLAMA (PRO)
+        // DERS 7: İKİ NOKTA (:) VE SELF
         // ==========================================
         Lesson(
             id = "lua_7",
             courseId = "lua",
-            sectionId = "lua_sec_4",
-            title = "Kapanışlar (Closures), Lexical Scoping & State Kapsülleme",
-            shortDesc = "Lexical Scoping, Upvalue değişkenleri, Closure fabrikaları, Kapsüllenmiş özel durumlar (Private State) ve Fonksiyonel araçlar (map, filter).",
+            sectionId = "lua_sec_3",
+            title = "İki Nokta (:) ile Metotlar ve self Kavramı",
+            shortDesc = "Nokta (.) ile İki Nokta (:) arasındaki fark ve 'self' parametresinin otomatik aktarımı.",
             level = CourseLevel.INTERMEDIATE,
             order = 7,
             isPremium = true,
             learningObjectives = listOf(
-                "Closure'ların dış kapsamdaki (Upvalue) değişkenleri nasıl canlı tuttuğunu anlamak",
-                "Nesnesiz saf private state (veri gizleme) fabrikaları üretmek",
-                "Yüksek dereceli fonksiyonlar (Higher-Order Functions) geliştirmek"
+                "nesne:metot() sözdiziminin nesne.metot(nesne) ile aynı olduğunu anlamak",
+                "self anahtar kelimesi ile nesnenin kendi özelliklerine erişmek"
             ),
-            prerequisites = listOf("OOP ve Sınıf Mimarisi"),
-            subtopics = listOf("Lexical Scope Kuralları", "Upvalues Nedir?", "Closure Fabrikaları", "Veri Kapsülleme (Private State)", "İteratör Üreticileri"),
+            prerequisites = listOf("Metatable ve OOP"),
+            subtopics = listOf("İki Nokta (:) Sözdizimi", "self Parametresi"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Closure ve Upvalue Mantığı",
-                    body = "Bir fonksiyon başka bir fonksiyon içinde tanımlandığında ve dış fonksiyonun lokal değişkenine eriştiğinde bir `Closure` oluşur. Dış fonksiyon sonlansa bile o değişken bellekte yaşamaya devam eder.",
-                    codeSnippet = "local function sayacUret(baslangic)\n    local sayi = baslangic or 0\n    return function()\n        sayi = sayi + 1\n        return sayi\n    end\nend\n\nlocal sayac1 = sayacUret(10)\nprint(sayac1()) -- 11\nprint(sayac1()) -- 12"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Özel Veri Gizleme",
-                    body = "Closure'lar sayesinde dışarıdan erişilemeyen güvenli banka hesabı veya şifre korumalı durum makineleri kurulabilir.",
-                    tip = "Lua'da for .. in döngüsü aslında her adımda bir closure iteratör çağırır."
+                    subtitle = "1. İki Nokta (:) Sihri",
+                    body = "`oyuncu:hasar_al(20)` yazdığınızda Lua arka planda otomatik olarak `oyuncu.hasar_al(oyuncu, 20)` yapar ve ilk parametreye `self` adını verir.",
+                    codeSnippet = "local Oyuncu = {}\nOyuncu.__index = Oyuncu\n\nfunction Oyuncu:hasar_al(miktar)\n    self.can = self.can - miktar\n    print(self.isim .. \" kalan can: \" .. self.can)\nend"
                 )
             ),
-            codeExample = "local function filtrele(tablo, kosul)\n    local sonuc = {}\n    for _, v in ipairs(tablo) do\n        if kosul(v) then table.insert(sonuc, v) end\n    end\n    return sonuc\nend\n\nlocal sayilar = {1, 2, 3, 4, 5, 6}\nlocal ciftler = filtrele(sayilar, function(x) return x % 2 == 0 end)\nprint(\"Cift Sayi Adedi: \" .. #ciftler)",
-            codeExplanation = "Anonim fonksiyon koşul olarak iletilip yüksek dereceli filtreleme yapılır.",
-            realWorldExample = "Oyun içi tetikleyiciler (Triggers ve Event Listener'lar) parametrelerini closure içinde dondurarak saklar.",
-            practicalTask = "Her çağrıldığında önceki sayının iki katını döndüren bir çarpan üreteci (Closure) yazın.",
-            starterPlaygroundCode = "local function carpanUret(k)\n    return function(x) return x * k end\nend\nlocal ikiyleCarp = carpanUret(2)\nprint(\"5 * 2 = \" .. ikiyleCarp(5))",
+            codeExample = "local p = { isim = \"Kurt\", can = 100 }\nsetmetatable(p, Oyuncu)\np:hasar_al(30) -- Kurt kalan can: 70",
+            codeExplanation = "p:hasar_al çağrısı ile self otomatik olarak p nesnesi oldu.",
+            realWorldExample = "Roblox API'sindeki 'part:Destroy()' veya 'humanoid:TakeDamage(10)' fonksiyonları bu yapıyla çalışır.",
+            practicalTask = "self.can değerini 10 artıran bir iyiles metodu tasarlayın.",
+            starterPlaygroundCode = "function Oyuncu:iyiles() self.can = self.can + 10 end",
             miniQuestion = MiniQuestion(
                 id = "lua_q_7",
-                question = "İç içe fonksiyonlarda bir alt fonksiyonun dış kapsamındaki lokal değişkene ne ad verilir?",
-                options = listOf("Upvalue (External Local Variable)", "Global değişken", "Static pointer", "Macro"),
+                question = "Lua'da 'nesne:fonksiyon()' çağrısı yapıldığında fonksiyonun ilk gizli parametresine ne ad verilir?",
+                options = listOf("self", "this", "me", "parent"),
                 correctIndex = 0,
-                explanation = "Lua'da iç fonksiyon tarafından yakalanan üst kapsam değişkenlerine 'Upvalue' adı verilir."
+                explanation = "İki nokta sözdizimi ilk parametreye otomatik olarak 'self' adını verir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_7",
                 lessonId = "lua_7",
-                title = "Kümülatif Toplayıcı Closure",
-                instructions = "baslangic değeri alan ve her çağrıldığında verilen miktarı biriktirip dönen toplayiciUret(baslangic) fonksiyonunu yazın.",
-                exampleInput = "t = toplayiciUret(10); t(5); t(10)",
-                exampleOutput = "25",
-                starterCode = "function toplayiciUret(baslangic)\n    -- Kodunu buraya yaz:\nend",
-                solutionCode = "function toplayiciUret(baslangic)\n    local toplam = baslangic or 0\n    return function(miktar)\n        toplam = toplam + (miktar or 0)\n        return toplam\n    end\nend",
-                hints = listOf("Lokal toplam değişkenini iç fonksiyonda güncelleyip döndürün."),
+                title = "Sayaç Artırıcı Metot",
+                instructions = "self.sayac değerini 1 artıran Sayac:artir() metodunu yazın.",
+                exampleInput = "local s = { sayac = 0 }; setmetatable(s, Sayac); s:artir();",
+                exampleOutput = "s.sayac = 1",
+                starterCode = "local Sayac = {}\nSayac.__index = Sayac\n\nfunction Sayac:artir()\n    -- Kodunu yaz:\nend",
+                solutionCode = "local Sayac = {}\nSayac.__index = Sayac\n\nfunction Sayac:artir()\n    self.sayac = self.sayac + 1\nend",
+                hints = listOf("self.sayac = self.sayac + 1 yazın."),
                 testCases = listOf(
-                    TestCase("t(5)", "15", "Kümülatif closure testi")
+                    TestCase("local s = {sayac=0}; setmetatable(s, Sayac); s:artir(); s.sayac", "1", "Sayaç artırma")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_7_1",
+                    lessonId = "lua_7",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "nesne.metot(nesne) yazmak ile nesne:metot() yazmak arasında nasıl bir fark vardır?",
+                    options = listOf("Hiçbir fark yoktur; iki nokta (:) sadece 'self' parametresini otomatik aktaran kullanışlı bir kısayoldur (Syntactic Sugar)", "İki nokta daha yavaştır", "Nokta hata verir", "Farklı dillere aittir"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! İki nokta sözdizimsel bir şekerdir (Syntactic sugar).",
+                    explanationWrong = "İki nokta otomatik self aktarımı sağlar.",
+                    reviewTopic = "Lua İki Nokta Sözdizimi"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Nokta ile iki noktayı karıştırırsam ne olur?",
+                    answer = "nesne.metot() yazarsanız self parametresi nil kalır ve kod 'attempt to index local self' hatası verir."
+                )
+            ),
+            completionCriteria = listOf(
+                ": ve . farkını kavramak",
+                "self ile metot yazabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 8: COROUTINES (EŞYORDAMLAR) (PRO)
+        // DERS 8: KAPANISLAR (CLOSURES)
         // ==========================================
         Lesson(
             id = "lua_8",
             courseId = "lua",
             sectionId = "lua_sec_4",
-            title = "Coroutines (Eşyordamlar): İşbirlikçi Çoklu Görev",
-            shortDesc = "İşbirlikçi çoklu görev (Cooperative Multitasking), coroutine.create, coroutine.resume, coroutine.yield, durum kontrolü (status) ve asenkron akışlar.",
+            title = "Kapanışlar (Closures) ile Durum Saklama",
+            shortDesc = "Global değişken kullanmadan fonksiyonun kendi özel hafızasını tutması.",
             level = CourseLevel.INTERMEDIATE,
             order = 8,
             isPremium = true,
             learningObjectives = listOf(
-                "İşletim sistemi thread'leri ile hafif Lua Coroutine'leri arasındaki farkı kavramak",
-                "coroutine.yield() ile fonksiyon yürütmesini dondurup ana akışa dönmek",
-                "coroutine.resume() ile veri ileterek donmuş noktadan devam ettirmek"
+                "İç içe fonksiyonlar ve Lexical Scoping mantığını öğrenmek",
+                "Closure ile dışarıdan müdahale edilemeyen gizli sayaçlar yapmak"
             ),
-            prerequisites = listOf("Closures ve Fonksiyonel Programlama"),
-            subtopics = listOf("Coroutines Nedir?", "coroutine.create & resume", "coroutine.yield ile Duraklatma", "Çift Yönlü Veri Aktarımı", "Oyun Döngüsü Zamanlayıcısı"),
+            prerequisites = listOf("Fonksiyonlar"),
+            subtopics = listOf("Closure Nedir?", "Gizli Değişkenler (Encapsulation)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Coroutine Mantığı",
-                    body = "Standart fonksiyonlar çağrılır ve sonuna kadar çalışır. Bir `coroutine` ise `coroutine.yield()` ile istediği yerde durup durumunu saklar ve daha sonra `coroutine.resume()` ile tam kaldığı satırdan devam eder.",
-                    codeSnippet = "local co = coroutine.create(function()\n    print(\"Adim 1: Basladi\")\n    coroutine.yield(\"Duraklatildi 1\")\n    print(\"Adim 2: Devam ediyor\")\n    coroutine.yield(\"Duraklatildi 2\")\n    print(\"Adim 3: Bitti\")\nend)\n\nprint(coroutine.resume(co)) -- true, Duraklatildi 1\nprint(coroutine.resume(co)) -- true, Duraklatildi 2\nprint(coroutine.resume(co)) -- true"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Thread Güvenliği",
-                    body = "Coroutines işbirlikçidir (cooperative); yani CPU kontrolünü zorla devretmezler, sadece kodun kendisi yield dediğinde kontrol ana programa döner. Bu sayede Lock ve Race Condition sorunları yaşanmaz.",
-                    tip = "Roblox'ta `task.wait()` veya `coroutine.wrap()` arka planda doğrudan Lua eşyordamlarını yönetir."
+                    subtitle = "1. Kendi Hafızası Olan Fonksiyon",
+                    body = "Bir fonksiyonun içinde tanımlanan değişken, o fonksiyonun döndürdüğü iç fonksiyon tarafından hatırlanmaya devam eder.",
+                    codeSnippet = "function sayac_yap()\n    local sayi = 0\n    return function()\n        sayi = sayi + 1\n        return sayi\n    end\nend\n\nlocal say = sayac_yap()\nprint(say()) -- 1\nprint(say()) -- 2"
                 )
             ),
-            codeExample = "local function geriSayim(n)\n    return coroutine.create(function()\n        for i = n, 1, -1 do\n            coroutine.yield(i)\n        end\n    end)\nend\n\nlocal sayacCo = geriSayim(3)\nlocal _, deger = coroutine.resume(sayacCo)\nprint(\"Gelen: \" .. deger) -- 3",
-            codeExplanation = "Eşyordam her yield çağrısında sıradaki sayıyı döner ve dondurulur.",
-            realWorldExample = "Oyunlarda NPC diyalog sistemleri veya sinematik ara sahneler coroutines ile adım adım kare kare oynatılır.",
-            practicalTask = "3 aşamalı bir görev tamamlanma sürecini adım adım yield eden bir coroutine yazın.",
-            starterPlaygroundCode = "local co = coroutine.create(function() print(\"A\"); coroutine.yield(); print(\"B\") end)\ncoroutine.resume(co)\nprint(\"Ana Akis\");\ncoroutine.resume(co)",
+            codeExample = "local s1 = sayac_yap()\nlocal s2 = sayac_yap()\nprint(s1(), s2()) -- 1, 1 (İkisi birbirinden bağımsız hafızaya sahiptir)",
+            codeExplanation = "Her closure kendi bağımsız sayi değişkenini hafızasında sakladı.",
+            realWorldExample = "Oyun içi benzersiz ID üreteçleri Closure ile yapılır.",
+            practicalTask = "Basit bir sayaç üreten closure fonksiyonunu inceleyin.",
+            starterPlaygroundCode = "function sayac() local n=0 return function() n=n+1 return n end end",
             miniQuestion = MiniQuestion(
                 id = "lua_q_8",
-                question = "Çalışmakta olan bir Lua coroutine'inin yürütülmesini duraklatıp çağıran koda dönmesini sağlayan fonksiyon hangisidir?",
-                options = listOf("coroutine.yield()", "coroutine.pause()", "coroutine.stop()", "coroutine.sleep()"),
+                question = "Bir iç fonksiyonun, kendisini çevreleyen dış fonksiyonun yerel değişkenlerini hatırlayıp kullanabilmesine ne ad verilir?",
+                options = listOf("Closure (Kapanış)", "Pointer", "Recursion", "Overload"),
                 correctIndex = 0,
-                explanation = "coroutine.yield() eşyordamın çalışmasını dondurup kontrolü resume() yapan tarafa iletir."
+                explanation = "Dış değişkenleri hatırlama özelliğine 'Closure' denir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_8",
                 lessonId = "lua_8",
-                title = "İki Adımlı Coroutine Üretici",
-                instructions = "İlk resume'da 10, ikinci resume'da 20 yield eden bir coroutine üreten ikiAdimCo() fonksiyonunu yazın.",
-                exampleInput = "co = ikiAdimCo(); _, val = coroutine.resume(co)",
-                exampleOutput = "10",
-                starterCode = "function ikiAdimCo()\n    -- Kodunu buraya yaz:\nend",
-                solutionCode = "function ikiAdimCo()\n    return coroutine.create(function()\n        coroutine.yield(10)\n        coroutine.yield(20)\n    end)\nend",
-                hints = listOf("coroutine.create(function() coroutine.yield(10) coroutine.yield(20) end) yazın."),
+                title = "Özel Sayaç Üretici",
+                instructions = "Her çağrıldığında 1 artıran anonim fonksiyon döndüren sayac_olustur() fonksiyonunu yazın.",
+                exampleInput = "local f = sayac_olustur(); f()",
+                exampleOutput = "1",
+                starterCode = "function sayac_olustur()\n    -- Kodunu yaz:\n    return function() return 0 end\nend",
+                solutionCode = "function sayac_olustur()\n    local n = 0\n    return function()\n        n = n + 1\n        return n\n    end\nend",
+                hints = listOf("local n = 0 return function() n = n + 1 return n end yazın."),
                 testCases = listOf(
-                    TestCase("coroutine.resume(co)", "true, 10", "Coroutine yield testi")
+                    TestCase("local f = sayac_olustur(); f()", "1", "İlk tık"),
+                    TestCase("local f = sayac_olustur(); f(); f()", "2", "İkinci tık")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_8_1",
+                    lessonId = "lua_8",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua'da closure tarafından yakalanıp saklanan dış değişkenlere ne ad verilir?",
+                    options = listOf("Upvalue", "Global", "Macro", "Constant"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Lua iç terminolojisinde bunlara 'Upvalue' denir.",
+                    explanationWrong = "Upvalue adı verilir.",
+                    reviewTopic = "Lua Closures"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Closure bellek harcar mı?",
+                    answer = "Evet, fonksiyon yaşadığı sürece kapattığı değişkenler RAM'de tutulur."
+                )
+            ),
+            completionCriteria = listOf(
+                "Closure mantığını kavramak",
+                "Fonksiyon döndüren fonksiyonlar yazabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 9: STRING DESEN EŞLEME (PATTERN MATCHING) (PRO)
+        // DERS 9: COROUTINES (YIELD VE RESUME)
         // ==========================================
         Lesson(
             id = "lua_9",
             courseId = "lua",
-            sectionId = "lua_sec_5",
-            title = "Desen Eşleme (Pattern Matching) & String Kütüphanesi",
-            shortDesc = "Lua'nın hafif regex alternatifi Desen Eşleme sistemi, Karakter sınıfları (%d, %a, %s, %w), string.find, string.match, string.gmatch ve string.gsub.",
+            sectionId = "lua_sec_4",
+            title = "Eşyordamlar (Coroutines): yield ve resume",
+            shortDesc = "Fonksiyonu istediğiniz yerde dondurma (yield) ve sonra kaldığı yerden devam ettirme (resume).",
             level = CourseLevel.ADVANCED,
             order = 9,
             isPremium = true,
             learningObjectives = listOf(
-                "Ağır Regex motorları yerine ultra hafif Lua Pattern sistemini kullanmak",
-                "Karakter sınıfları (%d: rakam, %a: harf, %s: boşluk) ile desenler oluşturmak",
-                "string.gsub ve yakalama parantezleri () ile metin dönüştürmek"
+                "coroutine.create ile eşyordam oluşturmak",
+                "coroutine.yield ile çalışmayı askıya almak",
+                "coroutine.resume ile kaldığı yerden devam ettirmek"
             ),
-            prerequisites = listOf("Coroutines ve Tablolar"),
-            subtopics = listOf("string.find ve string.match", "Karakter Sınıfları (%d, %a, %w)", "Yakalama Grupları ()", "string.gmatch ile Tüm Eşleşmeler", "string.gsub ile Metin Değiştirme"),
+            prerequisites = listOf("Fonksiyonlar ve Closures"),
+            subtopics = listOf("coroutine.create", "coroutine.yield()", "coroutine.resume()"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Lua Karakter Sınıfları",
-                    body = "• `%d`: Rakamlar (0-9)\n• `%a`: Harfler (a-z, A-Z)\n• `%w`: Harf ve rakamlar\n• `%s`: Boşluk karakterleri\n• `+`: 1 veya daha fazla\n• `*`: 0 veya daha fazla.",
-                    codeSnippet = "local metin = \"Siparis ID: #9842, Tarih: 2026-08-24\"\nlocal id = string.match(metin, \"#(%d+)\")\nprint(\"Bulunan ID: \" .. id) -- 9842"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. string.gsub ile Şablon Değiştirme",
-                    body = "`string.gsub(metin, desen, hedef)` metindeki desenle eşleşen tüm yerleri değiştirir veya her eşleşme için bir fonksiyon çalıştırır.",
-                    tip = "Büyük harfli sınıflar (%D, %A, %S) tam tersini (negation) temsil eder."
+                    subtitle = "1. Oyunu Dondurmadan Beklemek",
+                    body = "Normal bir fonksiyona `bekle(5)` derseniz tüm oyun donar. `coroutine` ise sadece o fonksiyonu uyutur (`yield`), oyun akmaya devam eder, süresi dolunca kaldığı yerden devam ettirilir (`resume`)!",
+                    codeSnippet = "local gorev = coroutine.create(function()\n    print(\"1. Aşama başladı!\")\n    coroutine.yield() -- BURADA DURAKLAR\n    print(\"2. Aşama devam ediyor!\")\nend)\n\ncoroutine.resume(gorev) -- \"1. Aşama başladı!\"\nprint(\"Oyun akıyor...\")\ncoroutine.resume(gorev) -- \"2. Aşama devam ediyor!\""
                 )
             ),
-            codeExample = "local metin = \"isim=Ali, yas=24, rol=Admin\"\nfor anahtar, deger in string.gmatch(metin, \"(%w+)=(%w+)\") do\n    print(anahtar .. \" -> \" .. deger)\nend",
-            codeExplanation = "string.gmatch bir iteratör döner ve tüm eşleşen anahtar=değer ikililerini çıkarır.",
-            realWorldExample = "Oyun içi sohbet filtreleri ve metin komut ayrıştırıcıları (örn: /tp oyuncu 100 200) string.match ile ayrıştırılır.",
-            practicalTask = "Bir metindeki tüm e-posta adreslerini veya telefon numaralarını desenle ayıklayan bir fonksiyon yazın.",
-            starterPlaygroundCode = "local log = \"HATA [404]: Sayfa Bulunamadi\"\nlocal kod = string.match(log, \"%[(%d+)%]\")\nprint(\"Hata Kodu: \" .. kod)",
+            codeExample = "local co = coroutine.create(function() coroutine.yield(42) end)\nlocal _, deger = coroutine.resume(co)\nprint(\"Yield edilen: \" .. deger) -- 42",
+            codeExplanation = "coroutine duraklarken dışarıya 42 değerini aktardı.",
+            realWorldExample = "Roblox'ta 'task.wait(2)' komutu arkasında coroutine.yield çalıştırarak karakteri 2 saniye bekletir.",
+            practicalTask = "coroutine yield ve resume akışını inceleyin.",
+            starterPlaygroundCode = "local co = coroutine.create(function() print(\"A\") coroutine.yield() print(\"B\") end)",
             miniQuestion = MiniQuestion(
                 id = "lua_q_9",
-                question = "Lua desen eşlemede (Pattern Matching) sadece sayıları/rakamları temsil eden karakter sınıfı hangisidir?",
-                options = listOf("%d", "%s", "%a", "%w"),
+                question = "Çalışmakta olan bir Lua coroutine'ini duraklatıp kontrolü ana programa devretmek için hangi fonksiyon çağrılır?",
+                options = listOf("coroutine.yield()", "coroutine.pause()", "coroutine.stop()", "coroutine.sleep()"),
                 correctIndex = 0,
-                explanation = "%d (digits) tüm 0-9 arası rakamlarla eşleşir."
+                explanation = "Duraklatmak için 'coroutine.yield()' çağrılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_9",
                 lessonId = "lua_9",
-                title = "Sayı Ayıklayıcı",
-                instructions = "Verilen bir metin içindeki ilk rakam öbeğini string olarak döndüren ilkSayiyiBul(metin) fonksiyonunu yazın.",
-                exampleInput = "metin = \"Oyuncu skoru: 450 puan\"",
-                exampleOutput = "\"450\"",
-                starterCode = "function ilkSayiyiBul(metin)\n    -- Kodunu buraya yaz:\n    return \"\"\nend",
-                solutionCode = "function ilkSayiyiBul(metin)\n    return string.match(metin, \"%d+\") or \"\"\nend",
-                hints = listOf("string.match(metin, \"%d+\") kullanın."),
+                title = "İlk Adım Coroutine",
+                instructions = "Çalıştırıldığında coroutine.resume(co) yapıp true döndüren baslat(co) fonksiyonunu yazın.",
+                exampleInput = "baslat(co)",
+                exampleOutput = "true",
+                starterCode = "function baslat(co)\n    -- Kodunu yaz:\n    return false\nend",
+                solutionCode = "function baslat(co)\n    local ok = coroutine.resume(co)\n    return ok\nend",
+                hints = listOf("local ok = coroutine.resume(co) return ok yazın."),
                 testCases = listOf(
-                    TestCase("ilkSayiyiBul(\"Puan 450\")", "450", "Pattern match testi")
+                    TestCase("baslat(coroutine.create(function() end))", "true", "Coroutine başlatma")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_9_1",
+                    lessonId = "lua_9",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Bir coroutine'in o anki durumunu (running, suspended, dead) öğrenmek için ne kullanılır?",
+                    options = listOf("coroutine.status(co)", "coroutine.state(co)", "coroutine.isAlive()", "co.status"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Durum kontrolü coroutine.status() ile yapılır.",
+                    explanationWrong = "coroutine.status() kullanılır.",
+                    reviewTopic = "Lua Coroutines"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Coroutine ile Thread farkı nedir?",
+                    answer = "Coroutine'ler işbirlikçidir (Cooperative); CPU aynı anda birden fazla çalıştırmaz, sadece siz yield dediğinizde sırayı devreder."
+                )
+            ),
+            completionCriteria = listOf(
+                "coroutine.create, yield ve resume mantığını kavramak",
+                "Oyunlarda bekleme mekanizmasını anlamak"
             )
         ),
 
         // ==========================================
-        // DERS 10: MODÜLLER, PAKETLER & REQUIRE (PRO)
+        // DERS 10: METİN İŞLEME (PATTERN MATCHING)
         // ==========================================
         Lesson(
             id = "lua_10",
             courseId = "lua",
             sectionId = "lua_sec_5",
-            title = "Modüller, Paketler & require() Mimarisi",
-            shortDesc = "Modül yazma standartları, require() fonksiyonu, package.loaded önbelleği, Modül izolasyonu ve temiz API tasarımı.",
+            title = "Metin İşleme ve Desen Eşleme: string.match",
+            shortDesc = "Metin içinden e-posta, sayı (%d) veya kelime (%a) ayıklama sanatı.",
             level = CourseLevel.ADVANCED,
             order = 10,
             isPremium = true,
             learningObjectives = listOf(
-                "Lua'da yeniden kullanılabilir bağımsız modüller (tablo dönen dosyalar) tasarlamak",
-                "require() ile modül import etmek ve package.path mantığını kavramak",
-                "Global isim alanını kirletmeden temiz kütüphaneler oluşturmak"
+                "string.find, string.match ve string.gsub kullanmak",
+                "Lua desenlerini (%d: sayı, %a: harf, %s: boşluk) öğrenmek"
             ),
-            prerequisites = listOf("Desen Eşleme ve Stringler"),
-            subtopics = listOf("Modül Tanımlama Kalıbı", "require() ve package.loaded", "Lokal Kapsam Hijyeni", "package.path Yapılandırması", "Singleton vs Factory Modülleri"),
+            prerequisites = listOf("Metinler ve Fonksiyonlar"),
+            subtopics = listOf("string.match", "Desen Belirteçleri (%d, %a)", "string.gsub Değiştirme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Temiz Modül Kalıbı",
-                    body = "Bir Lua modülü aslında bir dosya ve onun sonunda `return modülTablosu` diyen yapıdır.",
-                    codeSnippet = "-- matematik.lua\nlocal M = {}\n\nfunction M.topla(a, b) return a + b end\nfunction M.carp(a, b) return a * b end\n\nreturn M\n\n-- main.lua\nlocal mat = require(\"matematik\")\nprint(mat.topla(10, 5))"
+                    subtitle = "1. Regex Yerine Lua Desenleri",
+                    body = "Lua çok hafif olduğu için ağır Regex kütüphanesini içermez; kendi süper hızlı `%` desenlerini sunar:\n\n• `%d`: Sayı rakamları (0-9)\n• `%a`: Harfler\n• `%s`: Boşluk karakteri\n• `+`: Bir veya daha fazla tekrar"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. require() Önbelleklemesi",
-                    body = "Bir modül `require` ile ilk kez yüklendiğinde çalıştırılır ve sonucu `package.loaded` tablosunda saklanır. Sonraki çağrılarda dosya tekrar okunmaz, önbellekteki tablo anında döner.",
-                    tip = "Modül içinde asla global değişken tanımlamayın, her zaman yerel modül tablosuna bağlayın."
+                    subtitle = "2. Örnek Kullanım",
+                    body = "Metnin içinden sadece sayıları çekelim:",
+                    codeSnippet = "local yazi = \"Sipariş No: 48152\"\nlocal numara = string.match(yazi, \"%d+\")\nprint(\"Ayıklanan No: \" .. numara) -- 48152"
                 )
             ),
-            codeExample = "local Hesaplayici = {}\nHesaplayici.surum = \"1.0.0\"\nfunction Hesaplayici.kare(x) return x * x end\n\n-- Dışa aktarım simülasyonu:\nlocal k = Hesaplayici\nprint(\"Modul Versiyonu: \" .. k.surum .. \" -> Kare: \" .. k.kare(7))",
-            codeExplanation = "Modül tablosu dışarı aktarılır ve fonksiyonları temiz bir namespace altında toplanır.",
-            realWorldExample = "Oyun motoru eklentileri (LuaRocks kütüphaneleri) require ile projeye dahil edilir.",
-            practicalTask = "İçinde daireAlan ve dikdortgenAlan fonksiyonları olan bir Geometri modülü oluşturun.",
-            starterPlaygroundCode = "local Modul = { ad = \"TestModul\" }\nfunction Modul.selam() return \"Merhaba \" .. Modul.ad end\nprint(Modul.selam())",
+            codeExample = "local yeni = string.gsub(\"Elma Elma\", \"Elma\", \"Armut\")\nprint(yeni) -- Armut Armut",
+            codeExplanation = "string.gsub ile metin bul-değiştir işlemi yapıldı.",
+            realWorldExample = "Sohbet filtrelerinde küfür veya linkleri engellemek için string.match kullanılır.",
+            practicalTask = "string.match ile bir metinden sayı ayıklayın.",
+            starterPlaygroundCode = "local no = string.match(\"Fiyat: 150 TL\", \"%d+\")",
             miniQuestion = MiniQuestion(
                 id = "lua_q_10",
-                question = "Lua'da harici bir modül veya kütüphane dosyasını yüklemek için kullanılan yerleşik fonksiyon hangisidir?",
-                options = listOf("require()", "import()", "include()", "using()"),
+                question = "Lua desenlerinde (Patterns) sayısal rakamları (0-9) temsil eden desen belirteci hangisidir?",
+                options = listOf("%d", "%s", "%a", "%w"),
                 correctIndex = 0,
-                explanation = "require() fonksiyonu dosyayı yükler, çalıştırır ve döndürdüğü tabloyu getirir."
+                explanation = "Rakamlar için '%d' (digit) kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_10",
                 lessonId = "lua_10",
-                title = "Matematik Modülü Üretici",
-                instructions = "İçinde topla(a,b) ve cikar(a,b) metotları olan bir tablo döndüren modulUret() fonksiyonunu yazın.",
-                exampleInput = "m = modulUret(); m.topla(5, 3)",
-                exampleOutput = "8",
-                starterCode = "function modulUret()\n    -- Kodunu buraya yaz:\nend",
-                solutionCode = "function modulUret()\n    local M = {}\n    function M.topla(a, b) return a + b end\n    function M.cikar(a, b) return a - b end\n    return M\nend",
-                hints = listOf("Yerel bir tablo oluşturup içine fonksiyonları ekleyin ve return edin."),
+                title = "Sayı Ayıklayıcı",
+                instructions = "Gelen metinden string.match(metin, '%d+') ile ilk sayıyı ayıklayıp döndüren sayi_ayikla(metin) fonksiyonunu yazın.",
+                exampleInput = "sayi_ayikla(\"Skor: 99\")",
+                exampleOutput = "\"99\"",
+                starterCode = "function sayi_ayikla(metin)\n    -- Kodunu yaz:\n    return \"\"\nend",
+                solutionCode = "function sayi_ayikla(metin)\n    return string.match(metin, \"%d+\")\nend",
+                hints = listOf("return string.match(metin, \"%d+\") yazın."),
                 testCases = listOf(
-                    TestCase("m.topla(5, 3)", "8", "Modül üretme testi")
+                    TestCase("sayi_ayikla(\"Skor: 99\")", "99", "Sayı ayıklama")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_10_1",
+                    lessonId = "lua_10",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "string.gsub fonksiyonunun sonundaki 'sub' kelimesi ne anlama gelir?",
+                    options = listOf("Substitute (Yerine koyma / Değiştirme)", "Substring", "Subtract", "Subscribe"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Global Substitution (Bul ve Değiştir) anlamına gelir.",
+                    explanationWrong = "Substitute (Değiştirme) anlamına gelir.",
+                    reviewTopic = "Lua Metin İşleme"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Büyük harfle yazılan (%D) ne anlama gelir?",
+                    answer = "Tersini ifade eder; %D 'sayı olmayan tüm karakterler' demektir."
+                )
+            ),
+            completionCriteria = listOf(
+                "string.match ve string.gsub kullanımını bilmek",
+                "%d ve %a desenlerini kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 11: LUA C API & GÖMME (EMBEDDING) (PRO)
+        // DERS 11: MODÜLLER VE REQUIRE()
         // ==========================================
         Lesson(
             id = "lua_11",
             courseId = "lua",
-            sectionId = "lua_sec_6",
-            title = "Lua C API: C/C++ İçine Lua Gömme & Sanal Yığın (Virtual Stack)",
-            shortDesc = "Lua C API mimarisi, lua_State, Sanal Yığın (Stack: push, pop, gettop), C fonksiyonlarını Lua'ya export etme ve Yüksek performans köprüsü.",
-            level = CourseLevel.EXPERT,
+            sectionId = "lua_sec_5",
+            title = "Modüller ve require() ile Temiz Mimari",
+            shortDesc = "Büyük projeleri küçük dosyalara bölme ve require(\"modul\") ile içeri aktarma.",
+            level = CourseLevel.ADVANCED,
             order = 11,
             isPremium = true,
             learningObjectives = listOf(
-                "Lua'nın neden dünyanın 1 numaralı gömülü script dili olduğunu anlamak",
-                "Lua C sanal yığınını (Virtual Stack) ve pozitif/negatif indeksleri yönetmek",
-                "C/C++ fonksiyonlarını Lua içerisinden çağrılabilir hale getirmek"
+                "Modül tablosu oluşturup 'return modul' ile dışa aktarmak",
+                "require() ile diğer dosyalardan fonksiyonları çağırmak",
+                "Temiz ve modüler oyun mimarisi kurmak"
             ),
-            prerequisites = listOf("Modüller ve Coroutines"),
-            subtopics = listOf("lua_State Yaşam Döngüsü", "Sanal Yığın (Stack) İndeksleri", "lua_push* ve lua_to* Fonksiyonları", "C Fonksiyonu Kaydetme (lua_register)", "Lua'dan C'ye Hata Yönetimi"),
+            prerequisites = listOf("Tablolar ve Fonksiyonlar"),
+            subtopics = listOf("Modül Yazma", "require() Kullanımı", "Modül Önbelleği (Cache)"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Sanal Yığın (Virtual Stack) Mimarisi",
-                    body = "C ile Lua arasındaki tüm iletişim ortak bir yığın (Stack) üzerinden gerçekleşir.\n• Pozitif indeks (+1): Yığının en dibi (ilk eklenen)\n• Negatif indeks (-1): Yığının en tepesi (son eklenen).",
-                    codeSnippet = "// C Kodu Örneği\n#include <lua.h>\n#include <lauxlib.h>\n\nstatic int c_topla(lua_State *L) {\n    double a = lua_tonumber(L, 1); // 1. argüman\n    double b = lua_tonumber(L, 2); // 2. argüman\n    lua_pushnumber(L, a + b);      // Sonucu yığına koy\n    return 1;                      // 1 adet dönüş değeri\n}"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Neden Lua Gömülür?",
-                    body = "Oyun geliştiricileri C++ ile motoru yazar, oyun tasarımcıları ise derleme beklemeden anında canlı test yapabilmek için mantığı Lua ile kodlar.",
-                    tip = "LuaJIT derleyicisi Lua kodunu C hızına çok yakın JIT makine koduna dönüştürür."
+                    subtitle = "1. Modül Yazmak Çok Kolaydır",
+                    body = "Lua'da modül, fonksiyonlar içeren sıradan bir tablodur ve dosyanın sonunda `return` edilir.",
+                    codeSnippet = "-- matematik.lua dosyası:\nlocal M = {}\n\nfunction M.topla(a, b) return a + b end\nfunction M.carp(a, b) return a * b end\n\nreturn M\n\n-- main.lua dosyası:\nlocal mat = require(\"matematik\")\nprint(mat.topla(10, 5)) -- 15"
                 )
             ),
-            codeExample = "-- Lua Tarafından C Fonksiyonunun Çağrılması:\n-- C tarafında: lua_register(L, \"sistemLog\", c_log);\n-- Lua tarafında:\nlocal function testGomulu()\n    print(\"Lua -> C API Koprusu Aktif\")\nend\ntestGomulu()",
-            codeExplanation = "C fonksiyonları Lua ortamına kaydedilir ve Lua içerisinden doğal fonksiyonlar gibi çağrılır.",
-            realWorldExample = "Nginx web sunucusu (OpenResty) ve Redis veritabanı mikro-saniyelik filtreler için Lua C API kullanır.",
-            practicalTask = "C yığın indekslerinin (+1 ve -1) ne anlama geldiğini simüle eden bir açıklama yazın.",
-            starterPlaygroundCode = "print(\"Lua C API Entegrasyon Modulu Hazir\")",
+            codeExample = "local mat = require(\"matematik\")\nprint(mat.carp(3, 4)) -- 12",
+            codeExplanation = "require ile modül yüklendi ve fonksiyonları kullanıldı.",
+            realWorldExample = "Roblox projelerinde 'ModuleScript' nesneleri bu standart require mantığıyla çalışır.",
+            practicalTask = "Modül yapısını ve return M kalıbını inceleyin.",
+            starterPlaygroundCode = "local M = {}; function M.selam() return \"Selam\" end; return M",
             miniQuestion = MiniQuestion(
                 id = "lua_q_11",
-                question = "Lua C API'sinde yığının en tepesindeki (en son eklenen) elemanı okumak için hangi indeks kullanılır?",
-                options = listOf("-1", "0", "1", "top"),
+                question = "Lua'da başka bir dosyada yazılmış modülü projeye dahil edip yüklemek için hangi standart fonksiyon kullanılır?",
+                options = listOf("require()", "import()", "include()", "load()"),
                 correctIndex = 0,
-                explanation = "Lua yığınında negatif indeksler tepeden başlar; -1 en üstteki son elemandır."
+                explanation = "Modül yüklemek için 'require()' kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_11",
                 lessonId = "lua_11",
-                title = "Yığın Simülasyonu",
-                instructions = "Dizi olarak verilen bir yığının en üst elemanını (son eleman) döndüren sonEleman(yigin) fonksiyonunu yazın.",
-                exampleInput = "yigin = {10, 20, 30}",
-                exampleOutput = "30",
-                starterCode = "function sonEleman(yigin)\n    -- Kodunu buraya yaz:\n    return nil\nend",
-                solutionCode = "function sonEleman(yigin)\n    return yigin[#yigin]\nend",
-                hints = listOf("yigin[#yigin] ile son elemanı döndürün."),
+                title = "Basit Modül Tablosu",
+                instructions = "versiyon = \"1.0\" alanına sahip bir tablo oluşturup döndüren modül_uret() fonksiyonunu yazın.",
+                exampleInput = "modül_uret().versiyon",
+                exampleOutput = "\"1.0\"",
+                starterCode = "function modül_uret()\n    -- Kodunu yaz:\n    return {}\nend",
+                solutionCode = "function modül_uret()\n    local M = { versiyon = \"1.0\" }\n    return M\nend",
+                hints = listOf("local M = { versiyon = \"1.0\" } return M yazın."),
                 testCases = listOf(
-                    TestCase("sonEleman({10, 20, 30})", "30", "Yığın son eleman testi")
+                    TestCase("modül_uret().versiyon", "1.0", "Modül versiyonu")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_11_1",
+                    lessonId = "lua_11",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Aynı modülü birden fazla kez require() ettiğinizde Lua ne yapar?",
+                    options = listOf("İlk seferde önbelleğe (package.loaded) alır ve sonraki çağrılarda aynı nesneyi anında döndürür", "Her seferinde dosyayı baştan okur", "Hata verir", "Modülü siler"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Lua modülleri önbelleğe alarak performansı korur.",
+                    explanationWrong = "Önbellekten döndürür.",
+                    reviewTopic = "Lua Modüller"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "package.path nedir?",
+                    answer = "require() komutunun modül dosyalarını arayacağı klasör dizinlerinin listesidir."
+                )
+            ),
+            completionCriteria = listOf(
+                "Modül oluşturup return edebilmek",
+                "require() ile modülleri kullanabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 12: ROBLOX & OYUN MOTORU MİMARİSİ (PRO)
+        // DERS 12: ROBLOX VE LUA USTALIĞI
         // ==========================================
         Lesson(
             id = "lua_12",
             courseId = "lua",
             sectionId = "lua_sec_6",
-            title = "Roblox & Oyun Motorlarında İleri Mimari (ECS & State Machine)",
-            shortDesc = "Oyun durum makineleri (Finite State Machine), Varlık-Bileşen Sistemi (Entity-Component System - ECS), Event-Driven mimari ve Roblox Luau optimizasyonları.",
+            title = "Lua Ustalığı: Roblox, Oyun Geliştirme ve Gelecek",
+            shortDesc = "Roblox Studio, World of Warcraft, Neovim ve milyonlarca oyuncuya ulaşan Lua gücü.",
             level = CourseLevel.EXPERT,
             order = 12,
             isPremium = true,
             learningObjectives = listOf(
-                "Oyunlarda karmaşık if kontrolleri yerine Finite State Machine (FSM) tasarlamak",
-                "Entity-Component System (ECS) mimarisi ile performanslı oyun nesneleri yönetmek",
-                "Roblox ve modern oyun motorlarında 60 FPS bellek ve döngü optimizasyonları yapmak"
+                "Roblox Studio mimarisine (ServerScript, LocalScript, ModuleScript) tam hakim olmak",
+                "Lua'nın C/C++ motorlarına nasıl gömüldüğünü (Embedded) kavramak",
+                "Tebrikler: Artık oyunlar dünyasının aranan bir Lua geliştiricisisiniz!"
             ),
-            prerequisites = listOf("Lua C API ve Modüller"),
-            subtopics = listOf("Finite State Machine (FSM)", "Entity-Component System (ECS)", "Event Bus Mimarisi", "Roblox Luau Tip Belirteçleri", "60 FPS Garbage Collection Optimizasyonu"),
+            prerequisites = listOf("Tüm Lua Konuları"),
+            subtopics = listOf("Roblox Script Türleri", "C API ve Gömülü Sistemler", "Tebrikler ve Tavsiyeler"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Durum Makinesi (State Machine)",
-                    body = "Bir karakterin durumları (Boşta, Koşuyor, Saldırıyor, Ölü) durum nesneleri olarak kapsüllenir ve geçişler temiz yönetilir.",
-                    codeSnippet = "local StateMachine = {}\nStateMachine.__index = StateMachine\n\nfunction StateMachine.new(initialState)\n    return setmetatable({ current = initialState }, StateMachine)\nend\n\nfunction StateMachine:change(newState)\n    print(\"Durum degisti: \" .. self.current .. \" -> \" .. newState)\n    self.current = newState\nend\n\nlocal fsm = StateMachine.new(\"IDLE\")\nfsm:change(\"RUN\")"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. ECS Mimarisi ve GC Hijyeni",
-                    body = "Oyun içi her karede sürekli yeni tablo `{}` üretmek Çöp Toplayıcıyı (Garbage Collector) tetikleyerek FPS düşüşüne yol açar. Nesne havuzları (Object Pooling) ile aynı tablolar yeniden kullanılır.",
-                    tip = "Luau tip sistemi ile değişkenlere tür tanımlayarak derleyici optimizasyonlarını en üst düzeye çıkarabilirsiniz."
+                    subtitle = "1. Tebrikler! Lua Yolculuğunu Başarıyla Tamamladınız! 🌙🎮",
+                    body = "Artık tablolardan metatable OOP sistemine, Coroutine akışlarından Roblox modül mimarisine kadar Lua'nın tüm kalbine hakimsiniz.\n\nRoblox'ta milyonlarca kişinin oynayacağı oyunlar üretebilir, oyun motorlarına scriptler yazabilir veya hafif sistem araçları geliştirebilirsiniz!"
                 )
             ),
-            codeExample = "local OyuncuDurumu = {\n    DURUM_BEKLEME = \"IDLE\",\n    DURUM_KOSMA = \"RUNNING\",\n    DURUM_SALDIRI = \"ATTACK\"\n}\n\nlocal durum = OyuncuDurumu.DURUM_BEKLEME\nprint(\"Karakter Hazir, Durum: \" .. durum)",
-            codeExplanation = "Durum sabitleri ve event dinleyicileri oyun mimarisini modüler ve hatasız tutar.",
-            realWorldExample = "Milyonlarca oyuncuya sahip Roblox oyunları (Blox Fruits, Adopt Me) ve AAA oyun motorları bu ECS ve State Machine mimarisini kullanır.",
-            practicalTask = "Karakterin canı 0'a düştüğünde durumunu 'DEAD' yapan basit bir durum yöneticisi yazın.",
-            starterPlaygroundCode = "print(\"Lua ve Oyun Mimarisi Uzmanlik Seviyesi Tamamlandi!\")",
+            codeExample = "-- Lua Ustası Oldunuz!\nprint(\"Lua Seviyeniz: USTA! 🚀✨\")",
+            codeExplanation = "Lua yolculuğunuz başarıyla tamamlandı.",
+            realWorldExample = "Roblox'taki Adopt Me, Blox Fruits gibi milyar dolarlık oyunlar Lua ile programlanmıştır.",
+            practicalTask = "Lua başarınızı kutlayın!",
+            starterPlaygroundCode = "-- Harika bir Lua geliştiricisisiniz!",
             miniQuestion = MiniQuestion(
                 id = "lua_q_12",
-                question = "Oyun motorlarında her karede sürekli geçici tablolar ({}) oluşturmanın en büyük performans riski nedir?",
-                options = listOf("Garbage Collector'ı (Çöp Toplayıcıyı) tetikleyip mikro donmalara (Frame Drop) sebep olmak", "Ekran çözünürlüğünü düşürmek", "Dosya boyutunu arttırmak", "İnternet bağlantısını yavaşlatmak"),
+                question = "Roblox oyunlarında sunucu (Server) tarafında çalışan ana script türü hangisidir?",
+                options = listOf("Script (Server Script)", "LocalScript", "ClientScript", "HtmlScript"),
                 correctIndex = 0,
-                explanation = "Sürekli bellek tahsisi Garbage Collector'ın devreye girmesine ve 60 FPS kare düşüşlerine yol açar."
+                explanation = "Sunucu tarafında standart 'Script' (Server Script) çalışır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_lua_12",
                 lessonId = "lua_12",
-                title = "Durum Geçiş Denetleyicisi",
-                instructions = "Mevcut durum 'IDLE' ise 'RUNNING', 'RUNNING' ise 'IDLE' döndüren durumGecis(durum) fonksiyonunu yazın.",
-                exampleInput = "durum = \"IDLE\"",
-                exampleOutput = "\"RUNNING\"",
-                starterCode = "function durumGecis(durum)\n    -- Kodunu buraya yaz:\n    return durum\nend",
-                solutionCode = "function durumGecis(durum)\n    if durum == \"IDLE\" then return \"RUNNING\" end\n    if durum == \"RUNNING\" then return \"IDLE\" end\n    return durum\nend",
-                hints = listOf("if durum == \"IDLE\" then return \"RUNNING\" kontrolü yapın."),
+                title = "Şampiyon Lua Mesajı",
+                instructions = "Üstünde 'Lua Şampiyonu' yazan string döndüren sampiyon() fonksiyonunu yazın.",
+                exampleInput = "sampiyon()",
+                exampleOutput = "\"Lua Şampiyonu\"",
+                starterCode = "function sampiyon()\n    -- Kodunu yaz:\n    return \"\"\nend",
+                solutionCode = "function sampiyon()\n    return \"Lua Şampiyonu\"\nend",
+                hints = listOf("return \"Lua Şampiyonu\" yazın."),
                 testCases = listOf(
-                    TestCase("durumGecis(\"IDLE\")", "RUNNING", "State switch testi")
+                    TestCase("sampiyon()", "Lua Şampiyonu", "Şampiyonluk testi")
                 )
+            ),
+            quizQuestions = listOf(
+                QuizQuestion(
+                    id = "lua_quiz_12_1",
+                    lessonId = "lua_12",
+                    questionType = QuestionType.MULTIPLE_CHOICE,
+                    questionText = "Lua dilinin dünya genelinde en çok tercih edilmesinin 1 numaralı sebebi nedir?",
+                    options = listOf("C/C++ oyun ve grafik motorlarına entegre edilmesinin olağanüstü kolay ve hafif olması", "Büyük boyutu", "Yavaş olması", "Sadece web için olması"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Lua gömülebilirlik (Embeddability) alanında dünyanın lider dilidir.",
+                    explanationWrong = "C/C++ motorlarına gömülmesinin çok kolay olmasıdır.",
+                    reviewTopic = "Lua Felsefesi"
+                )
+            ),
+            qaItems = listOf(
+                TopicQAItem(
+                    question = "Bundan sonra ne yapmalıyım?",
+                    answer = "Roblox Studio'yu indirip ilk 3D mini oyununuzu kodlamaya hemen başlayabilirsiniz!"
+                )
+            ),
+            completionCriteria = listOf(
+                "Lua felsefesini kavramak",
+                "Roblox ve oyun scriptleri yazmaya hazır olmak"
             )
         )
     )

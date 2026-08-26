@@ -176,20 +176,20 @@ class SyntaxHighlightingTransformation(
         }
 
         private val KEYWORDS = listOf(
-            "var", "val", "const", "final", "void", "fun", "fn", "def", "let", "mut",
-            "if", "else", "elif", "then", "end", "repeat", "until", "local", "function",
-            "switch", "case", "for", "while", "do", "break", "continue", "return", "class",
-            "struct", "union", "enum", "extern", "static", "import", "package", "public", "private", "protected",
-            "async", "await", "Future", "print", "printf", "puts", "cout", "cin", "println", "console", "log",
+            "var", "val", "const", "final", "void", "fun", "fn", "func", "def", "defp", "defmodule", "let", "mut",
+            "if", "else", "elif", "then", "end", "repeat", "until", "local", "function", "when", "with", "unless", "cond",
+            "switch", "case", "for", "while", "do", "break", "continue", "return", "class", "select", "chan", "go", "defer",
+            "struct", "union", "enum", "extern", "static", "import", "package", "public", "private", "protected", "alias", "require", "use",
+            "async", "await", "Future", "print", "printf", "puts", "cout", "cin", "println", "console", "log", "make", "iota",
             "true", "false", "null", "nil", "new", "this", "self", "super", "yield", "try", "catch",
             "except", "finally", "throw", "raise", "pass", "in", "is", "as", "typedef", "include", "using", "sizeof",
             "not", "and", "or"
         )
 
         private val TYPES = listOf(
-            "int", "double", "float", "long", "short", "char", "unsigned", "signed", "void", "size_t",
-            "uint8_t", "uint16_t", "uint32_t", "uint64_t", "int8_t", "int16_t", "int32_t", "int64_t",
-            "String", "str", "bool", "boolean", "List", "Map", "Set", "table",
+            "int", "int64", "int32", "float", "float64", "float32", "double", "long", "short", "char", "byte", "rune", "unsigned", "signed", "void", "size_t",
+            "uint8_t", "uint16_t", "uint32_t", "uint64_t", "int8_t", "int16_t", "int32_t", "int64_t", "error", "any",
+            "String", "str", "string", "bool", "boolean", "List", "Map", "Set", "table",
             "vector", "usize", "i32", "i64", "f64", "Widget", "BuildContext", "dynamic", "auto",
             "StatelessWidget", "StatefulWidget", "State", "MaterialApp", "Scaffold", "AppBar", "Text", "Center"
         )
@@ -595,9 +595,13 @@ fun CodeEditorComponent(
                     val languageSymbols = when (language.lowercase()) {
                         "python" -> listOf("print()", "def", "for in :", "if :", "elif :", "else:", "[]", "{}", "()", "==", "!=", "+", "-", "*", "/")
                         "cpp" -> listOf("cout <<", "endl;", "int main()", "#include", ";", "{}", "()", "[]", "==", "!=", "+", "-", "*", "/")
+                        "c" -> listOf("printf()", "int main()", "#include <stdio.h>", ";", "{}", "()", "[]", "&", "*", "->", "==", "!=")
                         "rust" -> listOf("println!()", "fn main()", "let mut", ";", "->", "{}", "()", "[]", "==", "!=", "+", "-")
                         "javascript" -> listOf("console.log()", "let", "const", "=>", ";", "{}", "()", "[]", "===", "!==")
                         "kotlin" -> listOf("println()", "val", "var", "fun", "when", ";", "{}", "()", "[]", "->", "==")
+                        "lua" -> listOf("print()", "function", "end", "then", "local", "{}", "[]", "()", "..", "==", "~=")
+                        "go" -> listOf("fmt.Println()", "func", "package main", ":=", "go", "chan", "defer", "{}", "()", "[]", "if err != nil")
+                        "elixir" -> listOf("IO.puts()", "|>", "defmodule", "def", "do..end", "fn -> end", "%{}", "[]", "{}", "->", ":ok")
                         "flutter" -> listOf("Widget build", "return Scaffold(", "Text('')", "Center(", "Column(", "Row(", ";", "{}")
                         else -> listOf("print()", "void main()", "var", ";", "{}", "()", "[]", "=>", "==", "!=", "+", "-")
                     }

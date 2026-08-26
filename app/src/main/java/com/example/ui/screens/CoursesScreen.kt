@@ -47,11 +47,11 @@ enum class CoursesScreenMode(val titleTr: String, val titleEn: String, val icon:
 }
 
 enum class CourseCategoryFilter(val id: String, val labelTr: String, val labelEn: String, val icon: String) {
-    ALL("all", "Tümü (9)", "All (9)", "⚡"),
+    ALL("all", "Tümü (11)", "All (11)", "⚡"),
     MOBILE("mobile", "Mobil & UI", "Mobile & UI", "📱"),
     AI_DATA("ai_data", "Yapay Zeka & Veri", "AI & Data", "🧠"),
-    SYSTEMS("systems", "Sistem & Donanım", "Systems", "⚙️"),
-    WEB("web", "Web & Scripting", "Web & Scripts", "🌐")
+    SYSTEMS("systems", "Sistem & Bulut", "Systems & Cloud", "⚙️"),
+    WEB("web", "Web & Dağıtık", "Web & Distributed", "🌐")
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -96,8 +96,8 @@ fun CoursesScreen(
                 CourseCategoryFilter.ALL -> true
                 CourseCategoryFilter.MOBILE -> lang.id in listOf("dart", "flutter", "kotlin")
                 CourseCategoryFilter.AI_DATA -> lang.id in listOf("python")
-                CourseCategoryFilter.SYSTEMS -> lang.id in listOf("c", "cpp", "rust")
-                CourseCategoryFilter.WEB -> lang.id in listOf("javascript", "lua")
+                CourseCategoryFilter.SYSTEMS -> lang.id in listOf("c", "cpp", "rust", "go")
+                CourseCategoryFilter.WEB -> lang.id in listOf("javascript", "lua", "elixir", "go")
             }
 
             val matchesSearch = if (searchQuery.isBlank()) {

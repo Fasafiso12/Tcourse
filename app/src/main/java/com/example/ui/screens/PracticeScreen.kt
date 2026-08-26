@@ -74,6 +74,26 @@ fun PracticeScreen(
                 "loop" -> "fun main() {\n    for (i in 1..5) {\n        println(\"Kotlin Adim: \" + i)\n    }\n}"
                 else -> "fun main() {\n    val dil = \"Kotlin\"\n    println(\"Merhaba, \" + dil)\n    val a = 30\n    val b = 20\n    println(a + b)\n}"
             }
+            "c" -> when (type) {
+                "loop" -> "#include <stdio.h>\n\nint main(void) {\n    for (int i = 1; i <= 5; i++) {\n        printf(\"C Dongu Adimi: %d\\n\", i);\n    }\n    return 0;\n}"
+                "func" -> "#include <stdio.h>\n\nint topla(int a, int b) {\n    return a + b;\n}\n\nint main(void) {\n    printf(\"Toplam: %d\\n\", topla(15, 35));\n    return 0;\n}"
+                else -> "#include <stdio.h>\n\nint main(void) {\n    printf(\"Merhaba, C Dili ve Sistem Dunyasi!\\n\");\n    int sayi = 42;\n    printf(\"Deger: %d\\n\", sayi);\n    return 0;\n}"
+            }
+            "lua" -> when (type) {
+                "loop" -> "for i = 1, 5 do\n    print(\"Lua Adim: \" .. i)\nend"
+                "func" -> "function topla(a, b)\n    return a + b\nend\n\nprint(\"Sonuc: \" .. topla(20, 30))"
+                else -> "local platform = \"Lua & Roblox Scripting\"\nprint(\"Merhaba \" .. platform)\nlocal puan = 100\nprint(\"Puan: \" .. puan)"
+            }
+            "go" -> when (type) {
+                "loop" -> "package main\n\nimport \"fmt\"\n\nfunc main() {\n    toplam := 0\n    for i := 1; i <= 5; i++ {\n        toplam += i\n        fmt.Println(\"Go Adim:\", i)\n    }\n    fmt.Println(\"1-5 Toplami:\", toplam)\n}"
+                "func" -> "package main\n\nimport \"fmt\"\n\nfunc topla(a, b int) int {\n    return a + b\n}\n\nfunc main() {\n    fmt.Println(\"Toplam:\", topla(25, 75))\n}"
+                else -> "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Merhaba, Go (Golang) Dünyası!\")\n    dil := \"Go\"\n    fmt.Printf(\"Dil: %s, Hiz: Ultra Hizli\\n\", dil)\n}"
+            }
+            "elixir" -> when (type) {
+                "loop" -> "1..5\n|> Enum.each(fn i -> IO.puts(\"Elixir Adim: #{i}\") end)"
+                "func" -> "defmodule Hesap do\n  def topla(a, b), do: a + b\nend\n\nIO.puts(\"Sonuc: #{Hesap.topla(25, 75)}\")"
+                else -> "mesaj = \"Elixir & BEAM\"\nIO.puts(\"Merhaba #{mesaj}!\")\n\nsonuc = [1, 2, 3, 4]\n|> Enum.map(fn x -> x * 10 end)\n|> Enum.sum()\n\nIO.puts(\"Pipeline Toplami: #{sonuc}\")"
+            }
             "flutter" -> "import 'package:flutter/material.dart';\n\nvoid main() {\n  runApp(\n    MaterialApp(\n      home: Scaffold(\n        body: Center(\n          child: Text('Merhaba Kod Akademi Flutter!'),\n        ),\n      ),\n    ),\n  );\n}"
             else -> "void main() {\n  print('Kod Akademi Canlı Sandbox');\n}"
         }

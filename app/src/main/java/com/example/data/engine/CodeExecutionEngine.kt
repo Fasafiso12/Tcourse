@@ -80,8 +80,8 @@ object CodeExecutionEngine {
             val l = line.trim()
             if (l.isEmpty() || l.startsWith("//") || l.startsWith("#")) continue
 
-            // Variable assignments e.g. var x = 10, let y = "Kod", isim = "Ahmet", a = 5
-            val varAssignMatch = Regex("""^(?:var|val|let|const|int|String|float|double|auto)?\s*([a-zA-Z_]\w*)\s*=\s*(.*?);?$""").find(l)
+            // Variable assignments e.g. var x = 10, let y = "Kod", isim = "Ahmet", a = 5, x := 10
+            val varAssignMatch = Regex("""^(?:var|val|let|const|int|String|float|double|auto)?\s*([a-zA-Z_]\w*)\s*(?:=|:=)\s*(.*?);?$""").find(l)
             if (varAssignMatch != null && !l.startsWith("if") && !l.startsWith("for") && !l.startsWith("while")) {
                 val varName = varAssignMatch.groupValues[1]
                 var varValue = varAssignMatch.groupValues[2].trim().removeSuffix(";")
@@ -213,6 +213,55 @@ object CodeExecutionEngine {
                 }
                 continue
             }
+
+            // Go fmt.Println / fmt.Printf / fmt.Print
+            if (l.contains("fmt.Println") || l.contains("fmt.Printf") || l.contains("fmt.Print")) {
+                val goPrintfMatch = Regex("""fmt\.Printf\s*\(\s*"(.*?)"(?:\s*,\s*(.*?))?\)""").find(l)
+                if (goPrintfMatch != null) {
+                    var template = goPrintfMatch.groupValues[1].replace("\\n", "").replace("\\t", "    ")
+                    val args = goPrintfMatch.groupValues[2]
+                    if (args.isNotEmpty()) {
+                        val argList = args.split(",").map { it.trim() }
+                        for (arg in argList) {
+                            val resolved = resolveVariablesAndInterpolation(arg, variables)
+                            if (template.contains("%d")) {
+                                template = template.replaceFirst("%d", resolved)
+                            } else if (template.contains("%s")) {
+                                template = template.replaceFirst("%s", resolved)
+                            } else if (template.contains("%f") || template.contains("%.2f") || template.contains("%.1f")) {
+                                template = template.replace(Regex("""%\.?\d*f"""), resolved)
+                            } else if (template.contains("%v")) {
+                                template = template.replaceFirst("%v", resolved)
+                            } else if (template.contains("%t")) {
+                                template = template.replaceFirst("%t", resolved)
+                            } else if (template.contains("%T")) {
+                                template = template.replaceFirst("%T", "string")
+                            }
+                        }
+                    }
+                    outputLines.add(template)
+                    continue
+                }
+
+                val goPrintlnMatch = Regex("""fmt\.Print(?:ln)?\s*\(\s*(.*?)\s*\)""").find(l)
+                if (goPrintlnMatch != null) {
+                    val rawArgs = goPrintlnMatch.groupValues[1]
+                    val parts = rawArgs.split(",").map { it.trim() }
+                    val resolvedParts = parts.map { resolveVariablesAndInterpolation(it, variables) }
+                    outputLines.add(resolvedParts.joinToString(" "))
+                    continue
+                }
+            }
+
+            // Elixir IO.puts & IO.inspect
+            if (l.contains("IO.puts") || l.contains("IO.inspect")) {
+                val elixirMatch = Regex("""IO\.(?:puts|inspect)\s*\(?\s*["']?(.*?)["']?\s*\)?""").find(l)
+                if (elixirMatch != null) {
+                    val resolved = resolveVariablesAndInterpolation(elixirMatch.groupValues[1], variables)
+                    outputLines.add(resolved)
+                    continue
+                }
+            }
         }
 
         val finalOutput = if (outputLines.isNotEmpty()) {
@@ -315,10 +364,11 @@ object CodeExecutionEngine {
             clean = clean.substring(1, clean.length - 1)
         }
 
-        // Interpolation $var or ${var} or {var}
+        // Interpolation $var or ${var} or {var} or #{var} (Elixir / Ruby)
         for ((k, v) in variables) {
             clean = clean.replace("\$$k", v)
             clean = clean.replace("\${$k}", v)
+            clean = clean.replace("#{$k}", v)
             clean = clean.replace("{$k}", v)
         }
 
@@ -431,26 +481,26 @@ object CodeExecutionEngine {
 
         // Check functions or lambdas
         if ((lowerTask.contains("fonksiyon") || lowerTask.contains("metot") || lowerTask.contains("lambda") || lowerTask.contains("calculator")) &&
-            !lowerCode.contains("fun ") && !lowerCode.contains("def ") && !lowerCode.contains("fn ") && !lowerCode.contains("function") && !lowerCode.contains("void ") && !lowerCode.contains("int ") && !lowerCode.contains("double ") && !lowerCode.contains("bool") && !lowerCode.contains("auto ") && !lowerCode.contains("->") && !lowerCode.contains("=>")) {
+            !lowerCode.contains("fun ") && !lowerCode.contains("func ") && !lowerCode.contains("def ") && !lowerCode.contains("defp ") && !lowerCode.contains("defmodule ") && !lowerCode.contains("fn ") && !lowerCode.contains("function") && !lowerCode.contains("void ") && !lowerCode.contains("int ") && !lowerCode.contains("double ") && !lowerCode.contains("bool") && !lowerCode.contains("auto ") && !lowerCode.contains("->") && !lowerCode.contains("=>")) {
             missingHints.add("Görevde istenen fonksiyon, metot veya lambda tanımı eksik görünüyor.")
         }
 
         // Check classes or structs
         if ((lowerTask.contains("sınıf") || lowerTask.contains("class") || lowerTask.contains("struct") || lowerTask.contains("data class") || lowerTask.contains("jenerik")) &&
-            !lowerCode.contains("class") && !lowerCode.contains("struct") && !lowerCode.contains("interface") && !lowerCode.contains("type") && !lowerCode.contains("enum")) {
-            missingHints.add("Görevde tanımlanması istenen sınıf (class / struct) yapısı eksik görünüyor.")
+            !lowerCode.contains("class") && !lowerCode.contains("struct") && !lowerCode.contains("interface") && !lowerCode.contains("type") && !lowerCode.contains("defmodule") && !lowerCode.contains("enum")) {
+            missingHints.add("Görevde tanımlanması istenen sınıf / struct / modül yapısı eksik görünüyor.")
         }
 
         // Check coroutine / async / concurrency
-        if ((lowerTask.contains("flow") || lowerTask.contains("coroutine") || lowerTask.contains("async") || lowerTask.contains("suspend") || lowerTask.contains("channel") || lowerTask.contains("sharedflow") || lowerTask.contains("withcontext")) &&
-            !lowerCode.contains("suspend") && !lowerCode.contains("flow") && !lowerCode.contains("async") && !lowerCode.contains("launch") && !lowerCode.contains("channel") && !lowerCode.contains("withcontext") && !lowerCode.contains("dispatchers")) {
-            missingHints.add("Eşzamanlılık / Asenkron yapı (suspend, Flow, Channel, withContext vb.) eksik.")
+        if ((lowerTask.contains("flow") || lowerTask.contains("coroutine") || lowerTask.contains("async") || lowerTask.contains("suspend") || lowerTask.contains("channel") || lowerTask.contains("sharedflow") || lowerTask.contains("withcontext") || lowerTask.contains("goroutine") || lowerTask.contains("genserver") || lowerTask.contains("process")) &&
+            !lowerCode.contains("suspend") && !lowerCode.contains("flow") && !lowerCode.contains("async") && !lowerCode.contains("launch") && !lowerCode.contains("channel") && !lowerCode.contains("withcontext") && !lowerCode.contains("dispatchers") && !lowerCode.contains("go ") && !lowerCode.contains("chan ") && !lowerCode.contains("select") && !lowerCode.contains("spawn") && !lowerCode.contains("genserver") && !lowerCode.contains("receive")) {
+            missingHints.add("Eşzamanlılık / Asenkron yapı (suspend, Flow, Channel, Goroutine, GenServer vb.) eksik.")
         }
 
         // Check print or output statements
         if ((lowerTask.contains("yazdır") || lowerTask.contains("ekrana") || lowerTask.contains("printf") || lowerTask.contains("print")) &&
-            !lowerCode.contains("print") && !lowerCode.contains("printf") && !lowerCode.contains("println") && !lowerCode.contains("console.log") && !lowerCode.contains("cout") && !lowerCode.contains("io.write") && !lowerCode.contains("fmt.")) {
-            missingHints.add("Sonucu ekrana yazdıran çıktı ifadesi (print / println / printf / console.log vb.) eksik.")
+            !lowerCode.contains("print") && !lowerCode.contains("printf") && !lowerCode.contains("println") && !lowerCode.contains("console.log") && !lowerCode.contains("cout") && !lowerCode.contains("io.write") && !lowerCode.contains("io.puts") && !lowerCode.contains("io.inspect") && !lowerCode.contains("fmt.")) {
+            missingHints.add("Sonucu ekrana yazdıran çıktı ifadesi (print / println / printf / fmt.Println / IO.puts vb.) eksik.")
         }
 
         if (missingHints.isNotEmpty()) {

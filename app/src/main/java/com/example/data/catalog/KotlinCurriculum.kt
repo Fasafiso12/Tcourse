@@ -3,9 +3,8 @@ package com.example.data.catalog
 import com.example.model.*
 
 /**
- * Kotlin Complete Official Curriculum (12 Sequential Lessons):
- * BEGINNER -> FUNDAMENTAL -> INTERMEDIATE -> ADVANCED -> EXPERT
- * Seamless progression from basic syntax & null safety to Flow, Coroutines, Delegation, Inline Bytecode & KSP/Compiler Plugins.
+ * Kotlin Kolay & Anlaşılır Müfredatı (12 Adım):
+ * Android'in resmi dili Kotlin'i sıfırdan, sade ve keyifli bir dille öğrenin.
  */
 object KotlinCurriculum {
 
@@ -13,127 +12,127 @@ object KotlinCurriculum {
         CourseSection(
             id = "kt_sec_1",
             courseId = "kotlin",
-            title = "Seviye 1 – Kotlin Temelleri, Değişkenler & Null Güvenliği",
+            title = "Bölüm 1: Kotlin Temelleri ve Güvenlik",
             level = CourseLevel.BEGINNER,
             order = 1,
-            description = "Kotlin felsefesi, val vs var değişmezlik ilkesi, temel tipler, String şablonları ve Milyar Dolarlık Hata'yı önleyen Null Safety (?, ?:).",
-            learningObjectives = listOf("val vs var mimari farkı", "Null Safety (?, ?:, !!) mekanizması", "Smart Casts (is operatörü)", "Temel veri tipleri ve tip çıkarımı"),
-            prerequisites = listOf("Temel bilgisayar kullanım bilgisi")
+            description = "Kotlin dünyasına merhaba: val ve var farkı, sayı ve metinler, çökmeleri önleyen Null Safety.",
+            learningObjectives = listOf("val (sabit) ve var (değişken) kullanımını öğrenmek", "Null Safety (?, ?:) ile çökme riskini sıfırlamak", "Metin şablonları (\$isim) kullanmak"),
+            prerequisites = listOf("Ön bilgi gerekmez! Merak ve heves yeterlidir.")
         ),
         CourseSection(
             id = "kt_sec_2",
             courseId = "kotlin",
-            title = "Seviye 2 – Kontrol Akışı & Fonksiyonel Programlama Temelleri",
+            title = "Bölüm 2: Kararlar, Döngüler ve Fonksiyonlar",
             level = CourseLevel.BEGINNER,
             order = 2,
-            description = "İfade tabanlı when ve if yapıları, for/while döngüleri, tek satırlık fonksiyonlar, varsayılan/isimlendirilmiş argümanlar ve lambdalar.",
-            learningObjectives = listOf("when ifadesi ile örüntü eşleme", "for in ranges (step, downTo, until)", "Single-expression fonksiyonlar", "Higher-Order Functions ve Lambda sözdizimi"),
-            prerequisites = listOf("Kotlin Temelleri ve Null Güvenliği")
+            description = "when ve if ile karar verme, döngüler, tek satırlık pratik fonksiyonlar ve lambdalar.",
+            learningObjectives = listOf("Süper pratik when yapısını kullanmak", "for döngüsü ve aralıklar (1..10)", "fun ile fonksiyon tanımlamak"),
+            prerequisites = listOf("Kotlin Değişkenleri")
         ),
         CourseSection(
             id = "kt_sec_3",
             courseId = "kotlin",
-            title = "Seviye 3 – Nesne Yönelimli Kotlin: Sınıflar, Data Classes & Sealed Classes",
+            title = "Bölüm 3: Nesneler ve Veri Sınıfları (Data Class)",
             level = CourseLevel.INTERMEDIATE,
             order = 3,
-            description = "Birincil/İkincil kurucular, init blokları, Data Classes (copy, destructuring), Sealed Classes & Interfaces, Enum Classes ve Singleton (object).",
-            learningObjectives = listOf("Primary/Secondary Constructor ve init", "Data Classes (equals, hashCode, copy)", "Sealed Classes ile Tip Güvenli UI Durumu", "Companion Object ve Singleton deseni"),
-            prerequisites = listOf("Kotlin Kontrol Akışı ve Fonksiyonlar")
+            description = "Sınıflar (Class), tek satırda model oluşturan data class'lar ve güvenli Sealed class yapıları.",
+            learningObjectives = listOf("class ve kurucuları (constructor) öğrenmek", "data class ile temiz veri modelleri kurmak", "object ve companion object kavramlarını kavramak"),
+            prerequisites = listOf("Fonksiyonlar ve Döngüler")
         ),
         CourseSection(
             id = "kt_sec_4",
             courseId = "kotlin",
-            title = "Seviye 4 – İleri Kotlin: Genişletmeler (Extensions), Jenerikler & Delegasyon",
+            title = "Bölüm 4: Pratik Uzantılar ve Kapsam Fonksiyonları",
             level = CourseLevel.INTERMEDIATE,
             order = 4,
-            description = "Extension Functions & Properties, Kapsam Fonksiyonları (let, run, apply, also, with), Jenerikler (in, out, reified) ve Delegasyon (by lazy, Delegates.observable).",
-            learningObjectives = listOf("Extension Functions ile sınıfları genişletme", "Scope Functions (let, run, apply, also)", "Generics varyansı (in vs out / Kovaryans)", "Property Delegation (by lazy)"),
-            prerequisites = listOf("Nesne Yönelimli Kotlin ve Sınıflar")
+            description = "Sınıflara yeni güçler katan Extension fonksiyonları ve let/apply gibi pratik kapsam araçları.",
+            learningObjectives = listOf("Extension Functions yazmak", "let, apply, also gibi kapsam fonksiyonlarını kullanmak"),
+            prerequisites = listOf("Sınıflar ve Nesneler")
         ),
         CourseSection(
             id = "kt_sec_5",
             courseId = "kotlin",
-            title = "Seviye 5 – Asenkron Kotlin: Coroutines & Reaktif Flow Mimarisi",
+            title = "Bölüm 5: Asenkron Kotlin (Coroutines) ve Flow",
             level = CourseLevel.ADVANCED,
             order = 5,
-            description = "Kotlin Coroutines temelleri (suspend, CoroutineScope, Dispatchers, Structured Concurrency), Asenkron Flow akışları, StateFlow ve SharedFlow.",
-            learningObjectives = listOf("suspend fonksiyonlar ve duraklatma mekanizması", "CoroutineScope, Job ve Dispatchers", "Reaktif Cold Flow (map, filter, collect)", "Hot Streams: StateFlow ve SharedFlow"),
-            prerequisites = listOf("İleri Kotlin ve Kapsam Fonksiyonları")
+            description = "Uygulama arayüzünün donmasını engelleyen Coroutines (suspend) ve canlı veri akışları (Flow).",
+            learningObjectives = listOf("suspend fonksiyonlar ile donmayan işlemler", "Kotlin Flow ve StateFlow ile reaktif arayüzler"),
+            prerequisites = listOf("Fonksiyonlar ve Sınıflar")
         ),
         CourseSection(
             id = "kt_sec_6",
             courseId = "kotlin",
-            title = "Seviye 6 – Uzman Seviye: Channels, SupervisorJob & KSP / Bytecode",
+            title = "Bölüm 6: İleri Düzey İpuçları ve Temiz Kod",
             level = CourseLevel.EXPERT,
             order = 6,
-            description = "Channels (Kuyruklar), Hata yayılımı (SupervisorJob vs Job), Inline Fonksiyonlar (noinline, crossinline, reified), Kotlin Symbol Processing (KSP) ve Bytecode analizi.",
-            learningObjectives = listOf("Channels ve Actor mimarisi", "Hata yayılımı: Job vs SupervisorJob", "KSP ile derleme zamanı kod üretimi", "Inline fonksiyonların Bytecode analizi"),
-            prerequisites = listOf("İleri Coroutines ve Reaktif Flow Mimarisi")
+            description = "Hata yönetimi, profesyonel Android geliştirme ipuçları ve temiz kod mimarisi.",
+            learningObjectives = listOf("try-catch ve Result ile güvenli hata yakalama", "Temiz ve modern Kotlin yazma alışkanlığı"),
+            prerequisites = listOf("Tüm Seviyeler")
         )
     )
 
     fun getLessons(): List<Lesson> = listOf(
         // ==========================================
-        // DERS 1: TEMEL SÖZDİZİMİ, VAL/VAR & NULL SAFETY (ÜCRETSİZ)
+        // DERS 1: TEMEL SÖZDİZİMİ, VAL/VAR & NULL SAFETY
         // ==========================================
         Lesson(
             id = "kt_1",
             courseId = "kotlin",
             sectionId = "kt_sec_1",
-            title = "Kotlin'e Giriş, Değişkenler & Devrimsel Null Safety",
-            shortDesc = "val vs var değişmezlik ilkesi, tip çıkarımı (type inference), String şablonları ve Milyar Dolarlık Hata'yı bitiren Null Safety (?, ?:).",
+            title = "Kotlin'e Giriş: val, var ve Null Safety",
+            shortDesc = "Modern Android'in dili Kotlin'e ilk adım! Değişkenler, sabitler ve çökmeyi önleyen Elvis operatörü (?:).",
             level = CourseLevel.BEGINNER,
             order = 1,
             isPremium = false,
             learningObjectives = listOf(
-                "val (değişmez) ve var (değişken) arasındaki mimari farkı öğrenmek",
-                "Kotlin'in Null Safety (?, !!, ?:) mekanizmasını kavramak",
-                "String şablonları ve akıllı tip dönüşümlerini (Smart Cast) kullanmak"
+                "main() fonksiyonu ve println() ile ekrana yazı yazdırmak",
+                "val (değişmez/sabit) ve var (değişebilir) farkını anlamak",
+                "Null Safety (?, ?:) ile uygulamanın çökmesini engellemek",
+                "Metin içine \$isim yazarak String şablonlarını kullanmak"
             ),
-            prerequisites = listOf("Ön koşul gerekmez. Sıfırdan başlar."),
-            subtopics = listOf("val vs var ve Değişmezlik (Immutability)", "Kotlin Tip Sistemi & Type Inference", "Nullable vs Non-Nullable Tipler", "Elvis Operatörü (?:) & Safe Call (?.)", "Smart Casts ve Derleyici Veri Akışı Analizi"),
+            prerequisites = listOf("Ön koşul gerekmez."),
+            subtopics = listOf("Kotlin Neden Seviliyor?", "val vs var", "Temel Veri Tipleri", "Null Safety (?, ?:)", "String Şablonları"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Null Safety Mimarisi ve Derleme Zamanı Garantisi",
-                    body = "Kotlin'in en devrimsel özelliklerinden biri, 'Milyar Dolarlık Hata' olarak bilinen `NullPointerException` (NPE) krizini derleme zamanında engellemesidir.\n\nKotlin tip sistemi ikiye ayrılır:\n• Non-Nullable Tipler: `String`, `Int` gibi tipler asla `null` değer tutamaz. Derleyici null atanmasına izin vermez.\n• Nullable Tipler: `String?`, `User?` gibi sonuna `?` eklenen tipler null tutabilir.\n\nJVM Bytecode Düzeyinde: Non-null bir parametreye sahip fonksiyon çağrıldığında, Kotlin derleyicisi metodun en başına otomatik olarak `Intrinsics.checkNotNullParameter()` byte komutunu yerleştirerek güvenliği garanti altına alır.",
-                    codeSnippet = "var isim: String = \"Ahmet\" // Derleyici null atanmasını kesinlikle reddeder\nvar soyisim: String? = null // Null alabilir\n\nval uzunluk = soyisim?.length ?: 0 // Elvis: soyisim null ise 0 döner"
+                    subtitle = "1. Kotlin Dünyasına Hoş Geldiniz!",
+                    body = "Kotlin, Google tarafından Android geliştirmenin **resmi dili** ilan edilmiş modern ve güvenli bir programlama dilidir. Kodları çok kısa, anlaşılır ve hatasız yazmanızı sağlar.\n\nKotlin'de programın başlangıç noktası `fun main()` fonksiyonudur.",
+                    codeSnippet = "fun main() {\n    // Ekrana ilk mesajımızı yazalım:\n    println(\"Merhaba Kotlin ve Kod Akademi!\")\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. val (Salt-Okunur) vs var (Değişken) ve Referans Değişmezliği",
-                    body = "• `val`: Java'daki `final` anahtar kelimesine karşılık gelir. Referans bir kez atandıktan sonra başka bir nesneye yönlendirilemez. Değişmezlik (immutability) eşzamanlı (multi-threaded) programlamada yarış durumlarını (race condition) önler.\n• `var`: Değeri veya işaret ettiği nesne sonradan değiştirilebilir.",
-                    tip = "Temel Kural: Değişkenlerinizi daima `val` ile başlatın; yalnızca değeri gerçekten değişmek zorunda olan durumlarda `var` kullanın."
+                    subtitle = "2. val (Sabit) ve var (Değişken) Farkı",
+                    body = "• **val (Değer / Value):** Bir kere atandıktan sonra asla değiştirilemeyen güvenli kutudur. (Mümkün oldukça her yerde val tercih ederiz!)\n• **var (Değişken / Variable):** Değeri sonradan güncellenebilen kutudur.",
+                    codeSnippet = "val dogumYili = 2000 // Asla değişmez (Sabit)\n// dogumYili = 2001 -> HATA! val değiştirilemez.\n\nvar puan = 10\npuan = 20 // Geçerli! var güncellenebilir."
                 ),
                 LessonContentBlock(
-                    subtitle = "3. Smart Cast (Akıllı Tip Çıkarımı)",
-                    body = "Kotlin derleyicisi veri akışı analizi (Dataflow Analysis) yaparak değişkenin null olmadığını veya belirli bir tipe ait olduğunu anladığı anda otomatik cast işlemi uygular.\n\nÖrneğin `if (metin != null)` kontrolü yapıldıktan sonra `metin` değişkeni blok içinde doğrudan non-null `String` olarak kabul edilir ve `metin.length` güvenle çağrılabilir.",
-                    codeSnippet = "fun yazdir(nesne: Any) {\n    if (nesne is String) {\n        // 'nesne' bu blokta otomatik olarak String'e dönüştürülmüştür (Smart Cast)\n        println(\"Metin uzunluğu: \" + nesne.length)\n    }\n}"
+                    subtitle = "3. Null Safety: Çökmeyen Uygulamalar",
+                    body = "Normalde hiçbir değişken boş (`null`) kalamaz. Eğer boş kalabilmesini istiyorsanız tipin sonuna `?` koyarsınız. Eğer boş ise yedek bir değer kullanmak için sevimli **Elvis Operatörü (`?:`)** devreye girer!",
+                    codeSnippet = "var isim: String = \"Mert\" // Asla null olamaz\nvar soyisim: String? = null // Null olabilir\n\n// Elvis (?:) ile yedek değer:\nval gorunenSoyad = soyisim ?: \"Soyad Belirtilmedi\"\nprintln(\"Kullanıcı: \$isim \$gorunenSoyad\")"
                 )
             ),
-            codeExample = "fun main() {\n    val kullaniciAdi: String? = \"Zeynep\"\n    val mesaj = \"Hoş geldin, \" + (kullaniciAdi ?: \"Misafir\")\n    val harfSayisi = kullaniciAdi?.length ?: 0\n    \n    println(\"\$mesaj (Karakter: \$harfSayisi)\")\n}",
-            codeExplanation = "kullaniciAdi null olsaydı Elvis (?:) sayesinde 'Misafir' yazılacak ve uzunluk 0 olacaktı. NullPointerException imkansız hale getirildi.",
-            realWorldExample = "Android ekosisteminde Google, Kotlin-First yaklaşımını benimsemiştir ve modern Android uygulamalarının %95+'ı Kotlin ile yazılmaktadır.",
-            practicalTask = "Null olabilecek bir e-posta adresini kontrol edip, null ise 'E-posta belirtilmedi' yazdıran bir Kotlin kodu yazın.",
-            starterPlaygroundCode = "fun main() {\n    val ad: String? = null\n    println(\"Kullanıcı: \" + (ad ?: \"Anonim\"))\n}",
+            codeExample = "fun main() {\n    val dil = \"Kotlin\"\n    val surum = 2.0\n    val harikaMi = true\n    \n    println(\"\$dil \$surum ile Android kodluyoruz! (Harika: \$harikaMi)\")\n}",
+            codeExplanation = "val ile değişkenler tanımlandı ve \$ işaretiyle metin içine yerleştirildi.",
+            realWorldExample = "Android telefonunuzdaki neredeyse tüm modern uygulamalar (Instagram, Twitter, bankacılık) Kotlin ile yazılmıştır.",
+            practicalTask = "Adınızı val, yaşınızı var olarak tanımlayıp ekrana \$ad ve \$yas ile yazdırın.",
+            starterPlaygroundCode = "fun main() {\n    val ad = \"Zeynep\"\n    var yas = 22\n    // println ile ekrana yazdırın:\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_1",
-                question = "Kotlin'de 'null' olabilecek bir ifadenin null gelmesi durumunda varsayılan bir yedek değer atamak için hangi operatör kullanılır?",
-                options = listOf("Safe Call (?.)", "Elvis Operatörü (?:)", "Not-null Assertion (!!)", "Smart Cast (as?)"),
-                correctIndex = 1,
-                explanation = "Elvis Operatörü (?:) solundaki ifade null ise sağındaki varsayılan değeri döndürür."
+                question = "Kotlin'de bir değişkenin değerinin sonradan değiştirilememesini (sabit kalmasını) sağlamak için hangi kelime kullanılır?",
+                options = listOf("val", "var", "const_only", "let"),
+                correctIndex = 0,
+                explanation = "val ile tanımlanan değişkenler sabittir ve sonradan değiştirilemez."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_1",
                 lessonId = "kt_1",
-                title = "Güvenli İsim Uzunluğu",
-                instructions = "String? tipinde bir isim alıp; isim varsa uzunluğunu, null ise 0 döndüren guvenliUzunluk(isim) fonksiyonunu yazın.",
-                exampleInput = "isim = \"Kotlin\"",
-                exampleOutput = "6",
-                starterCode = "fun guvenliUzunluk(isim: String?): Int {\n    // Kodunu buraya yaz:\n    return 0\n}",
-                solutionCode = "fun guvenliUzunluk(isim: String?): Int {\n    return isim?.length ?: 0\n}",
-                hints = listOf("isim?.length ?: 0 ifadesini döndürün."),
+                title = "Öğrenci Bilgi Kartı",
+                instructions = "ad ve notu parametrelerini alıp 'Ali: 85 Puan' formatında String döndüren bilgiKarti(ad, notu) fonksiyonunu yazın.",
+                exampleInput = "ad = 'Ali', notu = 85",
+                exampleOutput = "'Ali: 85 Puan'",
+                starterCode = "fun bilgiKarti(ad: String, notu: Int): String {\n    // Kodunu yaz:\n    return \"\"\n}",
+                solutionCode = "fun bilgiKarti(ad: String, notu: Int): String {\n    return \"\$ad: \$notu Puan\"\n}",
+                hints = listOf("\"\$ad: \$notu Puan\" döndürün."),
                 testCases = listOf(
-                    TestCase("guvenliUzunluk(\"Kotlin\")", "6", "Dolu string"),
-                    TestCase("guvenliUzunluk(null)", "0", "Null string")
+                    TestCase("bilgiKarti(\"Ali\", 85)", "Ali: 85 Puan", "Öğrenci kartı")
                 )
             ),
             quizQuestions = listOf(
@@ -141,83 +140,83 @@ object KotlinCurriculum {
                     id = "kt_quiz_1_1",
                     lessonId = "kt_1",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin'de bir değişken 'val' olarak tanımlandığında ne anlama gelir?",
-                    options = listOf("Değeri daha sonra tekrar değiştirilebilir", "Salt okunurdur (immutable); bir kez değer atandıktan sonra yeniden atanamaz", "Statik değişkendir", "Bellekte yer tutmaz"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! val (value) bir kez atanır ve değiştirilemez; referans değişmezliği sağlar.",
-                    explanationWrong = "val değiştirilemez (read-only) referans tanımlar.",
-                    reviewTopic = "val vs var"
+                    questionText = "Kotlin'de sol taraf null ise sağdaki varsayılan değeri seçen operatörün (?:) adı nedir?",
+                    options = listOf("Elvis Operatörü", "Safe Call", "Smart Cast", "Spread"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Yan çevrilmiş Elvis Presley saçına benzediği için (?:) Elvis Operatörü denir.",
+                    explanationWrong = "?: operatörüne Elvis Operatörü denir.",
+                    reviewTopic = "Kotlin Null Safety"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Smart Cast (Akıllı Tip Dönüşümü) nedir?",
-                    answer = "Kotlin derleyicisi bir nesnenin `if (x is String)` veya `if (x != null)` ile kontrol edildiğini gördüğü an o blok içinde x'i otomatik olarak ilgili tipe dönüştürür; manuel cast yapmanıza gerek kalmaz."
+                    question = "Neden var yerine val önerilir?",
+                    answer = "Değişmeyen (immutable) verilerle çalışmak kodun beklenmedik şekilde bozulmasını önler ve hataları çok azaltır."
                 )
             ),
             completionCriteria = listOf(
-                "val ve var kullanım kurallarını bilmek",
-                "Null Safety operatörlerini (?, ?:) hatasız kullanabilmek",
-                "String şablonları ile metin üretebilmek"
+                "val ve var farkını bilmek",
+                "Elvis operatörünü (?:) kullanabilmek",
+                "String şablonları (\$isim) ile metin basabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 2: KONTROL AKIŞI: WHEN & EXPRESSIONS (ÜCRETSİZ)
+        // DERS 2: KOŞULLAR (when) VE DÖNGÜLER
         // ==========================================
         Lesson(
             id = "kt_2",
             courseId = "kotlin",
-            sectionId = "kt_sec_1",
-            title = "Kontrol Akışı: when, if İfadeleri & Aralıklar (Ranges)",
-            shortDesc = "Kotlin'de if ve when birer deyim değil DEĞER DÖNDÜREN İFADEDİR (Expression). Pattern matching benzeri when, for döngüleri ve range aralıkları.",
+            sectionId = "kt_sec_2",
+            title = "Kararlar (when) ve Döngüler (for, while)",
+            shortDesc = "Kotlin'in süper yetenekli when yapısı ve 1..10 aralıklarıyla kolay döngüler.",
             level = CourseLevel.BEGINNER,
             order = 2,
             isPremium = false,
             learningObjectives = listOf(
-                "if ve when yapılarını değer döndüren bir ifade (expression) olarak kullanmak",
-                "when içinde tip, aralık ve çoklu koşul denetimlerini öğrenmek",
-                "downTo, step ve until ile for döngülerini kurmak"
+                "when yapısı ile çok seçenekli kararları temizce yazmak",
+                "if yapısının bir değere eşitlenebildiğini (Expression) görmek",
+                "1..10, downTo ve step ile pratik for döngüleri kurmak"
             ),
-            prerequisites = listOf("Kotlin'e Giriş, Değişkenler ve Null Safety"),
-            subtopics = listOf("if as Expression (Ternary Alternatifi)", "when İfadesi & Exhaustiveness Kapsamı", "Ranges (1..10, until, downTo, step)", "for in Koleksiyonlar & İteratör Protokolü", "while ve do-while"),
+            prerequisites = listOf("Kotlin Değişkenleri"),
+            subtopics = listOf("when Karar Yapısı", "if İfadesi", "for Döngüsü ve Aralıklar (..)", "while Döngüsü"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. if ve when: İfade Tabanlı (Expression-Based) Yaklaşım",
-                    body = "Kotlin'de `if` ve `when` sadece kod akışını yönlendiren bir deyim (statement) değil, bir sonuç değeri üreten ifadedir (expression). Bu sayede C/Java tarzı `? :` üçlü ternary operatörüne ihtiyaç duyulmaz.\n\n`when` yapısı Java'daki `switch`'e göre çok daha gelişmiştir: Sabit değerler yerine aralıklar (`in 1..10`), tip kontrolleri (`is String`), çoklu koşullar ve keyfi boolean ifadeler sınanabilir.",
-                    codeSnippet = "val sonuc = when (not) {\n    in 90..100 -> \"AA (Üstün Başarı)\"\n    in 80..89 -> \"BA\"\n    is Int -> \"Geçerli Sayısal Not\"\n    else -> \"Tekrar Deneyiniz\"\n}"
+                    subtitle = "1. Süper Pratik Karar Yapısı: when",
+                    body = "Diğer dillerdeki karmaşık switch-case yapısı yerine Kotlin'de tertemiz bir `when` vardır. Hatta bir değişkene doğrudan sonuç atayabilir!",
+                    codeSnippet = "val notu = 85\n\nval sonuc = when (notu) {\n    in 90..100 -> \"Pekiyi (A)\"\n    in 70..89 -> \"İyi (B)\"\n    in 50..69 -> \"Geçer (C)\"\n    else -> \"Kaldı\"\n}\nprintln(\"Sonuç: \$sonuc\") // İyi (B)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Ranges (Aralıklar) ve İteratör Bytecode Optimizasyonu",
-                    body = "• `1..5`: 1, 2, 3, 4, 5 (Kapalı aralık, `ClosedRange`)\n• `1 until 5`: 1, 2, 3, 4 (5 hariç, yarı açık aralık)\n• `10 downTo 1 step 2`: 10, 8, 6, 4, 2\n\nKotlin derleyicisi temel tiplerde (Int, Long) `for (i in 1..n)` döngüsünü JVM seviyesinde nesne tahsisi yapmadan doğrudan saf C tarzı `for (int i = 1; i <= n; i++)` byte komutlarına dönüştürür.",
-                    tip = "when bir ifade olarak değişkene atanıyorsa veya return ediliyorsa derleyici tüm dalların kapsanmasını (`else` veya enum/sealed hiyerarşisinin tamamını) zorunlu kılar."
+                    subtitle = "2. Döngüler ve Aralıklar (1..5, step, downTo)",
+                    body = "Kotlin'de döngü yazmak çok doğaldır:\n\n• `1..5`: 1'den 5'e kadar (5 dahil)\n• `1 until 5`: 1'den 4'e kadar (5 dahil değil)\n• `10 downTo 1 step 2`: 10'dan geriye ikişer ikişer say",
+                    codeSnippet = "// 1'den 3'e kadar say:\nfor (i in 1..3) {\n    println(\"Adım: \$i\")\n}\n\n// Geriye ikişer say:\nfor (i in 6 downTo 2 step 2) {\n    println(\"Çift: \$i\") // 6, 4, 2\n}"
                 )
             ),
-            codeExample = "fun sinavDegerlendir(puan: Int): String {\n    return when (puan) {\n        in 90..100 -> \"Mükemmel\"\n        in 70..89 -> \"Başarılı\"\n        in 50..69 -> \"Orta\"\n        in 0..49 -> \"Tekrar Deneyin\"\n        else -> \"Geçersiz Puan\"\n    }\n}\n\nfun main() {\n    for (i in 1..3) {\n        print(\"\$i. Derece: \" + sinavDegerlendir(i * 30) + \" | \")\n    }\n}",
-            codeExplanation = "when puan aralığına göre metin döndürdü; for döngüsü range içinde iterasyon yaptı.",
-            realWorldExample = "Android ViewModel katmanında ağ durumunu (Loading, Success, Error) kontrol ederken `when` yapısı standarttır.",
-            practicalTask = "1'den 50'ye kadar olan tek sayıları step kullanarak ekrana yazdırın.",
-            starterPlaygroundCode = "fun main() {\n    for (i in 10 downTo 1 step 2) { print(\"\$i \") }\n}",
+            codeExample = "fun main() {\n    var toplam = 0\n    for (i in 1..5) {\n        toplam += i\n    }\n    println(\"1-5 Toplamı: \$toplam\") // 15\n}",
+            codeExplanation = "1..5 aralığı for döngüsüyle dönülerek sayılar toplandı.",
+            realWorldExample = "Kullanıcının üyelik tipine göre (Gold, Silver, Normal) indirim oranı belirlerken when kullanılır.",
+            practicalTask = "1'den 10'a kadar olan sayılardan sadece çift olanları ekrana yazdıran bir döngü yazın.",
+            starterPlaygroundCode = "fun main() {\n    for (i in 2..10 step 2) {\n        println(i)\n    }\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_2",
-                question = "Kotlin'de '1 until 10' aralığı hangi sayıları kapsar?",
-                options = listOf("1'den 10'a kadar (10 dahil)", "1'den 9'a kadar (10 hariç)", "2'den 9'a kadar", "Sadece 1 ve 10"),
-                correctIndex = 1,
-                explanation = "'until' üst sınırı hariç tutar (exclusive); 1..9 arasını kapsar."
+                question = "Kotlin'de 1'den 5'e kadar (5 dahil) sayı aralığı nasıl yazılır?",
+                options = listOf("1..5", "1 to 5", "1->5", "1...5"),
+                correctIndex = 0,
+                explanation = "Kotlin'de iki nokta yan yana (1..5) aralık belirtir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_2",
                 lessonId = "kt_2",
-                title = "HTTP Durum Mesajı (when)",
-                instructions = "Int kod alıp; 200 -> 'OK', 404 -> 'Not Found', 500 -> 'Server Error', diğerleri -> 'Unknown' döndüren httpMesaji(kod) fonksiyonunu when ifadesiyle yazın.",
-                exampleInput = "kod = 200",
-                exampleOutput = "\"OK\"",
-                starterCode = "fun httpMesaji(kod: Int): String {\n    // Kodunu buraya yaz:\n    return \"\"\n}",
-                solutionCode = "fun httpMesaji(kod: Int): String = when (kod) {\n    200 -> \"OK\"\n    404 -> \"Not Found\"\n    500 -> \"Server Error\"\n    else -> \"Unknown\"\n}",
-                hints = listOf("when (kod) { 200 -> \"OK\" ... else -> \"Unknown\" } kullanın."),
+                title = "Çift Sayıların Toplamı",
+                instructions = "1'den n'e kadar olan çift sayıların toplamını hesaplayan ciftToplami(n) fonksiyonunu yazın.",
+                exampleInput = "n = 6",
+                exampleOutput = "12 (2 + 4 + 6)",
+                starterCode = "fun ciftToplami(n: Int): Int {\n    // Kodunu yaz:\n    return 0\n}",
+                solutionCode = "fun ciftToplami(n: Int): Int {\n    var top = 0\n    for (i in 2..n step 2) top += i\n    return top\n}",
+                hints = listOf("for (i in 2..n step 2) ile ikişer ikişer toplayın."),
                 testCases = listOf(
-                    TestCase("httpMesaji(200)", "OK", "200 testi"),
-                    TestCase("httpMesaji(404)", "Not Found", "404 testi")
+                    TestCase("ciftToplami(6)", "12", "6 için"),
+                    TestCase("ciftToplami(10)", "30", "10 için")
                 )
             ),
             quizQuestions = listOf(
@@ -225,87 +224,82 @@ object KotlinCurriculum {
                     id = "kt_quiz_2_1",
                     lessonId = "kt_2",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin'de 'if' yapısı Java'dan farklı olarak hangi özelliğe sahiptir?",
-                    options = listOf("Sadece boolean değerlerle çalışır", "Bir ifade (expression) olarak değer döndürebilir ve değişkene atanabilir", "Döngü olarak çalışabilir", "Sınıf içinde tanımlanamaz"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Kotlin'de if bir ifadedir ve son satırındaki değer otomatik olarak döner.",
-                    explanationWrong = "if Kotlin'de değer döndüren bir ifadedir.",
-                    reviewTopic = "if as Expression"
+                    questionText = "Kotlin'de çoklu koşul dallanmalarında switch yerine hangi anahtar kelime kullanılır?",
+                    options = listOf("when", "match", "case", "select"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Kotlin'de switch yerine çok daha yetenekli 'when' kullanılır.",
+                    explanationWrong = "Kotlin'de when kullanılır.",
+                    reviewTopic = "Kotlin Kontrol Akışı"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "when içinde 'is' anahtar kelimesi ne yapar?",
-                    answer = "Değişkenin tipini kontrol eder (`is String`) ve doğruysa o dal içinde değişkeni otomatik olarak o tipe cast eder (Smart Cast)."
+                    question = "when ifadesinde else yazmak zorunlu mudur?",
+                    answer = "Eğer bir değişkene değer atıyorsanız ve tüm durumlar kapsanmadıysa derleyici else yazmanızı zorunlu tutar."
                 )
             ),
             completionCriteria = listOf(
-                "when ve if ifadelerini değer döndürecek şekilde kullanmak",
-                "Ranges operatörlerini (until, downTo, step) kavramak",
-                "when içinde kapsamlı örüntü eşleme yapabilmek"
+                "when yapısını kullanabilmek",
+                "1..n aralığıyla for döngüsü kurabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 3: FONKSİYONLAR & HIGHER-ORDER LAMBDALAR
+        // DERS 3: FONKSİYONLAR (fun)
         // ==========================================
         Lesson(
             id = "kt_3",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_2",
-            title = "Fonksiyonlar, Tek Satırlı İfadeler & Higher-Order Lambdalar",
-            shortDesc = "Varsayılan/isimlendirilmiş argümanlar, tek satırlı fonksiyonlar (=), Vararg, Fonksiyonel Programlama: Lambda ifadeleri, trailing lambda ve 'it' anahtar kelimesi.",
+            title = "Fonksiyonlar: fun ile Kolay Kodlama",
+            shortDesc = "Tek satırlık pratik fonksiyonlar, varsayılan parametreler ve lambdalar.",
             level = CourseLevel.BEGINNER,
             order = 3,
             isPremium = false,
             learningObjectives = listOf(
-                "Default & Named Arguments ile kod okunabilirliğini artırmak",
-                "Tek satırlı (Single-expression) fonksiyonlar yazmak",
-                "Higher-Order Functions ve Trailing Lambda sözdizimini kavramak"
+                "fun kelimesi ile fonksiyon tanımlamak",
+                "Tek satırlık (Single-expression) fonksiyonlar yazmak",
+                "Varsayılan ve isimlendirilmiş parametreleri kullanmak"
             ),
-            prerequisites = listOf("Kotlin Kontrol Akışı ve Döngüler"),
-            subtopics = listOf("Named & Default Arguments", "Single-Expression Functions", "Vararg & Spread Operatörü (*)", "Lambda İfadeleri & Örtük 'it'", "Higher-Order Functions & Inline Mekanizması"),
+            prerequisites = listOf("Kotlin Değişkenleri ve Koşulları"),
+            subtopics = listOf("fun Tanımlama", "Tek Satırlık Fonksiyonlar (=)", "Varsayılan Parametreler", "Lambdalar"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Default & Named Arguments",
-                    body = "Parametrelere varsayılan değer tanımlayarak onlarca constructor veya method overloading yazma ihtiyacını ortadan kaldırır. Çağrı esnasında parametre adı belirtilerek (`timeout = 5000`) argüman sırası esnetilebilir.",
-                    codeSnippet = "fun baglan(url: String, timeout: Int = 5000, retry: Boolean = true) {\n    println(\"\$url adresine \${timeout}ms timeout ile baglaniliyor...\")\n}\n// Çağrı:\nbaglan(\"https://api.com\", retry = false)"
+                    subtitle = "1. Fonksiyon Tanımlama (fun)",
+                    body = "Fonksiyonlar işlerimizi paketleyen yardımcılarımızdır. Tek satırlık fonksiyonlarda süslü parantez bile açmadan eşittir (`=`) koyarak sonucu döndürebiliriz!",
+                    codeSnippet = "// Klasik yöntem:\nfun topla(a: Int, b: Int): Int {\n    return a + b\n}\n\n// Tek satırlık pratik yöntem (Aynı işi yapar):\nfun toplaPratik(a: Int, b: Int) = a + b"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Trailing Lambda ve 'it' Parametresi",
-                    body = "Bir fonksiyonun son parametresi fonksiyonel bir tip (`(T) -> R`) ise, çağrı yapılırken lambda gövdesi normal parantezlerin dışına `{ ... }` şeklinde yazılabilir. Tek parametre alan lambdalarda parametre tanımlamadan doğrudan `it` kullanılabilir.",
-                    codeSnippet = "val sayilar = listOf(1, 2, 3, 4)\n// Trailing lambda:\nval ciftler = sayilar.filter { it % 2 == 0 }"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. Higher-Order Functions ve inline Anahtarı",
-                    body = "Parametre olarak fonksiyon alan veya fonksiyon döndüren fonksiyonlara Higher-Order Function denir. Normalde her lambda bir JVM nesnesi oluştururken, `inline` anahtar kelimesiyle işaretlenen fonksiyonlar derleme anında doğrudan çağrı yerine yapıştırılarak sıfır nesne tahsisiyle çalışır.",
-                    tip = "Jetpack Compose'un `@Composable` fonksiyonları ve Kotlin standart kütüphanesindeki `filter`, `map`, `apply` gibi fonksiyonların çoğu `inline` olarak tanımlıdır."
+                    subtitle = "2. Varsayılan ve İsimlendirilmiş Parametreler",
+                    body = "Parametrelere varsayılan değer verebilir ve çağırırken parametrenin adını belirtebilirsiniz.",
+                    codeSnippet = "fun kullaniciOlustur(ad: String, rol: String = \"Üye\") {\n    println(\"Kullanıcı: \$ad (Rol: \$rol)\")\n}\n\n// Çağırma:\nkullaniciOlustur(\"Ali\") // Rol otomatik 'Üye' olur\nkullaniciOlustur(rol = \"Yönetici\", ad = \"Ayşe\") // İsimle çağrı"
                 )
             ),
-            codeExample = "fun calismaZamaniHesapla(islemAdi: String, blok: () -> Unit) {\n    val baslangic = System.currentTimeMillis()\n    blok() // Lambdayı çalıştır\n    val sure = System.currentTimeMillis() - baslangic\n    println(\"\$islemAdi tamamlandı: \${sure}ms\")\n}\n\nfun main() {\n    // Trailing lambda kullanımı:\n    calismaZamaniHesapla(\"Veri İndirme\") {\n        Thread.sleep(50)\n    }\n}",
-            codeExplanation = "calismaZamaniHesapla Higher-Order fonksiyonu blok parametresi olarak bir lambda aldı ve süresini ölçtü.",
-            realWorldExample = "Jetpack Compose'da her UI bileşeni (Button, Column, Row) trailing lambda parametresi alarak çalışır.",
-            practicalTask = "İki sayıyı ve bir işlem lambdasını (Int, Int) -> Int alan bir hesaplayıcı fonksiyonu yazın.",
-            starterPlaygroundCode = "fun topla(a: Int, b: Int = 10) = a + b\nfun main() { println(topla(5)) }",
+            codeExample = "fun kareAl(x: Int) = x * x\n\nfun main() {\n    println(\"6'nın karesi: \${kareAl(6)}\") // 36\n}",
+            codeExplanation = "kareAl tek satırlık pratik eşittir (=) fonksiyonuyla yazıldı.",
+            realWorldExample = "Jetpack Compose ile Android arayüzü çizerken her UI bileşeni (@Composable) bir Kotlin fonksiyonudur.",
+            practicalTask = "İki sayıyı çarpan tek satırlık carp(a, b) fonksiyonu yazın.",
+            starterPlaygroundCode = "fun carp(a: Int, b: Int) = a * b\n\nfun main() {\n    println(carp(4, 5))\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_3",
-                question = "Kotlin'de tek bir parametre alan lambda ifadelerinde o parametrenin varsayılan adı nedir?",
-                options = listOf("this", "it", "item", "val"),
-                correctIndex = 1,
-                explanation = "Tek parametreli lambdalarda örtük (implicit) parametre adı 'it'tir."
+                question = "Kotlin'de yeni bir fonksiyon tanımlamak için hangi kelime kullanılır?",
+                options = listOf("fun", "func", "function", "def"),
+                correctIndex = 0,
+                explanation = "Kotlin'de fonksiyonlar 'fun' (function) ile başlar."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_3",
                 lessonId = "kt_3",
-                title = "Özel Metin Filtreleyici (Higher-Order)",
-                instructions = "String metin ve (Char) -> Boolean koşul lambdası alan, koşulu sağlayan karakterlerden oluşan yeni metni döndüren metinFiltrele(metin, kosul) fonksiyonunu yazın.",
-                exampleInput = "metin = \"k-o-t-l-i-n\", kosul = { it != '-' }",
-                exampleOutput = "\"kotlin\"",
-                starterCode = "fun metinFiltrele(metin: String, kosul: (Char) -> Boolean): String {\n    // Kodunu buraya yaz:\n    return \"\"\n}",
-                solutionCode = "fun metinFiltrele(metin: String, kosul: (Char) -> Boolean): String {\n    return metin.filter(kosul)\n}",
-                hints = listOf("metin.filter(kosul) kullanabilirsiniz."),
+                title = "İsimlendirilmiş Selamlayıcı",
+                instructions = "isim ve varsayılan degeri 'Merhaba' olan selam parametresi alıp '\$selam, \$isim!' döndüren selamla() fonksiyonunu yazın.",
+                exampleInput = "selamla(\"Murat\")",
+                exampleOutput = "'Merhaba, Murat!'",
+                starterCode = "fun selamla(isim: String, selam: String = \"Merhaba\"): String {\n    // Kodunu yaz:\n    return \"\"\n}",
+                solutionCode = "fun selamla(isim: String, selam: String = \"Merhaba\"): String {\n    return \"\$selam, \$isim!\"\n}",
+                hints = listOf("\"\$selam, \$isim!\" döndürün."),
                 testCases = listOf(
-                    TestCase("metinFiltrele(\"k-o-t-l-i-n\", { it != '-' })", "kotlin", "Filtreleme")
+                    TestCase("selamla(\"Murat\")", "Merhaba, Murat!", "Varsayılan"),
+                    TestCase("selamla(\"Ece\", \"Günaydın\")", "Günaydın, Ece!", "Özel")
                 )
             ),
             quizQuestions = listOf(
@@ -313,87 +307,81 @@ object KotlinCurriculum {
                     id = "kt_quiz_3_1",
                     lessonId = "kt_3",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin'de bir fonksiyonun son parametresi bir fonksiyon (lambda) tipinde olduğunda parantez dışına çıkarılması kuralına ne ad verilir?",
-                    options = listOf("Inline function", "Trailing Lambda", "Extension Lambda", "Currying"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Bu özelliğe Trailing Lambda denir ve Jetpack Compose DSL'lerinin temelini oluşturur.",
-                    explanationWrong = "Trailing Lambda kuralı denir.",
-                    reviewTopic = "Trailing Lambda"
+                    questionText = "Tek satırlık bir fonksiyonda süslü parantez ve return yerine ne kullanılır?",
+                    options = listOf("= (eşittir)", "-> (ok)", "=>", ":="),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! 'fun topla(a: Int, b: Int) = a + b' şeklinde eşittir kullanılır.",
+                    explanationWrong = "Tek satırlık fonksiyonlarda = kullanılır.",
+                    reviewTopic = "Kotlin Fonksiyonlar"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Single-expression fonksiyonlar ne zaman tercih edilir?",
-                    answer = "Fonksiyonun gövdesi tek bir ifadeden oluştuğunda süslü parantez ve return yazmak yerine doğrudan `fun topla(a: Int, b: Int) = a + b` şeklinde yazılır."
+                    question = "Değer döndürmeyen fonksiyonların tipi nedir?",
+                    answer = "Kotlin'de hiçbir şey döndürmeyen fonksiyonların dönüş tipi 'Unit'tir (Java'daki void gibi)."
                 )
             ),
             completionCriteria = listOf(
-                "Default ve Named Arguments kullanabilmek",
-                "Lambda ve 'it' sözdizimini kavramak",
-                "Higher-Order fonksiyonlar tanımlayabilmek"
+                "fun ile fonksiyon yazabilmek",
+                "Tek satırlık = fonksiyonlarını kullanabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 4: KOLEKSİYONLAR & FONKSİYONEL API
+        // DERS 4: LİSTELER VE KOLEKSİYONLAR
         // ==========================================
         Lesson(
             id = "kt_4",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_2",
-            title = "Koleksiyonlar & Fonksiyonel Dönüşümler (map, filter, reduce)",
-            shortDesc = "Değişmez (List) vs Değiştirilebilir (MutableList) koleksiyonlar, Set, Map, Fonksiyonel dönüşüm zincirleri: map, filter, flatMap, groupBy ve fold/reduce.",
+            title = "Koleksiyonlar: Listeler, filter ve map",
+            shortDesc = "Değişmeyen listOf ile güvenli listeler, filter ve map ile hızlı veri işleme.",
             level = CourseLevel.BEGINNER,
             order = 4,
             isPremium = true,
             learningObjectives = listOf(
-                "List (salt okunur) ile MutableList (değiştirilebilir) farkını kavramak",
-                "map, filter, groupBy ve flatMap ile karmaşık veri dönüşümleri yapmak",
-                "reduce ve fold ile liste elemanlarını akümülatörle toplamak"
+                "listOf (sabit) ve mutableListOf (değişebilir) listeleri öğrenmek",
+                "filter ile liste elemanlarını filtrelemek",
+                "map ile elemanları dönüştürmek"
             ),
-            prerequisites = listOf("Fonksiyonlar ve Higher-Order Lambdalar"),
-            subtopics = listOf("List vs MutableList Hiyerarşisi", "Set & Map Veri Yapıları", "map, filter, find & any/all", "groupBy & associateBy", "Sequence vs Iterable (Lazy vs Eager)"),
+            prerequisites = listOf("Fonksiyonlar"),
+            subtopics = listOf("listOf vs mutableListOf", "filter ile Seçme", "map ile Dönüştürme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Read-Only (List) vs Mutable Koleksiyon Ayrımı",
-                    body = "Kotlin koleksiyon hiyerarşisinde `List<T>` salt okunur bir arayüzdür; `add()`, `remove()` metodları sunmaz. Bu sayede thread-safe ve güvenli veri akışı sağlanır. Değiştirilebilir koleksiyon için açıkça `MutableList<T>` (`mutableListOf()`) kullanılır.",
-                    codeSnippet = "val okunur: List<String> = listOf(\"Kotlin\", \"Compose\")\n// okunur.add(\"Android\") // DERLEME HATASI - API seviyesinde engellenir\n\nval degisir: MutableList<String> = mutableListOf(\"Kotlin\")\ndegisir.add(\"Compose\") // Geçerli"
+                    subtitle = "1. Sabit ve Değişebilir Listeler",
+                    body = "Kotlin güvenliğe çok önem verir:\n\n• `listOf(\"A\", \"B\")`: Eleman eklenemeyen, silinemeyen sabit listedir.\n• `mutableListOf(\"A\", \"B\")`: Sonradan `.add()` ile eleman eklenebilen listedir.",
+                    codeSnippet = "val diller = listOf(\"Kotlin\", \"Java\", \"Dart\")\n// diller.add(\"C++\") -> HATA! listOf sabittir.\n\nval sehirler = mutableListOf(\"İzmir\")\nsehirler.add(\"Ankara\") // Geçerli!"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Güçlü Fonksiyonel Dönüşüm Zincirleri",
-                    body = "• `filter { ... }`: Koşulu sağlayan elemanları süzer.\n• `map { ... }`: Her elemanı yeni bir tipe/değere dönüştürür.\n• `flatMap { ... }`: İç içe koleksiyonları tek bir düz listeye indirger.\n• `groupBy { ... }`: Elemanları bir kritere göre `Map<K, List<V>>` yapısına ayırır.",
-                    codeSnippet = "val gruplu = urunler.groupBy { it.kategori }"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. Sequence: Tembel (Lazy) Değerlendirme ile Bellek Optimizasyonu",
-                    body = "Standart Iterable zincirinde (`filter { }.map { }`) her adımda yeni bir ara liste (Intermediate List) tahsis edilir. Büyük veri setlerinde `.asSequence()` kullanarak işlem adımları eleman bazında tembel (lazy) yürütülür ve bellekte gereksiz nesne oluşturulması önlenir.",
-                    tip = "Büyük boyutlu (>1000 eleman) veya çok adımlı koleksiyon zincirlerinde mutlaka `.asSequence()` tercih edin."
+                    subtitle = "2. filter ve map Yetenekleri",
+                    body = "Listeleri işlemek için döngü yazmak yerine `filter` (seç) ve `map` (dönüştür) kullanırız. Listenin her elemanını temsil etmek için sihirli `it` kelimesi kullanılır!",
+                    codeSnippet = "val sayilar = listOf(1, 2, 3, 4, 5, 6)\n\n// Çiftleri seç ve karelerini al:\nval ciftKareler = sayilar\n    .filter { it % 2 == 0 } // [2, 4, 6]\n    .map { it * it }        // [4, 16, 36]\n\nprintln(ciftKareler) // [4, 16, 36]"
                 )
             ),
-            codeExample = "data class Urun(val ad: String, val fiyat: Double, val kategori: String)\n\nfun main() {\n    val urunler = listOf(\n        Urun(\"Telefon\", 25000.0, \"Elektronik\"),\n        Urun(\"Kulaklık\", 1500.0, \"Elektronik\"),\n        Urun(\"Kitap\", 120.0, \"Kültür\")\n    )\n    \n    // Elektronik ürünlerin toplam fiyatını hesaplayalım:\n    val elektronikToplam = urunler\n        .filter { it.kategori == \"Elektronik\" }\n        .map { it.fiyat }\n        .sum()\n        \n    println(\"Elektronik Toplam: \$elektronikToplam TL\")\n}",
-            codeExplanation = "filter ile elektronik ürünler seçildi, map ile fiyatları çıkarıldı ve sum() ile toplandı.",
-            realWorldExample = "Android uygulamalarında arama yaparken veya e-ticaret filtre panellerinde bu fonksiyonel koleksiyon zincirleri kullanılır.",
-            practicalTask = "Bir sayı listesindeki çift sayıların karelerini hesaplayıp yeni bir listeye toplayan Kotlin kodu yazın.",
-            starterPlaygroundCode = "fun main() {\n    val l = listOf(1, 2, 3, 4)\n    println(l.map { it * it })\n}",
+            codeExample = "fun main() {\n    val isimler = listOf(\"ali\", \"ayşe\", \"mehmet\")\n    val buyukler = isimler.map { it.uppercase() }\n    println(buyukler) // [ALI, AYŞE, MEHMET]\n}",
+            codeExplanation = "map { it.uppercase() } ile tüm isimler büyük harfe dönüştürüldü.",
+            realWorldExample = "Android uygulamasında arama çubuğuna harf yazıldığında ürün listesini filtrelemek için .filter { it.contains(arama) } kullanılır.",
+            practicalTask = "Sayı listesindeki pozitif sayıları filtreleyip iki katını alan bir kod yazın.",
+            starterPlaygroundCode = "fun main() {\n    val liste = listOf(-2, 5, -1, 3)\n    val sonuc = liste.filter { it > 0 }.map { it * 2 }\n    println(sonuc)\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_4",
-                question = "Kotlin'de 'listOf(1, 2, 3)' ile oluşturulan bir listeye sonradan yeni eleman eklenebilir mi?",
-                options = listOf("Evet, .add() çağrılarak", "Hayır, listOf salt okunur (read-only) liste üretir; eleman eklemek için mutableListOf kullanılmalıdır", "Sadece sayılar eklenebilir", "Belli şartlarda eklenebilir"),
-                correctIndex = 1,
-                explanation = "listOf() read-only List interface'i döner ve add/remove metotları bulunmaz."
+                question = "Kotlin'de tek parametreli lambdalarda o anki elemanı temsil eden varsayılan kelime nedir?",
+                options = listOf("it", "this", "item", "el"),
+                correctIndex = 0,
+                explanation = "Kotlin lambdalarında tek parametre otomatik olarak 'it' adını alır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_4",
                 lessonId = "kt_4",
-                title = "Pozitif Sayıların Toplamı",
-                instructions = "List<Int> alıp içindeki 0'dan büyük pozitif sayıların toplamını Int olarak döndüren pozitifleriTopla(liste) fonksiyonunu yazın.",
-                exampleInput = "liste = listOf(10, -5, 20, -1, 5)",
-                exampleOutput = "35",
-                starterCode = "fun pozitifleriTopla(liste: List<Int>): Int {\n    // Kodunu buraya yaz:\n    return 0\n}",
-                solutionCode = "fun pozitifleriTopla(liste: List<Int>): Int {\n    return liste.filter { it > 0 }.sum()\n}",
-                hints = listOf("liste.filter { it > 0 }.sum()"),
+                title = "Pozitif Sayıları Filtrele ve Katla",
+                instructions = "Verilen tam sayı listesindeki sadece pozitif (> 0) sayıları seçip 2 katını liste olarak döndüren filtreleVeKatla(sayilar) fonksiyonunu yazın.",
+                exampleInput = "listOf(-2, 5, -1, 3)",
+                exampleOutput = "[10, 6]",
+                starterCode = "fun filtreleVeKatla(sayilar: List<Int>): List<Int> {\n    // Kodunu yaz:\n    return emptyList()\n}",
+                solutionCode = "fun filtreleVeKatla(sayilar: List<Int>): List<Int> {\n    return sayilar.filter { it > 0 }.map { it * 2 }\n}",
+                hints = listOf("sayilar.filter { it > 0 }.map { it * 2 } ifadesini döndürün."),
                 testCases = listOf(
-                    TestCase("pozitifleriTopla(listOf(10, -5, 20, -1, 5))", "35", "Pozitif toplam")
+                    TestCase("filtreleVeKatla(listOf(-2, 5, -1, 3))", "[10, 6]", "Filtreleme")
                 )
             ),
             quizQuestions = listOf(
@@ -401,87 +389,76 @@ object KotlinCurriculum {
                     id = "kt_quiz_4_1",
                     lessonId = "kt_4",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Büyük boyutlu koleksiyonlarda zincirleme map/filter işlemlerinin ara listeler üretmeden tembel (lazy) çalışmasını sağlayan yapı hangisidir?",
-                    options = listOf("Sequence (asSequence())", "Array", "Set", "Stream"),
+                    questionText = "Sonradan eleman eklenebilen ve silinebilen liste oluşturmak için hangisi kullanılır?",
+                    options = listOf("mutableListOf()", "listOf()", "fixedListOf()", "arrayListOf_readOnly()"),
                     correctOptionIndex = 0,
-                    explanationRight = "Doğru! Sequence'lar Java Stream gibi tembel çalışır ve ara bellek tahsislerini engeller.",
-                    explanationWrong = "Sequence (asSequence()) kullanılır.",
-                    reviewTopic = "Kotlin Sequences"
+                    explanationRight = "Doğru! Değiştirilebilir listeler için mutableListOf kullanılır.",
+                    explanationWrong = "Değişebilir liste mutableListOf ile üretilir.",
+                    reviewTopic = "Kotlin Koleksiyonlar"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "fold() ile reduce() arasındaki temel fark nedir?",
-                    answer = "`reduce()` başlangıç değeri olarak listenin ilk elemanını alır (liste boşsa hata verir). `fold(initial)` ise açıkça bir başlangıç değeri alır ve liste boşsa bu başlangıç değerini döner."
+                    question = "Neden varsayılan liste listOf değişmezdir?",
+                    answer = "Yanlışlıkla listenin bozulmasını engellemek ve kod güvenliğini en üst düzeye çıkarmak için Kotlin değişmezliği varsayılan yapmıştır."
                 )
             ),
             completionCriteria = listOf(
-                "Read-only ve Mutable koleksiyon farkını bilmek",
-                "map, filter, sum, groupBy zincirlerini kurabilmek",
-                "Sequence yapısının performans mantığını kavramak"
+                "listOf ve mutableListOf farkını bilmek",
+                "filter ve map ile liste işleyebilmek"
             )
         ),
 
         // ==========================================
-        // DERS 5: DATA CLASSES, SEALED CLASSES & OBJECT
+        // DERS 5: DATA CLASS VE NESNELER
         // ==========================================
         Lesson(
             id = "kt_5",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_3",
-            title = "Sınıflar, Data Classes, Sealed Classes & Object",
-            shortDesc = "Modern OOP: Primary Constructor, init bloğu, Data Classes (otomatik equals/copy), Sealed Classes/Interfaces (Tip Güvenli UI Durumu) ve Singleton 'object'.",
+            title = "Veri Sınıfları (Data Class) ve Nesneler",
+            shortDesc = "Tek satırda model sınıfları kurma ve otomatik equals, hashCode, copy ve toString süper güçleri.",
             level = CourseLevel.INTERMEDIATE,
             order = 5,
             isPremium = true,
             learningObjectives = listOf(
-                "Primary Constructor ve init bloğu ile sınıf yapılandırmasını öğrenmek",
-                "Data Class ile otomatik copy(), equals() ve destructuring kullanmak",
-                "Sealed Class/Interface ile MVI/MVVM State makinelerini tip güvenli tasarlamak"
+                "class tanımlayıp nesne üretmek",
+                "data class'ın sağladığı inanılmaz kolaylıkları keşfetmek",
+                "copy() metodu ile verileri kolayca kopyalayıp güncellemek"
             ),
-            prerequisites = listOf("Koleksiyonlar ve Fonksiyonel Dönüşümler"),
-            subtopics = listOf("Primary Constructor & init Bloğu", "Data Classes, .copy() & Destructuring Declarations", "Sealed Interfaces & Sınıf Hiyerarşisi Kısıtlama", "when ile Exhaustive State Yönetimi", "object (Singleton) & Companion Object"),
+            prerequisites = listOf("Fonksiyonlar ve Koleksiyonlar"),
+            subtopics = listOf("Normal Sınıflar (class)", "Süper Kahraman: data class", "copy() Yeteneği"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Data Class: Otomatik Kod Üretimi ve Destructuring",
-                    body = "`data class` tanımlandığında Kotlin derleyicisi birincil kurucudaki tüm alanlar için otomatik olarak `equals()`, `hashCode()`, `toString()`, `copy()` ve `component1()..componentN()` metotlarını üretir.\nBu sayede `val (id, isim) = kullanici` şeklinde ayrıştırma (Destructuring) doğrudan yapılabilir.",
-                    codeSnippet = "data class Kullanici(val id: Long, val ad: String)\nval k1 = Kullanici(1, \"Ali\")\nval k2 = k1.copy(ad = \"Veli\") // İmmutable güncelleme\nval (id, ad) = k2 // Destructuring"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Sealed Class / Interface: Cebirsel Veri Tipleri & Exhaustive Kontrol",
-                    body = "Sealed yapılar kalıtım hiyerarşisini aynı paket/modül içinde kısıtlar. Derleyici tüm alt sınıfları kesin olarak bilir. `when(state)` ifadesinde tüm alt tipler ele alındığında `else` dalına gerek kalmaz. Gelecekte yeni bir alt tip eklendiğinde derleyici tüm `when` bloklarında hata vererek eksik durum kalmasını imkansız kılar.",
-                    codeSnippet = "sealed interface UiState {\n    object Loading : UiState\n    data class Success(val veri: List<String>) : UiState\n    data class Error(val hataKodu: Int, val mesaj: String) : UiState\n}"
-                ),
-                LessonContentBlock(
-                    subtitle = "3. object (Thread-Safe Singleton) ve companion object",
-                    body = "Kotlin'de `object DatabaseHelper { ... }` ifadesi JVM seviyesinde thread-safe lazy bir Singleton oluşturur. Sınıf içi statik benzeri fabrika metodları için `companion object` kullanılır.",
-                    tip = "Jetpack Compose ve Android ViewModel state yönetiminde her ekran durumu bir `sealed interface` ile modellenir."
+                    subtitle = "1. data class: Tek Satırda Veri Modeli!",
+                    body = "Diğer dillerde bir Kullanıcı veya Ürün sınıfı yazmak için onlarca satır getter, setter, toString ve equals yazmak gerekirdi. Kotlin'de başına `data` yazmanız yeterlidir; her şey tek satırda otomatik oluşur!",
+                    codeSnippet = "// Tek satırda eksiksiz veri modeli:\ndata class Kullanici(val id: Int, val ad: String, val sehir: String = \"İstanbul\")\n\nfun main() {\n    val k1 = Kullanici(1, \"Zeynep\")\n    println(k1) // Otomatik şık çıktı: Kullanici(id=1, ad=Zeynep, sehir=İstanbul)\n    \n    // copy() ile kopyalayıp sadece şehri değiştirelim:\n    val k2 = k1.copy(sehir = \"Ankara\")\n    println(k2) // Kullanici(id=1, ad=Zeynep, sehir=Ankara)\n}"
                 )
             ),
-            codeExample = "sealed interface UiState {\n    object Loading : UiState\n    data class Success(val veri: String) : UiState\n    data class Error(val mesaj: String) : UiState\n}\n\nfun renderUi(state: UiState): String = when (state) {\n    is UiState.Loading -> \"Yükleniyor... ⏳\"\n    is UiState.Success -> \"Başarılı: \" + state.veri\n    is UiState.Error -> \"Hata Oluştu: \" + state.mesaj\n}\n\nfun main() {\n    val state: UiState = UiState.Success(\"Profil Yüklendi\")\n    println(renderUi(state))\n}",
-            codeExplanation = "renderUi fonksiyonunda when tüm durumları eksiksiz kapsadı, 'else' yazmaya gerek kalmadı.",
-            realWorldExample = "Jetpack Compose ve Android ViewModel state yönetiminde her ekran durumu bir `sealed interface` ile modellenir.",
-            practicalTask = "BankaHesabi data class'ı yazıp .copy() ile bakiyesini güncelleyin.",
-            starterPlaygroundCode = "data class User(val name: String, val age: Int)\nfun main() { val u = User(\"Ali\", 25); println(u.copy(age = 26)) }",
+            codeExample = "data class Urun(val isim: String, val fiyat: Double)\n\nfun main() {\n    val u1 = Urun(\"Kahve\", 45.0)\n    val u2 = Urun(\"Kahve\", 45.0)\n    println(\"Aynı mı: \${u1 == u2}\") // true! data class otomatik içerik karşılaştırır.\n}",
+            codeExplanation = "data class otomatik olarak equals oluşturduğu için u1 == u2 doğru (true) sonucunu verdi.",
+            realWorldExample = "Android uygulamalarında API'den gelen kullanıcılar, haberler, mesajlar her zaman data class olarak modellenir.",
+            practicalTask = "Kitap adında bir data class oluşturup baslik ve yazar alanları ekleyin.",
+            starterPlaygroundCode = "data class Kitap(val baslik: String, val yazar: String)\n\nfun main() {\n    val k = Kitap(\"1984\", \"George Orwell\")\n    println(k)\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_5",
-                question = "Kotlin'de 'data class' tanımlandığında derleyici aşağıdakilerden hangisini OTOMATİK olarak üretmez?",
-                options = listOf("toString()", "copy()", "compareTo()", "equals() ve hashCode()"),
-                correctIndex = 2,
-                explanation = "Data class'lar toString, copy, equals, hashCode ve componentN üretir; compareTo otomatik üretilmez."
+                question = "Kotlin'de bir sınıfın otomatik olarak toString(), equals() ve copy() metotlarına sahip olması için başına ne yazılır?",
+                options = listOf("data", "model", "struct", "record"),
+                correctIndex = 0,
+                explanation = "Kotlin'de 'data class' yazıldığında bu metotlar otomatik üretilir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_5",
                 lessonId = "kt_5",
-                title = "UI Durum Formatlayıcı (Sealed Class)",
-                instructions = "Success(val puan: Int) ve Failure(val sebep: String) alt sınıfları olan sealed class SonucDurumu tanımlayın. durumYazdir(durum: SonucDurumu) fonksiyonunda 'Puan: X' veya 'Hata: Y' döndürün.",
-                exampleInput = "SonucDurumu.Success(95)",
-                exampleOutput = "\"Puan: 95\"",
-                starterCode = "sealed class SonucDurumu {\n    // Alt sınıfları yazın:\n}\nfun durumYazdir(durum: SonucDurumu): String {\n    return \"\"\n}",
-                solutionCode = "sealed class SonucDurumu {\n    data class Success(val puan: Int) : SonucDurumu()\n    data class Failure(val sebep: String) : SonucDurumu()\n}\nfun durumYazdir(durum: SonucDurumu): String = when (durum) {\n    is SonucDurumu.Success -> \"Puan: \" + durum.puan\n    is SonucDurumu.Failure -> \"Hata: \" + durum.sebep\n}",
-                hints = listOf("when (durum) { is SonucDurumu.Success -> ... }"),
+                title = "Kitap Özeti",
+                instructions = "baslik ve yazar alanlarına sahip Kitap data class'ını yazın ve 'Başlık - Yazar' formatında metin veren ozet() metodunu ekleyin.",
+                exampleInput = "Kitap(\"Simyacı\", \"Paulo Coelho\").ozet()",
+                exampleOutput = "'Simyacı - Paulo Coelho'",
+                starterCode = "data class Kitap(val baslik: String, val yazar: String) {\n    fun ozet(): String {\n        // Kodunu yaz:\n        return \"\"\n    }\n}",
+                solutionCode = "data class Kitap(val baslik: String, val yazar: String) {\n    fun ozet(): String = \"\$baslik - \$yazar\"\n}",
+                hints = listOf("\"\$baslik - \$yazar\" döndürün."),
                 testCases = listOf(
-                    TestCase("durumYazdir", "Puan: 95", "Sealed class testi")
+                    TestCase("Kitap(\"1984\", \"George Orwell\").ozet()", "1984 - George Orwell", "Kitap özeti")
                 )
             ),
             quizQuestions = listOf(
@@ -489,82 +466,81 @@ object KotlinCurriculum {
                     id = "kt_quiz_5_1",
                     lessonId = "kt_5",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin'de bir sınıfa ait statik (static) benzeri fabrika metotları ve sabitler tanımlamak için sınıf içine hangi blok açılır?",
-                    options = listOf("static { }", "companion object { }", "singleton { }", "factory { }"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Kotlin'de Java static yerine `companion object` kullanılır.",
-                    explanationWrong = "companion object kullanılır.",
-                    reviewTopic = "Companion Object"
+                    questionText = "data class'larda var olan bir nesnenin birkaç alanını değiştirerek yenisini üretmeyi sağlayan metot hangisidir?",
+                    options = listOf("copy()", "clone()", "duplicate()", "recreate()"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! copy(...) fonksiyonuyla değişmez nesnelerin güncel kopyaları üretilir.",
+                    explanationWrong = "copy() metodu kullanılır.",
+                    reviewTopic = "Kotlin Data Classes"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "object anahtar kelimesi ile class arasındaki fark nedir?",
-                    answer = "`object` Singleton nesnesi üretir; bellekte tek bir örneği vardır ve doğrudan sınıf adıyla çağrılır. `class` ise her `new`/çağrıda yeni bir örnek üretir."
+                    question = "data class'ın birincil kurucusunda en az kaç parametre olmalıdır?",
+                    answer = "En az 1 adet val veya var parametresi bulunmalıdır."
                 )
             ),
             completionCriteria = listOf(
-                "Data class yeteneklerini ve .copy() metodunu bilmek",
-                "Sealed class ile durum yönetimini kurgulamak",
-                "Companion object kullanımını öğrenmek"
+                "data class tanımlayabilmek",
+                "copy() ile nesne güncelleyebilmek"
             )
         ),
 
         // ==========================================
-        // DERS 6: EXTENSIONS, SCOPE FUNCTIONS & DELEGATION
+        // DERS 6: KALITIM VE SEALED CLASSES
         // ==========================================
         Lesson(
             id = "kt_6",
-            courseId = "kotlin",
-            sectionId = "kt_sec_4",
-            title = "Extension Functions, Scope Functions & Property Delegation",
-            shortDesc = "Kotlin gücü: Extension Functions, Scope Functions (let, apply, run, also, with) ve Delegasyon (by lazy, Delegates.observable).",
+            courseId = "kt",
+            sectionId = "kt_sec_3",
+            title = "Kalıtım (open) ve Mühürlü Sınıflar (Sealed Class)",
+            shortDesc = "Kotlin'de sınıfları miras alma (open) ve durum yönetiminin kralı Sealed Class.",
             level = CourseLevel.INTERMEDIATE,
             order = 6,
             isPremium = true,
             learningObjectives = listOf(
-                "Var olan sınıflara (String, Int, View) kaynak kodu değiştirmeden yeni fonksiyonlar (Extensions) eklemek",
-                "5 Kapsam Fonksiyonunu (let, apply, run, also, with) doğru senaryolarda kullanmak",
-                "by lazy ile ağır nesneleri sadece ilk erişimde (Thread-safe) başlatmak"
+                "Kotlin'de sınıfların varsayılan olarak kapalı (final) olduğunu ve miras için 'open' gerektiğini öğrenmek",
+                "Sealed Class (Mühürlü Sınıf) ile UI durumlarını (Yükleniyor, Başarılı, Hata) modellemek",
+                "when ile tüm durumları eksiksiz yakalamak"
             ),
-            prerequisites = listOf("Data Classes ve Sınıf Mimarisi"),
-            subtopics = listOf("Extension Functions & Properties", "let (Null Check & Dönüşüm)", "apply (Nesne Yapılandırma)", "also (Yan Etki & Loglama)", "by lazy & Delegasyon"),
+            prerequisites = listOf("Sınıflar ve Data Class"),
+            subtopics = listOf("open Kelimesi ve Kalıtım", "override ile Özelleştirme", "Sealed Class Nedir?"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Extension Functions: Sınıfları Genişletme",
-                    body = "Miras almadan veya kaynak kodu değiştirmeden herhangi bir tipe yeni metotlar eklenebilir. Derleme zamanında statik yardımcı metoda (Utility method) dönüştürülür.",
-                    codeSnippet = "fun String.ilkHarfBuyuk(): String = this.replaceFirstChar { it.uppercase() }\n\nval ad = \"deniz\".ilkHarfBuyuk() // \"Deniz\""
+                    subtitle = "1. Kalıtım ve 'open' Anahtarı",
+                    body = "Kotlin'de sınıflar güvenlik gereği varsayılan olarak kilitlidir (miras alınamaz). Bir sınıfın miras alınabilmesi için başına açıkça `open` yazılır.",
+                    codeSnippet = "open class Hayvan(val isim: String) {\n    open fun sesCikar() = println(\"Ses...\")\n}\n\nclass Kopek(isim: String) : Hayvan(isim) {\n    override fun sesCikar() = println(\"\$isim: Hav hav! 🐶\")\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. Scope Functions Hızlı Seçim Rehberi",
-                    body = "• `apply`: Nesneyi yapılandırıp KENDİSİNİ döndürür (`this`).\n• `let`: Null kontrolü sonrası yeni bir tip DÖNDÜRÜR (`it`).\n• `also`: Nesneyi değiştirmeden ara adımda loglamak için (`it`).\n• `run`: Bir nesne üzerinde blok çalıştırıp SONUCU döndürür (`this`).",
-                    tip = "`val veritabani by lazy { AğırVeritabani() }` nesneyi ilk çağrıldığı ana kadar belleğe yüklemez."
+                    subtitle = "2. Sealed Class: Android UI Durumlarının Kalbi",
+                    body = "Mobil uygulamada sayfa 3 durumda olabilir: **Yükleniyor**, **Veri Geldi** veya **Hata Oluştu**. `sealed class` ile bu durumları mühürleriz; böylece `when` ifadesi tüm durumların kontrol edildiğini bilir ve asla hata kaçırmaz!",
+                    codeSnippet = "sealed class SayfaDurumu {\n    object Yukleniyor : SayfaDurumu()\n    data class Basarili(val veri: String) : SayfaDurumu()\n    data class Hata(val mesaj: String) : SayfaDurumu()\n}\n\nfun durumuGoster(durum: SayfaDurumu) = when (durum) {\n    is SayfaDurumu.Yukleniyor -> \"Dönüyor... ⏳\"\n    is SayfaDurumu.Basarili -> \"Gelen Veri: \${durum.veri} ✅\"\n    is SayfaDurumu.Hata -> \"Hata: \${durum.mesaj} ❌\"\n    // else yazmaya gerek yoktur, tüm durumlar garantidir!\n}"
                 )
             ),
-            codeExample = "data class Profil(var ad: String, var yas: Int, var aktif: Boolean = false)\n\nfun main() {\n    // apply ile nesneyi başlatalım:\n    val p = Profil(\"Murat\", 28).apply {\n        aktif = true\n    }\n    \n    // let ile null güvenli kullanalım:\n    val isimUzunluk = p.ad.let {\n        println(\"İsim işleniyor: \$it\")\n        it.length\n    }\n    \n    println(\"Uzunluk: \$isimUzunluk\")\n}",
-            codeExplanation = "apply nesneyi başlatıp döndürdü, let bloğu ismin uzunluğunu hesaplayıp döndürdü.",
-            realWorldExample = "Android'de View yapılandırmalarında `apply`, ViewModel bağımlılıklarında `by lazy` ve `by viewModels()` sürekli kullanılır.",
-            practicalTask = "Int tipine .ciftMi(): Boolean uzantı fonksiyonu (extension) yazın.",
-            starterPlaygroundCode = "fun Int.kare(): Int = this * this\nfun main() { println(5.kare()) }",
+            codeExample = "fun main() {\n    val durum = SayfaDurumu.Basarili(\"Kullanıcı Profili\")\n    println(durumuGoster(durum))\n}",
+            codeExplanation = "Sealed class ve when ile durum kusursuz bir şekilde yönetildi.",
+            realWorldExample = "Jetpack Compose ve Android ViewModel mimarisinde ekran durumları (UiState) daima Sealed Class / Interface ile yönetilir.",
+            practicalTask = "Sekil üst sınıfından türeyen ve alan hesaplayan Kare sınıfı yazın.",
+            starterPlaygroundCode = "open class Sekil {\n    open fun alan(): Double = 0.0\n}\nclass Kare(val kenar: Double) : Sekil() {\n    override fun alan() = kenar * kenar\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_6",
-                question = "Kotlin'de ağır bir nesnenin sadece ilk erişildiğinde başlatılmasını ve sonrasında aynı sonucun önbellekten dönmesini sağlayan delegasyon hangisidir?",
-                options = listOf("by observable", "by lazy", "by eager", "by delegate"),
-                correctIndex = 1,
-                explanation = "'by lazy' başlatma işlemini ilk okuma anına kadar erteler (Thread-safe Lazy Initialization)."
+                question = "Kotlin'de bir sınıfın başka bir sınıf tarafından miras alınabilmesi için başına hangi kelime yazılmalıdır?",
+                options = listOf("open", "public", "extendable", "base"),
+                correctIndex = 0,
+                explanation = "Kotlin'de sınıflar varsayılan final'dır, miras için 'open' yazılmalıdır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_6",
                 lessonId = "kt_6",
-                title = "String Ünlem Ekleme (Extension)",
-                instructions = "String tipine sonuna '!' ekleyen unlemEkle(): String extension fonksiyonunu yazın.",
-                exampleInput = "\"Merhaba\".unlemEkle()",
-                exampleOutput = "\"Merhaba!\"",
-                starterCode = "// Extension fonksiyonunu buraya yazın:",
-                solutionCode = "fun String.unlemEkle(): String = this + \"!\"",
-                hints = listOf("fun String.unlemEkle(): String = this + \"!\""),
+                title = "Kare Alanı",
+                instructions = "Sekil sınıfından türeyen ve alan() fonksiyonu kenar * kenar döndüren Kare sınıfını yazın.",
+                exampleInput = "Kare(5.0).alan()",
+                exampleOutput = "25.0",
+                starterCode = "open class Sekil {\n    open fun alan(): Double = 0.0\n}\n\nclass Kare(val kenar: Double) : Sekil() {\n    // override fun alan() yazın:\n}",
+                solutionCode = "open class Sekil {\n    open fun alan(): Double = 0.0\n}\n\nclass Kare(val kenar: Double) : Sekil() {\n    override fun alan(): Double = kenar * kenar\n}",
+                hints = listOf("override fun alan(): Double = kenar * kenar"),
                 testCases = listOf(
-                    TestCase("\"Merhaba\".unlemEkle()", "Merhaba!", "Extension testi")
+                    TestCase("Kare(5.0).alan().toInt()", "25", "5 kenarlı kare")
                 )
             ),
             quizQuestions = listOf(
@@ -572,82 +548,80 @@ object KotlinCurriculum {
                     id = "kt_quiz_6_1",
                     lessonId = "kt_6",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Bir nesnenin alanlarını (property) başlatıp yapılandırdıktan sonra YİNE O NESNENİN KENDİSİNİ döndürmek için hangi kapsam fonksiyonu (scope function) en uygundur?",
-                    options = listOf("let", "apply", "run", "with"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! apply nesne üzerinde çalışır ve bağlam nesnesinin (this) kendisini döndürür.",
-                    explanationWrong = "apply fonksiyonu nesnenin kendisini döndürür.",
-                    reviewTopic = "Scope Functions: apply"
+                    questionText = "Sealed Class kullanmanın when ifadelerindeki en büyük kolaylığı nedir?",
+                    options = listOf("Derleyici tüm durumların yazıldığını bildiği için 'else' dalı yazma zorunluluğunu kaldırır", "Sadece sayılarla çalışır", "Daha yavaş çalışır", "Miras alınamaz"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Sealed class sonlu sayıda durumu garanti eder.",
+                    explanationWrong = "Sealed class when ile else gerektirmeden tam kapsam sağlar.",
+                    reviewTopic = "Kotlin Sealed Classes"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Extension fonksiyonlar Java'da nasıl görünür?",
-                    answer = "Java'da ilk parametresi genişletilen nesne olan statik bir metot (`UtilsKt.ilkHarfBuyuk(str)`) olarak derlenir; nesnenin belleğine veya sınıf yapısına müdahale etmez."
+                    question = "Sealed Interface ile Sealed Class farkı nedir?",
+                    answer = "Sealed Interface çoklu kalıtıma izin verir ve bellekte daha hafiftir; modern Kotlin projelerinde çok tercih edilir."
                 )
             ),
             completionCriteria = listOf(
-                "Extension fonksiyonlar tanımlayabilmek",
-                "let, apply ve also farklarını bilmek",
-                "by lazy delegasyonunu uygulayabilmek"
+                "open ile kalıtım yapabilmek",
+                "Sealed Class mantığını ve durum yönetimini kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 7: JENERİKLER & VARYANS (IN, OUT, REIFIED)
+        // DERS 7: OBJECT VE SINGLETON
         // ==========================================
         Lesson(
             id = "kt_7",
-            courseId = "kotlin",
-            sectionId = "kt_sec_4",
-            title = "Jenerikler & Varyans: in, out (Kovaryans) & reified",
-            shortDesc = "Tip güvenli generic yapılar: Declaration-site variance (out / Kovaryans, in / Kontravaryans), Type Projections ve reified inline parametreleri.",
+            courseId = "kt",
+            sectionId = "kt_sec_3",
+            title = "object ve Companion Object: Tekil Nesneler",
+            shortDesc = "Tüm uygulamada tek bir örneği olan Singleton nesneler ve static benzeri Companion Object.",
             level = CourseLevel.INTERMEDIATE,
             order = 7,
             isPremium = true,
             learningObjectives = listOf(
-                "Declaration-site variance ile out (üretici) ve in (tüketici) mantığını kavramak",
-                "Java'daki '? extends T' ve '? super T' karmaşasının Kotlin'deki zarif karşılığını öğrenmek",
-                "Inline fonksiyonlarda 'reified' ile çalışma anında generic tip bilgisini (T::class.java) korumak"
+                "object kelimesi ile tek satırda Singleton oluşturmak",
+                "companion object ile sınıfa bağlı yardımcı fonksiyonlar yazmak"
             ),
-            prerequisites = listOf("Extensions ve Kapsam Fonksiyonları"),
-            subtopics = listOf("Generic Sınıflar ve Fonksiyonlar", "out (Kovaryans / Sadece Okuma)", "in (Kontravaryans / Sadece Yazma)", "Type Projections (*)", "reified Type Parameters"),
+            prerequisites = listOf("Sınıflar"),
+            subtopics = listOf("object ile Singleton", "companion object"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Kovaryans (out) ve Kontravaryans (in)",
-                    body = "• `out T`: Sınıf sadece T üretir (return eder), parametre olarak almaz. `List<out T>` sayesinde `List<String>`, `List<Any>` yerine güvenle atanabilir.\n• `in T`: Sınıf sadece T tüketir (parametre alır), return etmez.",
-                    codeSnippet = "interface Uretici<out T> {\n    fun uret(): T // out: Sadece dönüş tipinde geçerli\n}"
+                    subtitle = "1. object: Tek Satırda Singleton!",
+                    body = "Bir veritabanı yardımcısı veya ayar yöneticisi gibi tüm uygulamada sadece **tek bir kopyası** olması gereken yapılar için `object` kelimesini kullanırız.",
+                    codeSnippet = "object VeriTabani {\n    val dbAdi = \"UygulamaDB\"\n    fun baglan() = println(\"\$dbAdi bağlantısı kuruldu.\")\n}\n\nfun main() {\n    // new yapmadan doğrudan ismiyle çağrılır:\n    VeriTabani.baglan()\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. reified Anahtar Kelimesi",
-                    body = "Normalde JVM'de generic tipler derleme sonrası silinir (Type Erasure). Ancak `inline fun <reified T>` yazıldığında fonksiyon çağrıldığı yere gömülür ve `T::class.java` doğrudan okunabilir.",
-                    tip = "JSON ayrıştırma veya Android `startActivity<DetayActivity>()` extension'larında `reified` vazgeçilmezdir."
+                    subtitle = "2. companion object (Sınıfın Sadık Dostu)",
+                    body = "Bir sınıfa ait genel sabitleri veya fabrika metotlarını (Java'daki `static` gibi) sınıfın içine `companion object` açarak yazarız.",
+                    codeSnippet = "class Kullanici(val ad: String) {\n    companion object {\n        const val MIN_YAS = 18\n        fun misafirOlustur() = Kullanici(\"Misafir\")\n    }\n}\n\nfun main() {\n    val k = Kullanici.misafirOlustur()\n    println(\"Adı: \${k.ad}, Min Yaş: \${Kullanici.MIN_YAS}\")\n}"
                 )
             ),
-            codeExample = "inline fun <reified T> tipKontrol(deger: Any) {\n    if (deger is T) {\n        println(\"Verilen değer \" + T::class.java.simpleName + \" tipindedir.\")\n    } else {\n        println(\"Tip eşleşmedi!\")\n    }\n}\n\nfun main() {\n    tipKontrol<String>(\"Merhaba\")\n    tipKontrol<Int>(\"Merhaba\") // Tip eşleşmedi\n}",
-            codeExplanation = "reified sayesinde T silinmedi ve çalışma zamanında T::class.java üzerinden kontrol edilebildi.",
-            realWorldExample = "Retrofit ve Gson/Moshi kütüphaneleri `inline fun <reified T> parseJson(...)` kalıbı ile sınıf tipini çözer.",
-            practicalTask = "Jenerik bir Kutu<T>(val icerik: T) sınıfı yazıp içeriğini okuyan bir metot ekleyin.",
-            starterPlaygroundCode = "class Kutu<T>(val v: T)\nfun main() { println(Kutu(\"Veri\").v) }",
+            codeExample = "object Ayarlar {\n    var karanlikMod = true\n}\n\nfun main() {\n    println(\"Karanlık Mod: \${Ayarlar.karanlikMod}\")\n}",
+            codeExplanation = "object ile tekil bir Ayarlar nesnesi oluşturuldu ve doğrudan erişildi.",
+            realWorldExample = "Android Retrofit ağ isteklerinde ApiClient nesnesi companion object veya object ile tekil tutulur.",
+            practicalTask = "Matematik adında bir object açıp içine pi sabiti ve kareAl fonksiyonu ekleyin.",
+            starterPlaygroundCode = "object Matematik {\n    const val PI = 3.14\n    fun kare(x: Int) = x * x\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_7",
-                question = "Kotlin'de JVM'in Tip Silme (Type Erasure) mekanizmasını aşarak 'T::class.java' ifadesine çalışma zamanında erişebilmek için jenerik tipin başına ne yazılmalıdır?",
-                options = listOf("dynamic T", "reified T (inline fonksiyon ile)", "static T", "open T"),
-                correctIndex = 1,
-                explanation = "'inline fun <reified T>' tipi çağrı yerine gömerek runtime tip erişimi sağlar."
+                question = "Kotlin'de tüm programda yalnızca tek bir örneği (Singleton) olan nesne tanımlamak için hangi kelime kullanılır?",
+                options = listOf("object", "singleton", "static", "single"),
+                correctIndex = 0,
+                explanation = "Kotlin'de 'object' kelimesi doğrudan Singleton nesnesi oluşturur."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_7",
                 lessonId = "kt_7",
-                title = "Jenerik Çift Tutucu (Pair)",
-                instructions = "İki farklı tipte değer tutan generic CiftTutucu<A, B>(val birinci: A, val ikinci: B) sınıfını yazın.",
-                exampleInput = "CiftTutucu(1, \"Bir\").birinci",
+                title = "Tekil Sayaç Nesnesi",
+                instructions = "icinde sayac değişkeni ve artir() metodu bulunan Sayac object nesnesini yazın.",
+                exampleInput = "Sayac.artir()",
                 exampleOutput = "1",
-                starterCode = "// Generic sınıfı buraya yazın:",
-                solutionCode = "class CiftTutucu<A, B>(val birinci: A, val ikinci: B)",
-                hints = listOf("class CiftTutucu<A, B>(val birinci: A, val ikinci: B)"),
+                starterCode = "object Sayac {\n    var deger = 0\n    fun artir(): Int {\n        // Kodunu yaz:\n        return 0\n    }\n}",
+                solutionCode = "object Sayac {\n    var deger = 0\n    fun artir(): Int {\n        deger++\n        return deger\n    }\n}",
+                hints = listOf("deger++ yapıp deger döndürün."),
                 testCases = listOf(
-                    TestCase("CiftTutucu", "1", "Generic testi")
+                    TestCase("Sayac.artir()", "1", "Sayaç artırma")
                 )
             ),
             quizQuestions = listOf(
@@ -655,82 +629,81 @@ object KotlinCurriculum {
                     id = "kt_quiz_7_1",
                     lessonId = "kt_7",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Bir generic tip 'out T' olarak işaretlendiğinde (Kovaryans), bu tip parametresi sınıf içinde nerede KULLANILAMAZ?",
-                    options = listOf("Fonksiyonların dönüş tipi olarak (return T)", "Fonksiyonların parametre tipi olarak (fun ekle(item: T))", "Salt okunur val property olarak", "Hiçbir yerde"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! 'out' sadece üretici (producer) demektir; fonksiyon parametresi (tüketici) olarak kullanılamaz.",
-                    explanationWrong = "out parametre olarak (tüketici) kullanılamaz.",
-                    reviewTopic = "out Variance"
+                    questionText = "Kotlin'de bir sınıfa static benzeri metotlar eklemek için sınıf içine ne yazılır?",
+                    options = listOf("companion object", "static object", "inner class", "data object"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Kotlin'de static yerine companion object kullanılır.",
+                    explanationWrong = "companion object kullanılır.",
+                    reviewTopic = "Kotlin Companion Object"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Star-projection (*) nedir?",
-                    answer = "Tip argümanı hakkında hiçbir bilgiye sahip olmadığınızda (`List<*>`) kullanılır; Java'daki `List<?>` wildcard karşılığıdır."
+                    question = "object ile class farkı nedir?",
+                    answer = "class'tan istediğiniz kadar yeni nesne üretebilirsiniz (new). object ise zaten kendisi tek bir hazır nesnedir."
                 )
             ),
             completionCriteria = listOf(
-                "in ve out varyans farkını açıklayabilmek",
-                "reified inline fonksiyonlar tasarlayabilmek",
-                "Type Erasure kavramını ve çözümünü bilmek"
+                "object ile Singleton tanımlayabilmek",
+                "companion object kullanımını kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 8: ASENKRON KOTLIN: COROUTINES TEMELLERİ
+        // DERS 8: EXTENSION FUNCTIONS VE SCOPE FUNCTIONS
         // ==========================================
         Lesson(
             id = "kt_8",
-            courseId = "kotlin",
-            sectionId = "kt_sec_5",
-            title = "Asenkron Kotlin: Coroutines Temelleri & Structured Concurrency",
-            shortDesc = "Hafif iş parçacıkları (Lightweight Threads): suspend fonksiyonlar, duraklatma (continuation), CoroutineScope, Dispatchers (IO, Main, Default) ve launch vs async.",
-            level = CourseLevel.ADVANCED,
+            courseId = "kt",
+            sectionId = "kt_sec_4",
+            title = "Uzantılar (Extensions) ve Kapsam Fonksiyonları (let, apply)",
+            shortDesc = "Hazır sınıflara yeni metotlar kazandırma ve let, apply ile temiz kod yazma.",
+            level = CourseLevel.INTERMEDIATE,
             order = 8,
             isPremium = true,
             learningObjectives = listOf(
-                "suspend fonksiyonların thread bloke etmeden nasıl duraklatıldığını kavramak",
-                "Dispatchers.Main, Dispatchers.IO ve Dispatchers.Default görev dağılımlarını öğrenmek",
-                "launch (Ateşle ve Unut) ile async / await (Sonuç Bekle) farkını uygulamak"
+                "Extension Function ile String veya Int gibi sınıflara yeni fonksiyon eklemek",
+                "let ile null kontrolü yapıp işlem yürütmek",
+                "apply ile nesne özelliklerini tek blokta ayarlamak"
             ),
-            prerequisites = listOf("Jenerikler ve İleri Kotlin"),
-            subtopics = listOf("Coroutine Nedir? (Thread vs Coroutine)", "suspend Fonksiyon Mimarisi", "Dispatchers (Main, IO, Default, Unconfined)", "launch vs async/await", "Structured Concurrency & Cancellation"),
+            prerequisites = listOf("Fonksiyonlar ve Sınıflar"),
+            subtopics = listOf("Extension Functions", "let Kapsam Fonksiyonu", "apply ve also"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Coroutines Neden Devrimseldir?",
-                    body = "Bir işletim sistemi Thread'i ~1MB bellek tutarken ve oluşturulması maliyetliyken, tek bir thread üzerinde yüz binlerce Coroutine aynı anda çalışabilir. Coroutine bloke etmez; duraklar (suspend) ve thread'i diğer işlere bırakır.",
-                    codeSnippet = "suspend fun veriGetir(): String {\n    delay(1000) // Thread'i bloke etmez, coroutine'i duraklatır\n    return \"Veri\"\n}"
+                    subtitle = "1. Extension Functions: Sınıflara Yeni Yetenekler",
+                    body = "String sınıfına dokunmadan ona kendi fonksiyonunuzu ekleyebilirsiniz!",
+                    codeSnippet = "// String sınıfına unlemEkle metodu ekleyelim:\nfun String.unlemEkle(): String = \"\$this!\"\n\nfun main() {\n    val mesaj = \"Merhaba\"\n    println(mesaj.unlemEkle()) // Merhaba!\n}"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. launch vs async",
-                    body = "• `launch`: Geriye değer döndürmeyen işler için kullanılır (`Job` döner).\n• `async`: Sonuç döndüren işler için kullanılır; `Deferred<T>` döner ve `.await()` ile beklenir.",
-                    tip = "Veritabanı ve Ağ işlemleri için `Dispatchers.IO`, UI güncellemeleri için `Dispatchers.Main`, ağır CPU hesaplamaları için `Dispatchers.Default` kullanın."
+                    subtitle = "2. Süper Pratik 'let' ve 'apply'",
+                    body = "• **let:** Değişken null değilse bloğu çalıştırır (`?.let { ... }`).\n• **apply:** Bir nesneyi oluştururken tüm ayarlarını tek bir blokta şıkça yapmanızı sağlar.",
+                    codeSnippet = "val email: String? = \"ahmet@kod.com\"\nemail?.let {\n    println(\"Email gönderiliyor: \$it\")\n}"
                 )
             ),
-            codeExample = "import kotlinx.coroutines.*\n\nsuspend fun agdanIndir(id: Int): String {\n    delay(100) // Ağ gecikmesi simülasyonu\n    return \"Kullanıcı #\$id\"\n}\n\nfun main() = runBlocking {\n    println(\"Başladı...\")\n    \n    // İki isteği PARALEL olarak başlatalım:\n    val gorev1 = async(Dispatchers.IO) { agdanIndir(1) }\n    val gorev2 = async(Dispatchers.IO) { agdanIndir(2) }\n    \n    val sonuc1 = gorev1.await()\n    val sonuc2 = gorev2.await()\n    \n    println(\"Sonuçlar: \$sonuc1 ve \$sonuc2\")\n}",
-            codeExplanation = "async ile iki ağ isteği paralel başlatıldı ve await() ile paralel süre zarfında toplandı.",
-            realWorldExample = "Android uygulamalarında internetten veri çekip UI'a basma işlemi ViewModelScope içinde Coroutines ile saniyeler içinde kodlanır.",
-            practicalTask = "withContext(Dispatchers.IO) kullanarak arka planda çalışan ve sonucu döndüren bir suspend fonksiyon yazın.",
-            starterPlaygroundCode = "import kotlinx.coroutines.*\nfun main() = runBlocking { launch { delay(50); println(\"Bitti\"); } }",
+            codeExample = "fun Int.kare(): Int = this * this\n\nfun main() {\n    println(5.kare()) // 25\n}",
+            codeExplanation = "Int sınıfına .kare() uzantı fonksiyonu eklendi.",
+            realWorldExample = "Android'de `view.visible()` veya `context.showToast(\"...\")` gibi uzantılar Extension ile yazılır.",
+            practicalTask = "String sınıfına ilk harfi büyük yapan bir extension fonksiyonu yazın.",
+            starterPlaygroundCode = "fun String.ilkHarfBuyuk() = this.replaceFirstChar { it.uppercase() }",
             miniQuestion = MiniQuestion(
                 id = "kt_q_8",
-                question = "Kotlin Coroutines'te arka planda bir hesaplama yapıp sonucunu '.await()' ile geri almak için hangi coroutine builder kullanılır?",
-                options = listOf("launch", "async", "runBlocking", "produce"),
-                correctIndex = 1,
-                explanation = "async bir Deferred<T> döner ve await() çağrılarak üretilen sonuca erişilir."
+                question = "Kotlin'de mevcut bir sınıfa kaynak kodunu değiştirmeden yeni fonksiyon eklemeye ne ad verilir?",
+                options = listOf("Extension Function", "Inheritance", "Lambda", "Override"),
+                correctIndex = 0,
+                explanation = "Mevcut tiplere yeni fonksiyon eklemeye Extension Function (Genişletme Fonksiyonu) denir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_8",
                 lessonId = "kt_8",
-                title = "Paralel İstek Birleştirici (Coroutines)",
-                instructions = "İki ayrı suspend fonksiyon sonucunu async ile paralel çağırıp toplamlarını döndüren paralelTopla(f1: suspend () -> Int, f2: suspend () -> Int): Int fonksiyonunu coroutineScope ile yazın.",
-                exampleInput = "f1 -> 10, f2 -> 20",
-                exampleOutput = "30",
-                starterCode = "import kotlinx.coroutines.*\nsuspend fun paralelTopla(f1: suspend () -> Int, f2: suspend () -> Int): Int = coroutineScope {\n    // Kodunu buraya yaz:\n    0\n}",
-                solutionCode = "import kotlinx.coroutines.*\nsuspend fun paralelTopla(f1: suspend () -> Int, f2: suspend () -> Int): Int = coroutineScope {\n    val d1 = async { f1() }\n    val d2 = async { f2() }\n    d1.await() + d2.await()\n}",
-                hints = listOf("val d1 = async { f1() }; val d2 = async { f2() }; d1.await() + d2.await()"),
+                title = "String Ünlem Uzantısı",
+                instructions = "String sınıfına bu metnin sonuna '!' ekleyen unlemEkle() extension fonksiyonunu yazın.",
+                exampleInput = "\"Selam\".unlemEkle()",
+                exampleOutput = "'Selam!'",
+                starterCode = "fun String.unlemEkle(): String {\n    // Kodunu yaz:\n    return \"\"\n}",
+                solutionCode = "fun String.unlemEkle(): String = \"\$this!\"",
+                hints = listOf("\"\$this!\" döndürün."),
                 testCases = listOf(
-                    TestCase("paralelTopla", "30", "Paralel coroutine testi")
+                    TestCase("\"Kod\".unlemEkle()", "Kod!", "Ünlem")
                 )
             ),
             quizQuestions = listOf(
@@ -738,82 +711,76 @@ object KotlinCurriculum {
                     id = "kt_quiz_8_1",
                     lessonId = "kt_8",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin'de 'Thread.sleep(1000)' ile Coroutines 'delay(1000)' arasındaki en temel fark nedir?",
-                    options = listOf("Farkları yoktur", "Thread.sleep çalıştığı işletim sistemi thread'ini tamamen dondurur ve kilitler; delay ise sadece o coroutine'i duraklatıp thread'i diğer işler için serbest bırakır", "delay daha çok bellek harcar", "Thread.sleep sadece mobilde çalışır"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! delay non-blocking (bloke etmeyen) bir suspend fonksiyondur.",
-                    explanationWrong = "delay thread'i kilitlemez, sadece coroutine'i duraklatır.",
-                    reviewTopic = "delay vs Thread.sleep"
+                    questionText = "Bir değişken null DEĞİLSE bir kod bloğunu güvenle çalıştırmak için en çok hangi kalıp kullanılır?",
+                    options = listOf("degisken?.let { ... }", "degisken.run { ... }", "degisken.apply { ... }", "if (null)"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! 'degisken?.let' kalıbı Kotlin'in en sevilen null-safe yapısıdır.",
+                    explanationWrong = "degisken?.let { ... } kullanılır.",
+                    reviewTopic = "Kotlin Kapsam Fonksiyonları"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Structured Concurrency nedir?",
-                    answer = "Bir üst (parent) Coroutine Scope iptal edildiğinde veya hata verdiğinde altındaki tüm çalışan çocuk coroutine'lerin de otomatik ve güvenle iptal edilmesini garanti eden mimaridir (Bellek sızıntısı ve öksüz thread'leri engeller)."
+                    question = "Extension fonksiyon orijinal sınıfı bozar mı?",
+                    answer = "Hayır, Extension'lar sadece derleme zamanında pratiklik sağlayan sentetik yardımcı fonksiyonlardır."
                 )
             ),
             completionCriteria = listOf(
-                "suspend fonksiyon mantığını kavramak",
-                "Dispatchers türlerini doğru seçebilmek",
-                "launch ve async arasındaki farkı bilmek"
+                "Extension fonksiyon yazabilmek",
+                "?.let { } kalıbını kullanabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 9: REAKTİF KOTLIN: KOTLIN FLOW & OPERATÖRLER
+        // DERS 9: ASENKRON KOTLIN (Coroutines)
         // ==========================================
         Lesson(
             id = "kt_9",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_5",
-            title = "Reaktif Kotlin: Kotlin Flow & Asenkron Akışlar",
-            shortDesc = "Soğuk akışlar (Cold Streams): flow { emit() }, collect, Ara operatörler (map, filter, transform, debounce, distinctUntilChanged) ve flowOn.",
+            title = "Coroutines ve suspend: Donmayan Android Uygulamaları",
+            shortDesc = "İnternetten veri çekerken ekranın kilitlenmesini engelleyen ultra hafif Coroutines mimarisi.",
             level = CourseLevel.ADVANCED,
             order = 9,
             isPremium = true,
             learningObjectives = listOf(
-                "Flow'un Cold Stream (sadece dinlendiğinde çalışan) yapısını kavramak",
-                "map, filter, debounce ve flatMapLatest operatörleri ile asenkron veri boru hatları kurmak",
-                "flowOn(Dispatchers.IO) ile thread geçişlerini hatasız yönetmek"
+                "Coroutines kavramını ve geleneksel Thread'lerden neden bin kat hafif olduğunu anlamak",
+                "suspend fonksiyonlar ile duraklatılabilir işlemler yazmak",
+                "delay() ile donmayan beklemeler yapmak"
             ),
-            prerequisites = listOf("Coroutines Temelleri ve Structured Concurrency"),
-            subtopics = listOf("Flow vs List vs Sequence", "flow { emit() } & collect", "Dönüşüm Operatörleri", "Zamanlama Operatörleri (debounce, sample)", "flowOn & Exception Handling (catch)"),
+            prerequisites = listOf("Fonksiyonlar ve Sınıflar"),
+            subtopics = listOf("Coroutines Nedir?", "suspend Fonksiyonlar", "delay vs Thread.sleep"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Cold Stream Mantığı",
-                    body = "Flow soğuktur; yani `.collect()` çağrılana kadar içindeki kod asla çalışmaz. Her yeni dinleyici (collector) için akış baştan sıfırdan başlar.",
-                    codeSnippet = "fun sayiAkisi(): Flow<Int> = flow {\n    for (i in 1..3) {\n        delay(100)\n        emit(i) // Veriyi akışa yay\n    }\n}\n// Tüketim: sayiAkisi().collect { println(it) }"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. flowOn: Emniyetli Thread Değişimi",
-                    body = "Flow'un yayım yaptığı thread'i değiştirmek için `withContext` değil, doğrudan `.flowOn(Dispatchers.IO)` kullanılır.",
-                    tip = "Akıştaki hataları yakalamak için try-catch yerine Flow operatörü olan `.catch { e -> emit(YedekVeri) }` tercih edilmelidir."
+                    subtitle = "1. Coroutines Nedir? (Tüy Kadar Hafif İşçiler)",
+                    body = "Eski usul iş parçacıkları (Threads) bellekte çok yer kaplar ve telefonun pilini hızlı tüketir. Kotlin'in **Coroutines** teknolojisi ise tüy kadar hafiftir; aynı anda 100.000 tane Coroutine başlatsanız bile telefon zerre kasmaz!",
+                    codeSnippet = "// Duraklatılabilir asenkron fonksiyon:\nsuspend fun veriIndir(): String {\n    kotlinx.coroutines.delay(1000) // 1 saniye bekle ama ekranı dondurma!\n    return \"İnternetten gelen veri 📲\"\n}"
                 )
             ),
-            codeExample = "import kotlinx.coroutines.*\nimport kotlinx.coroutines.flow.*\n\nfun canliFiyatAkisi(): Flow<Double> = flow {\n    var fiyat = 100.0\n    while (true) {\n        delay(200)\n        fiyat += ((-2..2).random())\n        emit(fiyat)\n    }\n}\n\nfun main() = runBlocking {\n    canliFiyatAkisi()\n        .take(3) // Sadece ilk 3 veriyi al\n        .map { \"Fiyat: \$it TL\" }\n        .collect { println(it) }\n}",
-            codeExplanation = "flow {} emit ile fiyat üretti, take(3) akışı sınırladı, map formatladı ve collect ekrana bastı.",
-            realWorldExample = "Kullanıcı arama kutusuna yazı yazarken her harfte istek atmamak için `debounce(300)` ve `distinctUntilChanged` Flow operatörleri kullanılır.",
-            practicalTask = "1'den 5'e kadar her 100ms'de bir sayı yayan bir Flow oluşturup toList() ile toplayın.",
-            starterPlaygroundCode = "import kotlinx.coroutines.flow.*\nimport kotlinx.coroutines.*\nfun main() = runBlocking { flowOf(1, 2, 3).collect { println(it) } }",
+            codeExample = "suspend fun selamVer(): String {\n    return \"Coroutines ile Merhaba!\"\n}\n\nfun main() {\n    // runBlocking veya viewModelScope ile çağrılır\n}",
+            codeExplanation = "suspend kelimesi fonksiyonun duraklatılabilir asenkron bir görev olduğunu belirtir.",
+            realWorldExample = "Android'de Retrofit ile sunucudan veri çekerken API fonksiyonları `suspend fun getKullanicilar(): List<User>` şeklinde yazılır.",
+            practicalTask = "suspend anahtar kelimesi ile 1 saniye bekleyip sonuç veren bir fonksiyon tanımlayın.",
+            starterPlaygroundCode = "suspend fun gorevYap(): String {\n    return \"Görev Bitti\"\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_9",
-                question = "Kotlin Flow'da arama kutusu girdilerinde kullanıcının yazmayı bitirmesini bekleyip gereksiz ağ isteklerini önleyen zamanlama operatörü hangisidir?",
-                options = listOf("delay", "debounce", "buffer", "conflate"),
-                correctIndex = 1,
-                explanation = "debounce(sure) belirtilen süre boyunca yeni bir eleman gelmezse son elemanı yayar."
+                question = "Kotlin'de bir fonksiyonun Coroutines içinde duraklatılabilir (asenkron) olduğunu belirtmek için başına hangi kelime yazılır?",
+                options = listOf("suspend", "async", "await", "coroutine"),
+                correctIndex = 0,
+                explanation = "Kotlin'de duraklatılabilir fonksiyonlar 'suspend fun' ile tanımlanır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_9",
                 lessonId = "kt_9",
-                title = "Çift Sayı Flow Boru Hattı",
-                instructions = "Flow<Int> akışı alıp içindeki çift sayıları filtreleyip 10 ile çarpan Flow<Int> döndüren ciftleriOnlaCarp(akisi: Flow<Int>): Flow<Int> fonksiyonunu yazın.",
-                exampleInput = "flowOf(1, 2, 3, 4)",
-                exampleOutput = "flowOf(20, 40)",
-                starterCode = "import kotlinx.coroutines.flow.*\nfun ciftleriOnlaCarp(akis: Flow<Int>): Flow<Int> {\n    // Kodunu buraya yaz:\n    return akis\n}",
-                solutionCode = "import kotlinx.coroutines.flow.*\nfun ciftleriOnlaCarp(akis: Flow<Int>): Flow<Int> {\n    return akis.filter { it % 2 == 0 }.map { it * 10 }\n}",
-                hints = listOf("akis.filter { it % 2 == 0 }.map { it * 10 }"),
+                title = "Asenkron Selamlama",
+                instructions = "suspend fun olarak tanımlanan ve 'Merhaba, \$isim!' döndüren asenkronSelam(isim) fonksiyonunu yazın.",
+                exampleInput = "asenkronSelam(\"Merve\")",
+                exampleOutput = "'Merhaba, Merve!'",
+                starterCode = "suspend fun asenkronSelam(isim: String): String {\n    // Kodunu yaz:\n    return \"\"\n}",
+                solutionCode = "suspend fun asenkronSelam(isim: String): String {\n    return \"Merhaba, \$isim!\"\n}",
+                hints = listOf("\"Merhaba, \$isim!\" döndürün."),
                 testCases = listOf(
-                    TestCase("ciftleriOnlaCarp", "Flow", "Flow operatör testi")
+                    TestCase("asenkronSelam(\"Merve\")", "Merhaba, Merve!", "Asenkron test")
                 )
             ),
             quizQuestions = listOf(
@@ -821,82 +788,76 @@ object KotlinCurriculum {
                     id = "kt_quiz_9_1",
                     lessonId = "kt_9",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Kotlin Flow akışlarında 'flowOn(Dispatchers.IO)' operatörü nereyi etkiler?",
-                    options = listOf("collect metodunun çalıştığı yeri", "flowOn çağrısından ÖNCEKİ üst akış (upstream) kodlarının çalıştığı Dispatcher'ı", "Tüm programı", "Hiçbir yeri"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! flowOn sadece kendisinden önceki emit/dönüşüm aşamalarının çalıştığı thread havuzunu değiştirir.",
-                    explanationWrong = "flowOn kendisinden önceki üst akışı etkiler.",
-                    reviewTopic = "flowOn Upstream"
+                    questionText = "suspend fonksiyonlar nereden çağrılabilir?",
+                    options = listOf("Yalnızca başka bir suspend fonksiyonun içinden veya bir Coroutine kapsamından", "Herhangi bir normal fonksiyondan doğrudan", "Sadece main()'den", "Sadece sınıflardan"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! suspend fonksiyonlar sadece coroutine kapsamı içinden çalıştırılabilir.",
+                    explanationWrong = "suspend fonksiyonlar coroutine kapsamı gerektirir.",
+                    reviewTopic = "Kotlin Coroutines"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Flow neden RxJava'ya göre daha avantajlıdır?",
-                    answer = "Kotlin Coroutines ile doğrudan yerel entegredir; ek bağımlılık ve karmaşık operatör yığını gerektirmez, 'suspend' fonksiyonları doğrudan destekler."
+                    question = "delay() ile Thread.sleep() farkı nedir?",
+                    answer = "Thread.sleep tüm işlemi dondurur. delay() ise iş parçacığını serbest bırakır, başka işlerin çalışmasına izin verir."
                 )
             ),
             completionCriteria = listOf(
-                "Cold Flow mantığını kavramak",
-                "Flow dönüştürme ve zamanlama operatörlerini kullanabilmek",
-                "flowOn ve catch ile hata/thread yönetimini kurabilmek"
+                "suspend anahtar kelimesini bilmek",
+                "Coroutines'in hafifliğini kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 10: STATEFLOW & SHAREDFLOW (HOT STREAMS)
+        // DERS 10: VERİ AKIŞLARI (Kotlin Flow)
         // ==========================================
         Lesson(
             id = "kt_10",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_5",
-            title = "Hot Streams: StateFlow & SharedFlow (MVI/MVVM)",
-            shortDesc = "Canlı durum akışları (Hot Streams): StateFlow (Son durum tutan, UI State), SharedFlow (Olaylar, Snackbar, Navigasyon) ve collectAsStateWithLifecycle.",
+            title = "Kotlin Flow: Canlı ve Sürekli Veri Akışları",
+            shortDesc = "Canlı sohbet mesajları, borsa kurları veya sayaç gibi sürekli akan verileri Flow ile dinleyin.",
             level = CourseLevel.ADVANCED,
             order = 10,
             isPremium = true,
             learningObjectives = listOf(
-                "Cold Flow ile Hot Stream (StateFlow/SharedFlow) farkını kavramak",
-                "MutableStateFlow ve asStateFlow() ile kapsüllenmiş (encapsulated) UI State tasarlamak",
-                "SharedFlow ile tek seferlik olayları (One-off Events: Dialog, Navigate) yönetmek"
+                "Flow (Veri Akışı) mantığını kavramak",
+                "flow { emit(...) } ile canlı veri yaymak",
+                "collect ile verileri ekranda yakalamak"
             ),
-            prerequisites = listOf("Kotlin Flow ve Operatörler"),
-            subtopics = listOf("Cold Stream vs Hot Stream", "StateFlow Mimarisi (value & replay=1)", "SharedFlow (Event Bus)", "asStateFlow() Kapsülleme Deseni", "Compose: collectAsStateWithLifecycle"),
+            prerequisites = listOf("Coroutines ve suspend"),
+            subtopics = listOf("Flow Nedir?", "emit ile Veri Fırlatma", "collect ile Dinleme"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. StateFlow vs SharedFlow",
-                    body = "• `StateFlow`: DAİMA bir başlangıç değeri vardır ve son durumu hafızada tutar (`.value`). UI'ın mevcut durumunu göstermek için idealdir.\n• `SharedFlow`: Başlangıç değeri yoktur; olayları dinleyicilere fırlatır (Toast, Sayfa Geçişi vb.).",
-                    codeSnippet = "private val _uiState = MutableStateFlow<UiState>(UiState.Loading)\nval uiState: StateFlow<UiState> = _uiState.asStateFlow()\n\nfun guncelle(yeniVeri: String) {\n    _uiState.value = UiState.Success(yeniVeri)\n}"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Lifecycle Güvenli Dinleme",
-                    body = "Android Jetpack Compose'da `collectAsStateWithLifecycle()` uygulaması arka plana gittiğinde akışı durdurarak gereksiz CPU ve pil tüketimini önler.",
-                    tip = "StateFlow değerini güncellerken race condition'ları önlemek için `_state.update { it.copy(...) }` atomik metodunu kullanın."
+                    subtitle = "1. Flow Nedir? (Canlı Yayın Akışı)",
+                    body = "Tek bir değer için `suspend fun` yeterlidir. Ancak zaman içinde birden çok veri akacaksa (örneğin kronometre saniyeleri veya canlı bildirimler) **Kotlin Flow** kullanırız.",
+                    codeSnippet = "import kotlinx.coroutines.flow.*\n\n// 1'den 3'e kadar her saniye sayı akıtan Flow:\nfun sayacFlow(): Flow<Int> = flow {\n    for (i in 1..3) {\n        kotlinx.coroutines.delay(1000)\n        emit(i) // 'Yeni veriyi akışa bırak' demektir\n    }\n}"
                 )
             ),
-            codeExample = "import kotlinx.coroutines.*\nimport kotlinx.coroutines.flow.*\n\nclass SayacViewModel {\n    private val _sayac = MutableStateFlow(0)\n    val sayac: StateFlow<Int> = _sayac.asStateFlow()\n    \n    fun artir() {\n        _sayac.update { it + 1 }\n    }\n}\n\nfun main() = runBlocking {\n    val vm = SayacViewModel()\n    \n    val job = launch {\n        vm.sayac.collect { println(\"UI Güncellendi: \$it\") }\n    }\n    \n    vm.artir()\n    vm.artir()\n    delay(50)\n    job.cancel()\n}",
-            codeExplanation = "MutableStateFlow güncellendikçe collect anında tetiklendi; _sayac private tutularak dışarıdan bozulması engellendi.",
-            realWorldExample = "Modern Android mimarisinde ViewModel ile Jetpack Compose arayüzü arasındaki tüm veri bağı StateFlow üzerinden kurulur.",
-            practicalTask = "Bir SharedFlow oluşturup arka arkaya 2 event fırlatan bir kod yazın.",
-            starterPlaygroundCode = "import kotlinx.coroutines.flow.*\nval s = MutableStateFlow(0); s.value = 1; println(s.value);",
+            codeExample = "import kotlinx.coroutines.flow.*\n\nfun bildirimler(): Flow<String> = flow {\n    emit(\"Yeni mesajınız var! 💬\")\n    emit(\"Arkadaşınız beğendi ❤️\")\n}",
+            codeExplanation = "emit ile veriler akışa bırakıldı.",
+            realWorldExample = "Android Jetpack Compose ve Room veritabanı, tablodaki her değişiklikte ekranı otomatik güncellemek için Flow döndürür.",
+            practicalTask = "1'den 5'e kadar sayıları emit eden bir flow fonksiyonu yazın.",
+            starterPlaygroundCode = "import kotlinx.coroutines.flow.*\nfun sayiAkisi() = flow { for (i in 1..5) emit(i) }",
             miniQuestion = MiniQuestion(
                 id = "kt_q_10",
-                question = "StateFlow'un Flow'dan en temel farkı nedir?",
-                options = listOf("StateFlow senkron çalışır", "StateFlow bir Hot Stream'dir; daima son bir değere (.value) sahiptir ve dinleyici olmasa da hafızada yaşar", "StateFlow sadece String tutar", "StateFlow derlenmez"),
-                correctIndex = 1,
-                explanation = "StateFlow hot stream'dir ve her zaman geçerli son durumunu saklar."
+                question = "Kotlin Flow içinde yeni bir veriyi akışa fırlatmak için hangi fonksiyon kullanılır?",
+                options = listOf("emit()", "send()", "yield()", "push()"),
+                correctIndex = 0,
+                explanation = "Flow içinde veri yaymak için 'emit()' kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_10",
                 lessonId = "kt_10",
-                title = "StateFlow Sayaç Yöneticisi",
-                instructions = "MutableStateFlow(0) tutan ve degeriArtir() metodu ile değeri 1 artıran SayacTutucu sınıfını yazın.",
-                exampleInput = "SayacTutucu().degeriArtir()",
-                exampleOutput = "state.value == 1",
-                starterCode = "import kotlinx.coroutines.flow.*\nclass SayacTutucu {\n    // Kodunu buraya yaz:\n}",
-                solutionCode = "import kotlinx.coroutines.flow.*\nclass SayacTutucu {\n    val state = MutableStateFlow(0)\n    fun degeriArtir() {\n        state.update { it + 1 }\n    }\n}",
-                hints = listOf("state.update { it + 1 } kullanın."),
+                title = "Geri Sayım Flow'u",
+                instructions = "n'den 1'e kadar geriye doğru sayan ve emit ile fırlatan geriSayim(n) flow fonksiyonunu yazın.",
+                exampleInput = "geriSayim(3)",
+                exampleOutput = "3, 2, 1",
+                starterCode = "import kotlinx.coroutines.flow.*\n\nfun geriSayim(n: Int): Flow<Int> = flow {\n    // Kodunu yaz:\n}",
+                solutionCode = "import kotlinx.coroutines.flow.*\n\nfun geriSayim(n: Int): Flow<Int> = flow {\n    for (i in n downTo 1) emit(i)\n}",
+                hints = listOf("for (i in n downTo 1) emit(i) kullanın."),
                 testCases = listOf(
-                    TestCase("SayacTutucu", "StateFlow", "StateFlow testi")
+                    TestCase("geriSayim(3)", "3, 2, 1", "Geri sayım")
                 )
             ),
             quizQuestions = listOf(
@@ -904,82 +865,76 @@ object KotlinCurriculum {
                     id = "kt_quiz_10_1",
                     lessonId = "kt_10",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "StateFlow değişkenlerini dış sınıflara açarken neden 'val state = _state.asStateFlow()' kalıbı kullanılır?",
-                    options = listOf("Daha hızlı çalışması için", "Dış sınıfların '_state.value = ...' şeklinde veriyi dışarıdan doğrudan değiştirmesini engelleyip (Encapsulation) salt okunur StateFlow sunmak için", "Zorunlu bir Kotlin kuralı olduğu için", "Belleği temizlemek için"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Kapsülleme (Encapsulation) prensibi gereği durum sadece ViewModel içinden güncellenebilmelidir.",
-                    explanationWrong = "Kapsülleme sağlayıp dışarıdan müdahaleyi engellemek için kullanılır.",
-                    reviewTopic = "StateFlow Encapsulation"
+                    questionText = "Bir Flow'dan gelen verileri tüketip ekranda göstermek için hangi metot çağrılır?",
+                    options = listOf("collect()", "get()", "fetch()", "listen()"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Flow verileri 'collect { ... }' ile toplanır/dinlenir.",
+                    explanationWrong = "collect { } çağrısı kullanılır.",
+                    reviewTopic = "Kotlin Flow"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "SharedFlow replay parametresi ne işe yarar?",
-                    answer = "Yeni bir dinleyici abone olduğunda, geçmişte fırlatılmış son kaç olayı önbellekten ona yeniden göndereceğini (replay) belirler."
+                    question = "StateFlow nedir?",
+                    answer = "StateFlow, her zaman en son güncel değeri hafızasında tutan ve UI ekranlarına yayınlayan özel bir Flow türüdür."
                 )
             ),
             completionCriteria = listOf(
-                "Cold Flow ve Hot Stream ayrımını bilmek",
-                "StateFlow ile UI State modellemesi yapabilmek",
-                "asStateFlow kapsülleme kalıbını uygulamak"
+                "Flow ve emit mantığını kavramak",
+                "collect ile veriyi yakalayabilmek"
             )
         ),
 
         // ==========================================
-        // DERS 11: CHANNELS & SUPERVISORJOB (HATA İZOLASYONU)
+        // DERS 11: KANALLAR (Channels)
         // ==========================================
         Lesson(
             id = "kt_11",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_6",
-            title = "Channels & SupervisorJob: İleri Coroutines & Hata İzolasyonu",
-            shortDesc = "Coroutines arası boru hatları (Channels: Channel.BUFFERED, actor), Hata yayılımı: Standart Job vs SupervisorJob (ve supervisorScope) farkı.",
+            title = "Kanallar (Channels): Coroutines Arası Mesajlaşma",
+            shortDesc = "Farklı işçiler arasında veri boruları (borular) kurarak güvenli mesajlaşma.",
             level = CourseLevel.EXPERT,
             order = 11,
             isPremium = true,
             learningObjectives = listOf(
-                "Channels (SendChannel / ReceiveChannel) ile coroutines arası FIFO mesajlaşması kurmak",
-                "Standart Job ile SupervisorJob arasındaki hata yayılım (Failure Propagation) farkını anlamak",
-                "Bir alt coroutine çöktüğünde tüm ekranın çökmesini SupervisorJob ile engellemek"
+                "Channel (Kanal) kavramını anlamak",
+                "send ve receive ile veri aktarmak"
             ),
-            prerequisites = listOf("StateFlow ve Hot Streams"),
-            subtopics = listOf("Channels vs Flow", "Channel Kapasiteleri (RENDEZVOUS, BUFFERED, CONFLATED)", "CoroutineExceptionHandler", "Job vs SupervisorJob Hata Yayılımı", "supervisorScope ile Hata İzolasyonu"),
+            prerequisites = listOf("Coroutines ve Flow"),
+            subtopics = listOf("Channel Nedir?", "send ve receive"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. Job vs SupervisorJob: Kritik Fark",
-                    body = "• Standart `Job`: Bir çocuk coroutine hata ile çökerse, ebeveynini ve AYNI SEVİYEDEKİ TÜM KARDEŞLERİNİ de anında iptal eder.\n• `SupervisorJob`: Bir çocuk çökse bile hata yukarı yayılmaz; kardeş coroutine'ler güvenle çalışmaya devam eder.",
-                    codeSnippet = "val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)\n// scope içindeki 1. görev çökse bile 2. görev çalışmaya devam eder!"
-                ),
-                LessonContentBlock(
-                    subtitle = "2. Channels: Sıra Tabanlı İletişim",
-                    body = "Flow veri akışını yayıp dinletirken, `Channel` veriyi tek bir alıcıya aktaran (Queue) boru hattıdır.",
-                    tip = "Bağımsız paralel indirme işlemlerinde tek bir indirme hatası aldığında diğerlerinin iptal olmaması için daima `supervisorScope` kullanın."
+                    subtitle = "1. Channel: İki İşçi Arasındaki Boru Hattı",
+                    body = "Bir Coroutine veri üretirken diğer Coroutine bu veriyi işlemek istiyorsa aralarına bir `Channel` (Kanal borusu) kurarız. Biri `send` ile içine atar, diğeri `receive` ile alır.",
+                    codeSnippet = "import kotlinx.coroutines.channels.Channel\n\nval kanal = Channel<String>()\n\n// İşçi 1: kanal.send(\"Sipariş 1\")\n// İşçi 2: val siparis = kanal.receive()"
                 )
             ),
-            codeExample = "import kotlinx.coroutines.*\n\nfun main() = runBlocking {\n    // supervisorScope ile hata izolasyonu sağlayalım:\n    supervisorScope {\n        val basariliGorev = launch {\n            delay(100)\n            println(\"1. Görev Başarıyla Tamamlandı! ✅\")\n        }\n        \n        val hataliGorev = launch {\n            delay(50)\n            throw RuntimeException(\"2. Görevde Beklenmeyen Hata! ❌\")\n        }\n    }\n    \n    println(\"Ana Akış Çökmeden Devam Etti! 🛡️\")\n}",
-            codeExplanation = "supervisorScope kullanıldığı için 2. görevdeki çökme 1. görevi iptal etmedi ve ana akış devam etti.",
-            realWorldExample = "Android ViewModel'de `viewModelScope` arkada bir `SupervisorJob()` kullanır; böylece bir API hatası tüm ekranı çökertmez.",
-            practicalTask = "Channel kullanarak 3 mesaj gönderip alıcı tarafında bunları okuyan bir kod yazın.",
-            starterPlaygroundCode = "import kotlinx.coroutines.channels.*\nimport kotlinx.coroutines.*\nfun main() = runBlocking { val c = Channel<Int>(); launch { c.send(1); }; println(c.receive()); }",
+            codeExample = "fun main() {\n    // Channel örnek kullanımı\n    println(\"Kanal Mimarisi Hazır!\")\n}",
+            codeExplanation = "Channel iki asenkron görev arasında güvenli köprü kurar.",
+            realWorldExample = "Oyunlarda arka planda indirilen grafik modellerini ana sahneye sırayla aktarırken Channel kullanılır.",
+            practicalTask = "Basit bir Channel tanımlayıp veri aktarım mantığını inceleyin.",
+            starterPlaygroundCode = "import kotlinx.coroutines.channels.Channel\nval kanal = Channel<Int>()",
             miniQuestion = MiniQuestion(
                 id = "kt_q_11",
-                question = "Birden fazla çocuk coroutine çalışırken bir tanesinde oluşan hatanın diğer kardeş coroutine'leri iptal ETMEMESİ için hangi Job türü kullanılmalıdır?",
-                options = listOf("Job()", "SupervisorJob()", "CompletableJob()", "DeferredJob()"),
-                correctIndex = 1,
-                explanation = "SupervisorJob çocukların hatalarını yukarıya yaymaz; arıza izolasyonu sağlar."
+                question = "Kotlin Channel yapısında kanala veri göndermek için hangi fonksiyon kullanılır?",
+                options = listOf("send()", "emit()", "push()", "put()"),
+                correctIndex = 0,
+                explanation = "Channel'a veri göndermek için 'send()' kullanılır."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_11",
                 lessonId = "kt_11",
-                title = "Channel ile Mesaj İletimi",
-                instructions = "Kapasitesi 5 olan bir Channel<String> oluşturup 'Selam' gönderen ve receive() ile alıp döndüren kanalMesaji(): String fonksiyonunu yazın.",
-                exampleInput = "kanalMesaji()",
-                exampleOutput = "\"Selam\"",
-                starterCode = "import kotlinx.coroutines.channels.*\nimport kotlinx.coroutines.*\nsuspend fun kanalMesaji(): String {\n    // Kodunu buraya yaz:\n    return \"\"\n}",
-                solutionCode = "import kotlinx.coroutines.channels.*\nimport kotlinx.coroutines.*\nsuspend fun kanalMesaji(): String {\n    val kanal = Channel<String>(5)\n    kanal.send(\"Selam\")\n    return kanal.receive()\n}",
-                hints = listOf("val kanal = Channel<String>(5); kanal.send(\"Selam\"); return kanal.receive()"),
+                title = "Faktöriyel Hesaplayıcı",
+                instructions = "Verilen n sayısının faktöriyelini hesaplayan faktoriyel(n) fonksiyonunu yazın.",
+                exampleInput = "faktoriyel(5)",
+                exampleOutput = "120",
+                starterCode = "fun faktoriyel(n: Int): Int {\n    // Kodunu yaz:\n    return 1\n}",
+                solutionCode = "fun faktoriyel(n: Int): Int {\n    var f = 1\n    for (i in 2..n) f *= i\n    return f\n}",
+                hints = listOf("for (i in 2..n) f *= i döngüsü kurun."),
                 testCases = listOf(
-                    TestCase("kanalMesaji", "Selam", "Channel testi")
+                    TestCase("faktoriyel(5)", "120", "5!"),
+                    TestCase("faktoriyel(4)", "24", "4!")
                 )
             ),
             quizQuestions = listOf(
@@ -987,82 +942,81 @@ object KotlinCurriculum {
                     id = "kt_quiz_11_1",
                     lessonId = "kt_11",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Standart bir CoroutineScope içinde 'launch' ile başlatılan bir coroutine işlenmeyen bir Exception fırlattığında ne gerçekleşir?",
-                    options = listOf("Sadece o coroutine sessizce durur", "Hata yukarıya yayılır, parent Job iptal olur ve o Scope altındaki tüm kardeş coroutine'ler de anında iptal edilir", "Program askıda kalır", "Hata görmezden gelinir"),
-                    correctOptionIndex = 1,
-                    explanationRight = "Doğru! Standart Job yapısında Structured Concurrency gereği bir hata tüm ağacı iptal eder.",
-                    explanationWrong = "Standart Job'da hata tüm kardeş coroutine'leri iptal eder.",
-                    reviewTopic = "Job Exception Propagation"
+                    questionText = "Channel ile Flow arasındaki temel fark nedir?",
+                    options = listOf("Channel tek seferlik tüketilen sıcak bir kuyruktur, Flow ise soğuk bir veri akışıdır", "Channel daha yavaştır", "Flow sadece Android içindir", "Fark yoktur"),
+                    correctOptionIndex = 0,
+                    explanationRight = "Doğru! Channel kuyruk mantığıyla mesajlaşma sağlar.",
+                    explanationWrong = "Channel kuyruk mantığıyla çalışır.",
+                    reviewTopic = "Kotlin Channels"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Channel ile SharedFlow arasındaki en temel fark nedir?",
-                    answer = "`Channel` bir kuyruktur; gönderilen her mesajı yalnızca TEK BİR alıcı tüketir (Point-to-Point). `SharedFlow` ise yayıncıdır; gönderilen mesajı TÜM aboneler aynı anda alır (Broadcast)."
+                    question = "Channel kapatılabilir mi?",
+                    answer = "Evet, kanal.close() çağrılarak artık yeni veri gelmeyeceği belirtilebilir."
                 )
             ),
             completionCriteria = listOf(
-                "Job ile SupervisorJob farkını bilmek",
-                "supervisorScope ile arıza izolasyonu yapmak",
-                "Channel ile coroutine'ler arası veri aktarmak"
+                "Channel mantığını bilmek",
+                "send ve receive kullanımını kavramak"
             )
         ),
 
         // ==========================================
-        // DERS 12: INLINE BYTECODE & KSP DERLEYİCİ EKLENTİLERİ
+        // DERS 12: HATA YÖNETİMİ VE TEMİZ KOD
         // ==========================================
         Lesson(
             id = "kt_12",
-            courseId = "kotlin",
+            courseId = "kt",
             sectionId = "kt_sec_6",
-            title = "İleri Düzey: Inline Fonksiyonlar (noinline, crossinline) & KSP",
-            shortDesc = "JVM & Derleyici derinlikleri: inline fonksiyonların Bytecode analizi, noinline, crossinline, Non-local returns ve Kotlin Symbol Processing (KSP) meta-programlama.",
+            title = "Hata Yakalama ve Profesyonel Android İpuçları",
+            shortDesc = "try-catch, runCatching ile çökmeyen yapılar ve Android geliştirici standartları.",
             level = CourseLevel.EXPERT,
             order = 12,
             isPremium = true,
             learningObjectives = listOf(
-                "inline anahtar kelimesinin lambda nesnesi tahsisini (Allocation) nasıl sıfırladığını Bytecode seviyesinde görmek",
-                "noinline ve crossinline anahtar kelimelerinin kullanım sınırlarını kavramak",
-                "KSP (Kotlin Symbol Processing) ile Room/Dagger benzeri derleme zamanı kod üretimi mimarisini öğrenmek"
+                "try-catch-finally ile hataları güvenle yakalamak",
+                "Kotlin'in süper pratik runCatching fonksiyonunu öğrenmek",
+                "Tebrikler: Artık tam donanımlı bir Kotlin geliştiricisisiniz!"
             ),
-            prerequisites = listOf("Channels, SupervisorJob ve İleri Kotlin"),
-            subtopics = listOf("inline & Bytecode Inlining", "Non-local returns", "noinline & crossinline Farkı", "KAPT vs KSP (Kotlin Symbol Processing)", "Derleme Zamanı Kod Üretimi (Code Generation)"),
+            prerequisites = listOf("Tüm Kotlin Konuları"),
+            subtopics = listOf("try-catch ve finally", "runCatching Pratiği", "Profesyonel Kodlama İpuçları"),
             detailedExplanation = listOf(
                 LessonContentBlock(
-                    subtitle = "1. inline ve Bytecode Optimizasyonu",
-                    body = "Normal lambdalar JVM'de `Function0` nesnesi olarak bellekte tahsis edilir (Allocation overhead). Bir fonksiyon `inline` yapıldığında derleyici fonksiyonun ve lambdanın gövdesini çağrıldığı yere doğrudan kopyalar; sıfır nesne üretilir.",
-                    codeSnippet = "inline fun olc(blok: () -> Unit) {\n    val t = System.currentTimeMillis()\n    blok()\n    println(\"Süre: \" + (System.currentTimeMillis() - t))\n}"
+                    subtitle = "1. Güvenli Hata Yakalama (try-catch ve runCatching)",
+                    body = "Beklenmedik bir hata olduğunda uygulamanın kapanmaması için kodları `try-catch` içine alabilir veya Kotlin'in modern `runCatching` fonksiyonunu kullanabiliriz.",
+                    codeSnippet = "fun sayiCevir(metin: String): Int {\n    return try {\n        metin.toInt()\n    } catch (e: Exception) {\n        -1 // Hata olursa -1 döner\n    }\n}\n\n// runCatching ile modern yöntem:\nval sonuc = runCatching { \"123\".toInt() }.getOrDefault(0)"
                 ),
                 LessonContentBlock(
-                    subtitle = "2. crossinline ve noinline",
-                    body = "• `noinline`: inline fonksiyon içindeki belirli bir lambdanın inline edilmeyip nesne olarak kalmasını sağlar.\n• `crossinline`: Lambdanın başka bir thread/kapsam içinden çağrıldığını ve 'non-local return' yapamayacağını garanti eder.",
-                    tip = "KSP, Java annotation processor'larına (kapt) göre Kotlin kodlarını 2 kat daha hızlı analiz eder."
+                    subtitle = "2. Tebrikler! Kotlin Ustası Oldunuz! 🏆",
+                    body = "Artık değişkenlerden veri sınıflarına, Coroutines'ten Flow mimarisine kadar modern Android geliştirmenin tüm gereksinimlerine hakimsiniz. Şimdi Jetpack Compose ile hayalinizdeki Android uygulamalarını inşa etme zamanı! 📱🚀"
                 )
             ),
-            codeExample = "inline fun calistir(crossinline islem: () -> Unit, noinline loglayici: (String) -> Unit) {\n    val th = Thread {\n        islem() // crossinline sayesinde güvenle başka thread'e geçirildi\n    }\n    th.start()\n    loglayici(\"Thread başlatıldı\")\n}\n\nfun main() {\n    calistir(\n        islem = { println(\"Arka planda çalışıyor\") },\n        loglayici = { println(\"LOG: \$it\") }\n    )\n}",
-            codeExplanation = "islem crossinline ile thread içine aktarıldı, loglayici noinline ile nesne olarak tutuldu.",
-            realWorldExample = "Jetpack Compose derleyicisi ve Room veritabanı kütüphanesi tüm sorgu ve arayüz kodlarını KSP eklentileri ile derleme anında üretir.",
-            practicalTask = "Bir inline fonksiyon yazıp içine basit bir işlem bloğu geçirin.",
-            starterPlaygroundCode = "inline fun tekrarEt(n: Int, action: (Int) -> Unit) { for (i in 0 until n) action(i) }\nfun main() { tekrarEt(3) { println(it) } }",
+            codeExample = "fun main() {\n    val sonuc = runCatching { 10 / 0 }.getOrElse { 0 }\n    println(\"Güvenli Sonuç: \$sonuc\") // 0\n}",
+            codeExplanation = "runCatching ile sıfıra bölme hatası yakalandı ve varsayılan 0 döndürüldü.",
+            realWorldExample = "Android'de internetten JSON verisi ayrıştırılırken (JSON parse) veri bozuksa uygulamanın çökmemesi için runCatching kullanılır.",
+            practicalTask = "Geçersiz bir metni sayıya çevirmeyi deneyip hatayı yakalayan bir try-catch bloğu yazın.",
+            starterPlaygroundCode = "fun main() {\n    try {\n        val sayi = \"abc\".toInt()\n    } catch (e: Exception) {\n        println(\"Hata yakalandı!\")\n    }\n}",
             miniQuestion = MiniQuestion(
                 id = "kt_q_12",
-                question = "Kotlin'de Room ve Hilt gibi kütüphanelerin derleme zamanında hızlı kod üretmesini sağlayan modern Kotlin derleyici API'sinin adı nedir?",
-                options = listOf("KAPT", "KSP (Kotlin Symbol Processing)", "JVM Bytecode", "Reflection"),
-                correctIndex = 1,
-                explanation = "KSP (Kotlin Symbol Processing) doğrudan Kotlin AST ağacını işleyerek yüksek hızda kod üretir."
+                question = "Kotlin'de bir kod bloğunu deneyip hata durumunda yedek değer döndürmeyi sağlayan modern fonksiyon hangisidir?",
+                options = listOf("runCatching", "catchAll", "safeRun", "guard"),
+                correctIndex = 0,
+                explanation = "runCatching { ... }.getOrDefault(...) yapısı Kotlin'de çok popülerdir."
             ),
             codingChallenge = CodingChallenge(
                 id = "cc_kt_12",
                 lessonId = "kt_12",
-                title = "Inline Çalıştırma Sayacı",
-                instructions = "Bir 'islem: () -> Unit' lambdası alan ve bunu 2 kez çalıştıran inline fun ikiKezCalistir(islem: () -> Unit) fonksiyonunu yazın.",
-                exampleInput = "ikiKezCalistir { println(\"A\") }",
-                exampleOutput = "A A",
-                starterCode = "// inline fonksiyonu buraya yazın:",
-                solutionCode = "inline fun ikiKezCalistir(islem: () -> Unit) {\n    islem()\n    islem()\n}",
-                hints = listOf("inline fun ikiKezCalistir(islem: () -> Unit) { islem(); islem(); }"),
+                title = "Güvenli Sayı Çevirici",
+                instructions = "Verilen metni sayıya çevirmeye çalışan, başarısız olursa -1 döndüren guvenliCevir(metin) fonksiyonunu yazın.",
+                exampleInput = "guvenliCevir(\"42\")",
+                exampleOutput = "42",
+                starterCode = "fun guvenliCevir(metin: String): Int {\n    // try-catch ile yazın:\n    return 0\n}",
+                solutionCode = "fun guvenliCevir(metin: String): Int {\n    return try {\n        metin.toInt()\n    } catch (e: Exception) {\n        -1\n    }\n}",
+                hints = listOf("try { metin.toInt() } catch(e: Exception) { -1 } kullanın."),
                 testCases = listOf(
-                    TestCase("ikiKezCalistir", "A A", "inline testi")
+                    TestCase("guvenliCevir(\"42\")", "42", "Geçerli sayı"),
+                    TestCase("guvenliCevir(\"abc\")", "-1", "Hatalı metin")
                 )
             ),
             quizQuestions = listOf(
@@ -1070,24 +1024,23 @@ object KotlinCurriculum {
                     id = "kt_quiz_12_1",
                     lessonId = "kt_12",
                     questionType = QuestionType.MULTIPLE_CHOICE,
-                    questionText = "Bir inline fonksiyonun parametresi olan lambdanın içinden 'return' yazıldığında dıştaki çağıran fonksiyonun da sonlanması özelliğine ne ad verilir?",
-                    options = listOf("Non-local return", "Cross-return", "Local return", "Early return"),
+                    questionText = "Bir try-catch yapısında hata meydana gelse de gelmese de kesinlikle çalışan blok hangisidir?",
+                    options = listOf("finally", "catch", "else", "always"),
                     correctOptionIndex = 0,
-                    explanationRight = "Doğru! inline fonksiyonlar kodun içine gömüldüğü için lambda içindeki return doğrudan çevreleyen fonksiyonu sonlandırır (Non-local return).",
-                    explanationWrong = "Non-local return denir.",
-                    reviewTopic = "Non-local returns"
+                    explanationRight = "Doğru! finally bloğu her halükarda en sonda çalışır.",
+                    explanationWrong = "finally bloğu her durumda çalışır.",
+                    reviewTopic = "Kotlin Hata Yönetimi"
                 )
             ),
             qaItems = listOf(
                 TopicQAItem(
-                    question = "Her fonksiyonu inline yapmak doğru mudur?",
-                    answer = "Hayır! Çok büyük gövdeye sahip fonksiyonları inline yapmak derlenen Bytecode boyutunu şişirir (Code bloat). Yalnızca lambda parametresi alan küçük yardımcı fonksiyonlar inline yapılmalıdır."
+                    question = "Kotlin'de Checked Exception zorunluluğu var mıdır?",
+                    answer = "Hayır! Java'dan farklı olarak Kotlin'de tüm istisnalar Unchecked'tir; bu sayede kodunuz gereksiz throws kalabalığıyla boğulmaz."
                 )
             ),
             completionCriteria = listOf(
-                "inline, noinline ve crossinline farkını bilmek",
-                "Non-local return mantığını kavramak",
-                "KSP mimarisinin rolünü açıklayabilmek"
+                "try-catch ve runCatching mantığını bilmek",
+                "Temiz ve çökmeyen Kotlin uygulamaları yazabilmek"
             )
         )
     )

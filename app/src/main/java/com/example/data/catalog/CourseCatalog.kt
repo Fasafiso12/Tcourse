@@ -126,6 +126,32 @@ object CourseCatalog {
             totalLessonsCount = 12,
             isPopular = true,
             drawableRes = R.drawable.img_lang_javascript_1787396236459
+        ),
+        ProgrammingLanguage(
+            id = "go",
+            name = "Go",
+            tag = "Cloud & Concurrency",
+            iconEmoji = "🐹",
+            colorHex = 0xFF00ADD8,
+            shortDescription = "Google tarafından geliştirilen; ultra hafif Goroutines, yüksek derleme hızı ve bulut mimarileri için standart dil.",
+            targetAudience = "Backend, bulut altyapısı ve mikroservis geliştiricileri",
+            popularUses = listOf("Kubernetes & Docker", "Yüksek Hızlı API", "Mikroservisler"),
+            totalLessonsCount = 12,
+            isPopular = true,
+            drawableRes = R.drawable.img_lang_kotlin_1787396247052
+        ),
+        ProgrammingLanguage(
+            id = "elixir",
+            name = "Elixir",
+            tag = "OTP & Distributed",
+            iconEmoji = "💧",
+            colorHex = 0xFFA855F7,
+            shortDescription = "Erlang BEAM sanal makinesinde çalışan; hata toleranslı, dağıtık ve milyonlarca eşzamanlı aktör yöneten fonksiyonel dil.",
+            targetAudience = "Dağıtık sistemler, gerçek zamanlı sohbet ve yüksek erişilebilirlik mimarları",
+            popularUses = listOf("Phoenix Canlı Web", "Dağıtık Sohbet & Oyun", "Finansal Sistemler"),
+            totalLessonsCount = 12,
+            isPopular = true,
+            drawableRes = R.drawable.img_lang_dart_1787396183719
         )
     )
 
@@ -185,6 +211,8 @@ object CourseCatalog {
             "flutter" -> FlutterCurriculum.getSections()
             "c" -> CCurriculum.getSections()
             "lua" -> LuaCurriculum.getSections()
+            "go" -> GoCurriculum.getSections()
+            "elixir" -> ElixirCurriculum.getSections()
             else -> DartCurriculum.getSections()
         }
     }
@@ -200,6 +228,8 @@ object CourseCatalog {
             "flutter" -> FlutterCurriculum.getLessons()
             "c" -> CCurriculum.getLessons()
             "lua" -> LuaCurriculum.getLessons()
+            "go" -> GoCurriculum.getLessons()
+            "elixir" -> ElixirCurriculum.getLessons()
             else -> DartCurriculum.getLessons()
         }
     }
@@ -208,6 +238,26 @@ object CourseCatalog {
     // UYGULAMALI GERÇEK DÜNYA PROJELERİ
     // ==========================================
     val projects = listOf(
+        ProjectItem(
+            id = "proj_go_rate_limiter_pipeline",
+            courseId = "go",
+            title = "Goroutine & Channel Tabanlı Dağıtık Worker Pool & Rate Limiter",
+            level = CourseLevel.EXPERT,
+            description = "Token Bucket algoritması, context.WithTimeout iptal zincirleri, sync.WaitGroup ve saniyede 1 milyon isteği eriten yüksek hızlı Go iş kuyruğu.",
+            learningObjectives = listOf("Goroutine Worker Pool", "Channel-based Rate Limiter", "context.Context Timeout Propagation", "sync.WaitGroup & Atomic Operations"),
+            starterCode = "package main\n\n// Go Worker Pool & Rate Limiter mimarisini yazın",
+            solutionCode = "package main\n\nimport (\n    \"context\"\n    \"sync\"\n    \"time\"\n)\n\ntype RateLimiter struct {\n    tokens chan struct{}\n}\n\nfunc NewRateLimiter(rate time.Duration) *RateLimiter {\n    rl := &RateLimiter{tokens: make(chan struct{}, 100)}\n    go func() {\n        for range time.Tick(rate) {\n            select { case rl.tokens <- struct{}{}: default: }\n        }\n    }()\n    return rl\n}"
+        ),
+        ProjectItem(
+            id = "proj_elixir_otp_distributed_chat",
+            courseId = "elixir",
+            title = "GenServer & OTP Supervision Tabanlı Hata Toleranslı Dağıtık Sohbet & Cache",
+            level = CourseLevel.EXPERT,
+            description = "GenServer durum yönetimi, DynamicSupervisor çocuk denetimi, Registry PubSub ve BEAM düğümleri arası kümeleme ile sıfır kesintili dağıtık mesajlaşma motoru.",
+            learningObjectives = listOf("GenServer State Management", "OTP Supervision Tree & Self-Healing", "Distributed Node Clustering", "Registry & PubSub Broadcast"),
+            starterCode = "defmodule DistributedEngine do\n  use GenServer\n  # GenServer ve Supervisor motorunu yazın\nend",
+            solutionCode = "defmodule ChatEngine do\n  use GenServer\n  def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)\n  def init(state), do: {:ok, state}\n  def handle_call({:broadcast, msg}, _from, state) do\n    {:reply, :ok, [msg | state]}\n  end\nend"
+        ),
         ProjectItem(
             id = "proj_c_arena_allocator",
             courseId = "c",
