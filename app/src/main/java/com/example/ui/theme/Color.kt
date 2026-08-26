@@ -6,14 +6,14 @@ import androidx.compose.ui.graphics.Color
 
 /**
  * App Theme Modes offering diverse eye comfort and contrast profiles.
- * Default is now FLUTTER_DART_DARK: A sleek, minimalist Flutter/Dart-inspired UI theme.
+ * Default is FLUTTER_DART_DARK: Modern minimalist dark theme with refined Indigo accent.
  */
 enum class AppThemeMode(val displayName: String, val iconEmoji: String, val description: String) {
-    FLUTTER_DART_DARK("Flutter Modern Dark", "💙", "Flutter & Dart tarzı minimalist ve sade koyu tema"),
-    OBSIDIAN_DARK("Obsidian Koyu", "🌑", "Dengeli ve modern koyu tema"),
+    FLUTTER_DART_DARK("Modern Slate Koyu", "🌑", "Minimalist ve sade modern koyu tema"),
+    OBSIDIAN_DARK("Obsidian Koyu", "🌌", "Dengeli ve zarif derin koyu tema"),
     OLED_MIDNIGHT("OLED Saf Siyah", "⬛", "Tam siyah, gözü dinlendirir & pil tasarrufu"),
     WARM_AMBER_EYE_CARE("Gece Işığı & Göz Koruma", "🌙", "Mavi ışığı süzen sıcak sepia/amber tonları"),
-    LIGHT("Flutter Aydınlık", "☀️", "Flutter tarzı temiz, minimalist ve sade açık tema");
+    LIGHT("Minimal Aydınlık", "☀️", "Ferah, temiz ve sade açık tema");
 
     val isDark: Boolean get() = this != LIGHT
 }
@@ -38,52 +38,52 @@ enum class EditorTheme(
     val punctuationColor: Color
 ) {
     FLUTTER_STUDIO(
-        displayName = "Flutter DevTools",
-        iconEmoji = "💙",
-        bg = Color(0xFF131722),
-        header = Color(0xFF1B2234),
-        border = Color(0xFF28334E),
+        displayName = "Studio Dark",
+        iconEmoji = "💻",
+        bg = Color(0xFF0F141E),
+        header = Color(0xFF161D2B),
+        border = Color(0xFF222C3E),
         gutterText = Color(0xFF5B6B8C),
         textPrimary = Color(0xFFE2E8F0),
-        keywordColor = Color(0xFF00B4D8),
-        stringColor = Color(0xFF06D6A0),
-        numberColor = Color(0xFFFFD166),
-        commentColor = Color(0xFF6C7A9C),
-        typeColor = Color(0xFF48CAE4),
-        operatorColor = Color(0xFF90E0EF),
-        punctuationColor = Color(0xFFB8C0D2)
-    ),
-    OBSIDIAN(
-        displayName = "Obsidian Slate",
-        iconEmoji = "🌑",
-        bg = Color(0xFF0B1120),
-        header = Color(0xFF161F30),
-        border = Color(0xFF334155),
-        gutterText = Color(0xFF64748B),
-        textPrimary = Color(0xFFF8FAFC),
-        keywordColor = Color(0xFFF43F5E),
+        keywordColor = Color(0xFF818CF8),
         stringColor = Color(0xFF34D399),
         numberColor = Color(0xFFFBBF24),
         commentColor = Color(0xFF64748B),
         typeColor = Color(0xFF38BDF8),
-        operatorColor = Color(0xFFF472B6),
-        punctuationColor = Color(0xFFA78BFA)
+        operatorColor = Color(0xFFA5B4FC),
+        punctuationColor = Color(0xFFCBD5E1)
+    ),
+    OBSIDIAN(
+        displayName = "Obsidian Slate",
+        iconEmoji = "🌑",
+        bg = Color(0xFF0B0F17),
+        header = Color(0xFF131924),
+        border = Color(0xFF1E2837),
+        gutterText = Color(0xFF64748B),
+        textPrimary = Color(0xFFF8FAFC),
+        keywordColor = Color(0xFF818CF8),
+        stringColor = Color(0xFF34D399),
+        numberColor = Color(0xFFFBBF24),
+        commentColor = Color(0xFF64748B),
+        typeColor = Color(0xFF38BDF8),
+        operatorColor = Color(0xFFA5B4FC),
+        punctuationColor = Color(0xFFE2E8F0)
     ),
     OLED_BLACK(
         displayName = "OLED Saf Siyah",
         iconEmoji = "⬛",
         bg = Color(0xFF000000),
         header = Color(0xFF0A0A0A),
-        border = Color(0xFF262626),
+        border = Color(0xFF242424),
         gutterText = Color(0xFF525252),
         textPrimary = Color(0xFFFFFFFF),
-        keywordColor = Color(0xFFFF3366),
-        stringColor = Color(0xFF00E676),
-        numberColor = Color(0xFFFFD54F),
-        commentColor = Color(0xFF757575),
-        typeColor = Color(0xFF00E5FF),
-        operatorColor = Color(0xFFFF4081),
-        punctuationColor = Color(0xFFB388FF)
+        keywordColor = Color(0xFF818CF8),
+        stringColor = Color(0xFF22C55E),
+        numberColor = Color(0xFFF59E0B),
+        commentColor = Color(0xFF737373),
+        typeColor = Color(0xFF38BDF8),
+        operatorColor = Color(0xFFA5B4FC),
+        punctuationColor = Color(0xFFE5E5E5)
     ),
     WARM_AMBER(
         displayName = "Göz Koruma (Amber)",
@@ -104,9 +104,9 @@ enum class EditorTheme(
     MONOKAI_PRO(
         displayName = "Monokai Pro",
         iconEmoji = "🔥",
-        bg = Color(0xFF1A191B),
-        header = Color(0xFF222024),
-        border = Color(0xFF38353D),
+        bg = Color(0xFF18181A),
+        header = Color(0xFF202023),
+        border = Color(0xFF2E2E33),
         gutterText = Color(0xFF727075),
         textPrimary = Color(0xFFFCFCFA),
         keywordColor = Color(0xFFFF6188),
@@ -155,76 +155,76 @@ data class AppColors(
     val themeMode: AppThemeMode
 )
 
-// 0. High-Tech Deep Obsidian / Modern Knowledge Palette (Dark-First Standard)
+// 0. Modern Minimal Slate Dark Palette (Single Primary Accent: Modern Indigo)
 val FlutterDartDarkAppColors = AppColors(
-    bg = Color(0xFF0B0E14), // Modern Knowledge Canvas
-    surface = Color(0xFF111620), // Primary Surface
-    surfaceVariant = Color(0xFF161C27), // Card Surface
-    cardBorder = Color(0xFF242F42), // Fine Geometric Border
-    textPrimary = Color(0xFFF5F7FA), // Crisp Readable Text
-    textSecondary = Color(0xFFA0A7B5), // Muted Supporting Text
-    textMuted = Color(0xFF596170), // Subtle Text & Indicators
-    primaryIndigo = Color(0xFF7C83FF), // Electric Knowledge Indigo
-    primaryIndigoLight = Color(0xFF9DA4FF),
-    primaryDark = Color(0xFF5A62E8),
-    primarySubtle = Color(0xFF171B33),
-    primarySubtleBorder = Color(0xFF2E3566),
-    accentEmerald = Color(0xFF4ADE80), // Mastered / Success
-    accentEmeraldLight = Color(0xFF86EFAC),
-    accentEmeraldSubtle = Color(0xFF0D2818),
-    accentEmeraldBorder = Color(0xFF1A5330),
-    accentAmber = Color(0xFFFBBF24), // XP / Streak Glow
-    accentAmberSubtle = Color(0xFF2E230B),
-    accentAmberBorder = Color(0xFF5C4717),
-    accentOrange = Color(0xFFFB923C),
-    accentOrangeSubtle = Color(0xFF331B0B),
-    accentOrangeBorder = Color(0xFF6B3917),
-    accentRose = Color(0xFFF87171), // Error / Warning
-    accentRoseSubtle = Color(0xFF331215),
-    accentRoseBorder = Color(0xFF6B252C),
-    accentCyan = Color(0xFF5EEAD4), // Secondary Knowledge Accent (Teal)
-    accentPurple = Color(0xFFC084FC),
-    accentVioletSubtle = Color(0xFF261838),
-    accentVioletBorder = Color(0xFF4F3175),
-    codeBg = Color(0xFF0E131D),
-    codeHeader = Color(0xFF151C2B),
+    bg = Color(0xFF0B0F17), // Deep Slate Neutral Canvas
+    surface = Color(0xFF111722), // Primary Surface
+    surfaceVariant = Color(0xFF161E2D), // Card Surface
+    cardBorder = Color(0xFF222C3E), // Subtle Geometric Border
+    textPrimary = Color(0xFFF8FAFC), // Crisp Slate 50
+    textSecondary = Color(0xFF94A3B8), // Slate 400 Supporting Text
+    textMuted = Color(0xFF64748B), // Slate 500 Subtle Text
+    primaryIndigo = Color(0xFF6366F1), // Modern Single Primary Accent (Indigo 500)
+    primaryIndigoLight = Color(0xFF818CF8), // Indigo 400
+    primaryDark = Color(0xFF4F46E5), // Indigo 600
+    primarySubtle = Color(0xFF181C30), // Soft Primary Surface Tint
+    primarySubtleBorder = Color(0xFF2A3358),
+    accentEmerald = Color(0xFF22C55E), // Mastered / Success
+    accentEmeraldLight = Color(0xFF4ADE80),
+    accentEmeraldSubtle = Color(0xFF0F2618),
+    accentEmeraldBorder = Color(0xFF1C452C),
+    accentAmber = Color(0xFFF59E0B), // XP / Streak Glow
+    accentAmberSubtle = Color(0xFF261D0C),
+    accentAmberBorder = Color(0xFF4A3816),
+    accentOrange = Color(0xFFF97316),
+    accentOrangeSubtle = Color(0xFF29170D),
+    accentOrangeBorder = Color(0xFF4D2B18),
+    accentRose = Color(0xFFEF4444), // Error / Warning
+    accentRoseSubtle = Color(0xFF2B1417),
+    accentRoseBorder = Color(0xFF522328),
+    accentCyan = Color(0xFF06B6D4), // Secondary Info Accent
+    accentPurple = Color(0xFFA855F7),
+    accentVioletSubtle = Color(0xFF201633),
+    accentVioletBorder = Color(0xFF3E2B63),
+    codeBg = Color(0xFF0F141E),
+    codeHeader = Color(0xFF161D2B),
     isDark = true,
     themeMode = AppThemeMode.FLUTTER_DART_DARK
 )
 
-// 1. High-tech Deep Obsidian Dark Palette
+// 1. Deep Obsidian Dark Palette
 val DarkAppColors = AppColors(
-    bg = Color(0xFF0B0E14),
-    surface = Color(0xFF111620),
-    surfaceVariant = Color(0xFF161C27),
-    cardBorder = Color(0xFF283244),
-    textPrimary = Color(0xFFF5F7FA),
-    textSecondary = Color(0xFFA0A7B5),
-    textMuted = Color(0xFF596170),
-    primaryIndigo = Color(0xFF7C83FF),
-    primaryIndigoLight = Color(0xFF9DA4FF),
-    primaryDark = Color(0xFF5A62E8),
-    primarySubtle = Color(0xFF171B33),
-    primarySubtleBorder = Color(0xFF2E3566),
-    accentEmerald = Color(0xFF4ADE80),
-    accentEmeraldLight = Color(0xFF86EFAC),
-    accentEmeraldSubtle = Color(0xFF0D2818),
-    accentEmeraldBorder = Color(0xFF1A5330),
-    accentAmber = Color(0xFFFBBF24),
-    accentAmberSubtle = Color(0xFF2E230B),
-    accentAmberBorder = Color(0xFF5C4717),
-    accentOrange = Color(0xFFFB923C),
-    accentOrangeSubtle = Color(0xFF331B0B),
-    accentOrangeBorder = Color(0xFF6B3917),
-    accentRose = Color(0xFFF87171),
-    accentRoseSubtle = Color(0xFF331215),
-    accentRoseBorder = Color(0xFF6B252C),
-    accentCyan = Color(0xFF5EEAD4),
-    accentPurple = Color(0xFFC084FC),
-    accentVioletSubtle = Color(0xFF261838),
-    accentVioletBorder = Color(0xFF4F3175),
-    codeBg = Color(0xFF0E131D),
-    codeHeader = Color(0xFF151C2B),
+    bg = Color(0xFF0B0F17),
+    surface = Color(0xFF111722),
+    surfaceVariant = Color(0xFF161E2D),
+    cardBorder = Color(0xFF222C3E),
+    textPrimary = Color(0xFFF8FAFC),
+    textSecondary = Color(0xFF94A3B8),
+    textMuted = Color(0xFF64748B),
+    primaryIndigo = Color(0xFF6366F1),
+    primaryIndigoLight = Color(0xFF818CF8),
+    primaryDark = Color(0xFF4F46E5),
+    primarySubtle = Color(0xFF181C30),
+    primarySubtleBorder = Color(0xFF2A3358),
+    accentEmerald = Color(0xFF22C55E),
+    accentEmeraldLight = Color(0xFF4ADE80),
+    accentEmeraldSubtle = Color(0xFF0F2618),
+    accentEmeraldBorder = Color(0xFF1C452C),
+    accentAmber = Color(0xFFF59E0B),
+    accentAmberSubtle = Color(0xFF261D0C),
+    accentAmberBorder = Color(0xFF4A3816),
+    accentOrange = Color(0xFFF97316),
+    accentOrangeSubtle = Color(0xFF29170D),
+    accentOrangeBorder = Color(0xFF4D2B18),
+    accentRose = Color(0xFFEF4444),
+    accentRoseSubtle = Color(0xFF2B1417),
+    accentRoseBorder = Color(0xFF522328),
+    accentCyan = Color(0xFF06B6D4),
+    accentPurple = Color(0xFFA855F7),
+    accentVioletSubtle = Color(0xFF201633),
+    accentVioletBorder = Color(0xFF3E2B63),
+    codeBg = Color(0xFF0F141E),
+    codeHeader = Color(0xFF161D2B),
     isDark = true,
     themeMode = AppThemeMode.OBSIDIAN_DARK
 )
@@ -232,36 +232,36 @@ val DarkAppColors = AppColors(
 // 2. OLED Pure Midnight True Black Palette
 val OledMidnightAppColors = AppColors(
     bg = Color(0xFF000000),
-    surface = Color(0xFF080808),
-    surfaceVariant = Color(0xFF121212),
-    cardBorder = Color(0xFF242424),
+    surface = Color(0xFF0A0A0A),
+    surfaceVariant = Color(0xFF141414),
+    cardBorder = Color(0xFF262626),
     textPrimary = Color(0xFFFFFFFF),
     textSecondary = Color(0xFFA3A3A3),
-    textMuted = Color(0xFF666666),
-    primaryIndigo = Color(0xFF38BDF8),
-    primaryIndigoLight = Color(0xFF7DD3FC),
-    primaryDark = Color(0xFF0284C7),
-    primarySubtle = Color(0xFF141C24),
-    primarySubtleBorder = Color(0xFF1E293B),
-    accentEmerald = Color(0xFF10B981),
-    accentEmeraldLight = Color(0xFF34D399),
-    accentEmeraldSubtle = Color(0xFF042F24),
-    accentEmeraldBorder = Color(0xFF065F46),
-    accentAmber = Color(0xFFFBBF24),
-    accentAmberSubtle = Color(0xFF382307),
-    accentAmberBorder = Color(0xFF78350F),
-    accentOrange = Color(0xFFFB923C),
-    accentOrangeSubtle = Color(0xFF3A1807),
-    accentOrangeBorder = Color(0xFF7C2D12),
-    accentRose = Color(0xFFFB7185),
-    accentRoseSubtle = Color(0xFF3F0B18),
-    accentRoseBorder = Color(0xFF881337),
-    accentCyan = Color(0xFF38BDF8),
-    accentPurple = Color(0xFFC084FC),
-    accentVioletSubtle = Color(0xFF240E40),
-    accentVioletBorder = Color(0xFF581C87),
+    textMuted = Color(0xFF737373),
+    primaryIndigo = Color(0xFF6366F1),
+    primaryIndigoLight = Color(0xFF818CF8),
+    primaryDark = Color(0xFF4F46E5),
+    primarySubtle = Color(0xFF14172B),
+    primarySubtleBorder = Color(0xFF222847),
+    accentEmerald = Color(0xFF22C55E),
+    accentEmeraldLight = Color(0xFF4ADE80),
+    accentEmeraldSubtle = Color(0xFF0A2414),
+    accentEmeraldBorder = Color(0xFF154024),
+    accentAmber = Color(0xFFF59E0B),
+    accentAmberSubtle = Color(0xFF2B1F0A),
+    accentAmberBorder = Color(0xFF4D3812),
+    accentOrange = Color(0xFFF97316),
+    accentOrangeSubtle = Color(0xFF2B160A),
+    accentOrangeBorder = Color(0xFF4D2812),
+    accentRose = Color(0xFFEF4444),
+    accentRoseSubtle = Color(0xFF2E1215),
+    accentRoseBorder = Color(0xFF542026),
+    accentCyan = Color(0xFF06B6D4),
+    accentPurple = Color(0xFFA855F7),
+    accentVioletSubtle = Color(0xFF211536),
+    accentVioletBorder = Color(0xFF42286B),
     codeBg = Color(0xFF000000),
-    codeHeader = Color(0xFF0C0C0C),
+    codeHeader = Color(0xFF0A0A0A),
     isDark = true,
     themeMode = AppThemeMode.OLED_MIDNIGHT
 )
@@ -270,16 +270,16 @@ val OledMidnightAppColors = AppColors(
 val WarmAmberEyeCareAppColors = AppColors(
     bg = Color(0xFF12100E),
     surface = Color(0xFF1A1612),
-    surfaceVariant = Color(0xFF25201A),
-    cardBorder = Color(0xFF3D342A),
-    textPrimary = Color(0xFFF5EDE0),
-    textSecondary = Color(0xFFC4B5A5),
+    surfaceVariant = Color(0xFF241F1A),
+    cardBorder = Color(0xFF383027),
+    textPrimary = Color(0xFFFDF8F0),
+    textSecondary = Color(0xFFC7B8A6),
     textMuted = Color(0xFF8C7E6E),
     primaryIndigo = Color(0xFFF59E0B),
     primaryIndigoLight = Color(0xFFFBBF24),
     primaryDark = Color(0xFFD97706),
-    primarySubtle = Color(0xFF2B2215),
-    primarySubtleBorder = Color(0xFF453622),
+    primarySubtle = Color(0xFF282015),
+    primarySubtleBorder = Color(0xFF423422),
     accentEmerald = Color(0xFF81B29A),
     accentEmeraldLight = Color(0xFFA8D5BA),
     accentEmeraldSubtle = Color(0xFF1B2B24),
@@ -303,39 +303,39 @@ val WarmAmberEyeCareAppColors = AppColors(
     themeMode = AppThemeMode.WARM_AMBER_EYE_CARE
 )
 
-// 4. Flutter Crisp & Clean Minimal Light Palette
+// 4. Modern Minimal Clean Light Palette
 val LightAppColors = AppColors(
-    bg = Color(0xFFF6F8FA), // Minimal Flutter canvas
-    surface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFFEAEEF2),
-    cardBorder = Color(0xFFD0D7DE),
-    textPrimary = Color(0xFF1F2328),
-    textSecondary = Color(0xFF656D76),
-    textMuted = Color(0xFF8C959F),
-    primaryIndigo = Color(0xFF0284C7),
-    primaryIndigoLight = Color(0xFF0284C7),
-    primaryDark = Color(0xFF0369A1),
-    primarySubtle = Color(0xFFDDF4FF),
-    primarySubtleBorder = Color(0xFFB6E3FF),
-    accentEmerald = Color(0xFF1A7F37),
-    accentEmeraldLight = Color(0xFF2DA44E),
-    accentEmeraldSubtle = Color(0xFFDAFBE1),
-    accentEmeraldBorder = Color(0xFF4AC26B),
-    accentAmber = Color(0xFF9A6700),
-    accentAmberSubtle = Color(0xFFFFF8C5),
-    accentAmberBorder = Color(0xFFD4A72C),
-    accentOrange = Color(0xFFBC4C00),
-    accentOrangeSubtle = Color(0xFFFFEBE9),
-    accentOrangeBorder = Color(0xFFFF8182),
-    accentRose = Color(0xFFCF222E),
-    accentRoseSubtle = Color(0xFFFFEBE9),
-    accentRoseBorder = Color(0xFFFF8182),
-    accentCyan = Color(0xFF0969DA),
-    accentPurple = Color(0xFF8250DF),
-    accentVioletSubtle = Color(0xFFFBEFFF),
-    accentVioletBorder = Color(0xFFD2A8FF),
-    codeBg = Color(0xFF1F2328),
-    codeHeader = Color(0xFF2D333B),
+    bg = Color(0xFFF8FAFC), // Slate 50 canvas
+    surface = Color(0xFFFFFFFF), // Pure white surface
+    surfaceVariant = Color(0xFFF1F5F9), // Slate 100 card surface
+    cardBorder = Color(0xFFE2E8F0), // Slate 200 fine border
+    textPrimary = Color(0xFF0F172A), // Slate 900
+    textSecondary = Color(0xFF475569), // Slate 600
+    textMuted = Color(0xFF94A3B8), // Slate 400
+    primaryIndigo = Color(0xFF4F46E5), // Indigo 600
+    primaryIndigoLight = Color(0xFF6366F1), // Indigo 500
+    primaryDark = Color(0xFF3730A3), // Indigo 800
+    primarySubtle = Color(0xFFEEF2FF), // Indigo 50
+    primarySubtleBorder = Color(0xFFC7D2FE), // Indigo 200
+    accentEmerald = Color(0xFF16A34A),
+    accentEmeraldLight = Color(0xFF22C55E),
+    accentEmeraldSubtle = Color(0xFFDCFCE7),
+    accentEmeraldBorder = Color(0xFF86EFAC),
+    accentAmber = Color(0xFFD97706),
+    accentAmberSubtle = Color(0xFFFEF3C7),
+    accentAmberBorder = Color(0xFFFDE68A),
+    accentOrange = Color(0xFFEA580C),
+    accentOrangeSubtle = Color(0xFFFFEDD5),
+    accentOrangeBorder = Color(0xFFFED7AA),
+    accentRose = Color(0xFFDC2626),
+    accentRoseSubtle = Color(0xFFFEE2E2),
+    accentRoseBorder = Color(0xFFFECACA),
+    accentCyan = Color(0xFF0891B2),
+    accentPurple = Color(0xFF9333EA),
+    accentVioletSubtle = Color(0xFFF3E8FF),
+    accentVioletBorder = Color(0xFFE9D5FF),
+    codeBg = Color(0xFF0F172A),
+    codeHeader = Color(0xFF1E293B),
     isDark = false,
     themeMode = AppThemeMode.LIGHT
 )
@@ -392,3 +392,4 @@ val CodeType: Color @Composable get() = LocalEditorTheme.current.typeColor
 val CodeFunction: Color @Composable get() = LocalEditorTheme.current.punctuationColor
 val CodeOperator: Color @Composable get() = LocalEditorTheme.current.operatorColor
 val CodePunctuation: Color @Composable get() = LocalEditorTheme.current.punctuationColor
+

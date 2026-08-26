@@ -31,6 +31,7 @@ import com.example.data.db.UserNoteEntity
 import com.example.data.engine.GamificationService
 import com.example.data.util.AppStrings
 import com.example.model.*
+import com.example.ui.components.LanguageProgressChartComponent
 import com.example.ui.theme.*
 import com.example.viewmodel.MainViewModel
 
@@ -302,6 +303,18 @@ fun ProfileScreen(
             }
 
             "STATS" -> {
+                item {
+                    LanguageProgressChartComponent(
+                        languages = languages,
+                        progressMap = allProgressMap,
+                        streakDays = userProfile.streakDays,
+                        onLanguageClick = { lang ->
+                            viewModel.selectLanguage(lang.id)
+                        },
+                        modifier = Modifier.testTag("profile_language_progress_chart")
+                    )
+                }
+
                 item {
                     Card(
                         modifier = Modifier

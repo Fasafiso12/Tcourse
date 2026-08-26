@@ -55,6 +55,7 @@ fun HomeScreen(
     val richAchievements by viewModel.richAchievements.collectAsState()
     val weeklyStats by viewModel.weeklyStats.collectAsState()
     val topicMasteryList by viewModel.courseTopicMasteryList.collectAsState()
+    val allLanguagesProgress by viewModel.allLanguagesProgress.collectAsState()
 
     val levelTier = remember(userProfile.currentXp) {
         GamificationService.getLevelTier(userProfile.currentXp)
@@ -318,7 +319,22 @@ fun HomeScreen(
             }
 
             // ====================================================
-            // 4. TOPIC MASTERY & INTERACTIVE ROADMAP PREVIEW
+            // 4. PROGRESS DASHBOARD: D3-INSPIRED LESSON COMPLETION
+            // ====================================================
+            item {
+                LanguageProgressChartComponent(
+                    languages = languages,
+                    progressMap = allLanguagesProgress,
+                    streakDays = userProfile.streakDays,
+                    onLanguageClick = { lang ->
+                        viewModel.selectLanguage(lang.id)
+                    },
+                    modifier = Modifier.testTag("home_language_progress_chart")
+                )
+            }
+
+            // ====================================================
+            // 5. TOPIC MASTERY & INTERACTIVE ROADMAP PREVIEW
             // ====================================================
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {

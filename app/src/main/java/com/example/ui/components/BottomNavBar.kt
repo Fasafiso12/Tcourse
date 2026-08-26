@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -37,12 +38,12 @@ fun BottomNavBar(
             .fillMaxWidth()
             .navigationBarsPadding(),
         color = DarkSurface,
-        border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder))
+        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .padding(horizontal = AppSpacing.sm, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -60,12 +61,13 @@ fun BottomNavBar(
 
                 Column(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(AppRadius.md))
                         .background(if (isSelected) PrimarySubtle else Color.Transparent)
                         .clickable { onTabSelected(tab) }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .padding(horizontal = AppSpacing.sm, vertical = 6.dp)
                         .testTag("nav_tab_${tab.name.lowercase()}"),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         imageVector = icon,
@@ -73,11 +75,11 @@ fun BottomNavBar(
                         tint = color,
                         modifier = Modifier.size(22.dp)
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = tabTitle,
-                        fontSize = 10.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        style = AppTypography.badge,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                         color = color
                     )
                 }
@@ -93,3 +95,4 @@ private fun getTabIcon(tab: AppNavTab, isSelected: Boolean): ImageVector = when 
     AppNavTab.PRACTICE -> if (isSelected) Icons.Filled.Terminal else Icons.Outlined.Terminal
     AppNavTab.PROFILE -> if (isSelected) Icons.Filled.Person else Icons.Outlined.Person
 }
+

@@ -229,7 +229,7 @@ fun CoursesScreen(
                             val label = if (mode == CoursesScreenMode.LANGUAGES_MENU) {
                                 if (isTr) "Diller Ana Menüsü (${languages.size})" else "Languages Menu (${languages.size})"
                             } else {
-                                "${activeLanguage.iconEmoji} ${activeLanguage.name} Dersleri (${activeLessons.size})"
+                                if (isTr) "${activeLanguage.name} Dersleri (${activeLessons.size})" else "${activeLanguage.name} Lessons (${activeLessons.size})"
                             }
 
                             Box(

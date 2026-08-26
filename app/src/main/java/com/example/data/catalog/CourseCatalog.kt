@@ -112,7 +112,7 @@ object CourseCatalog {
             popularUses = listOf("Linux Çekirdeği", "Gömülü Cihazlar", "Oyun Motorları"),
             totalLessonsCount = 12,
             isPopular = true,
-            drawableRes = R.drawable.img_lang_cpp_1787396210963
+            drawableRes = null
         ),
         ProgrammingLanguage(
             id = "lua",
@@ -125,7 +125,7 @@ object CourseCatalog {
             popularUses = listOf("Roblox Studio", "Oyun Scripting & AI", "Redis & Nginx Eklentileri"),
             totalLessonsCount = 12,
             isPopular = true,
-            drawableRes = R.drawable.img_lang_javascript_1787396236459
+            drawableRes = null
         ),
         ProgrammingLanguage(
             id = "go",
@@ -138,7 +138,7 @@ object CourseCatalog {
             popularUses = listOf("Kubernetes & Docker", "Yüksek Hızlı API", "Mikroservisler"),
             totalLessonsCount = 12,
             isPopular = true,
-            drawableRes = R.drawable.img_lang_kotlin_1787396247052
+            drawableRes = null
         ),
         ProgrammingLanguage(
             id = "elixir",
@@ -151,7 +151,7 @@ object CourseCatalog {
             popularUses = listOf("Phoenix Canlı Web", "Dağıtık Sohbet & Oyun", "Finansal Sistemler"),
             totalLessonsCount = 12,
             isPopular = true,
-            drawableRes = R.drawable.img_lang_dart_1787396183719
+            drawableRes = null
         )
     )
 

@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,9 +53,13 @@ fun TopAppBarHeader(
             .fillMaxWidth()
             .background(DarkSurface)
             .statusBarsPadding()
-            .border(1.dp, DarkCardBorder.copy(alpha = 0.7f), RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .border(
+                1.dp,
+                DarkCardBorder.copy(alpha = 0.8f),
+                RoundedCornerShape(bottomStart = AppRadius.lg, bottomEnd = AppRadius.lg)
+            )
+            .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)
     ) {
         // Tier 1: User Profile Header & Dynamic FlowRow Gamification Chips
         Row(
@@ -66,7 +71,7 @@ fun TopAppBarHeader(
             Row(
                 modifier = Modifier.weight(1f, fill = false),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
             ) {
                 Box(
                     modifier = Modifier
@@ -86,14 +91,13 @@ fun TopAppBarHeader(
                 Column(modifier = Modifier.padding(end = 4.dp)) {
                     Text(
                         text = strings.welcomeBack,
-                        fontSize = 10.sp,
+                        style = AppTypography.caption,
                         color = TextMuted,
-                        fontWeight = FontWeight.Medium,
                         maxLines = 1
                     )
                     Text(
                         text = userProfile.username,
-                        fontSize = 14.sp,
+                        style = AppTypography.title,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary,
                         maxLines = 1,
@@ -109,20 +113,20 @@ fun TopAppBarHeader(
             ) {
                 // Streak Chip
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(AppRadius.pill),
                     color = AccentOrangeSubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(AccentOrangeBorder)),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentOrangeBorder)),
                     modifier = Modifier.testTag("streak_chip")
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         Text("🔥", fontSize = 11.sp)
                         Text(
                             text = "${userProfile.streakDays}",
-                            fontSize = 11.sp,
+                            style = AppTypography.caption,
                             fontWeight = FontWeight.Bold,
                             color = AccentOrange
                         )
@@ -131,22 +135,22 @@ fun TopAppBarHeader(
 
                 // XP Chip
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(AppRadius.pill),
                     color = PrimarySubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(PrimarySubtleBorder)),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(PrimarySubtleBorder)),
                     modifier = Modifier.testTag("xp_chip")
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         Text("⭐", fontSize = 10.sp)
                         Text(
                             text = "${userProfile.currentXp}",
-                            fontSize = 11.sp,
+                            style = AppTypography.caption,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryIndigo
+                            color = PrimaryIndigoLight
                         )
                     }
                 }
@@ -154,14 +158,13 @@ fun TopAppBarHeader(
                 // PRO Badge
                 if (userProfile.isPremium) {
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(AppRadius.pill),
                         color = AccentEmeraldSubtle,
-                        border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(AccentEmeraldBorder))
+                        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentEmeraldBorder))
                     ) {
                         Text(
                             text = "PRO",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Black,
+                            style = AppTypography.badge,
                             color = AccentEmeraldLight,
                             modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                         )
@@ -174,17 +177,17 @@ fun TopAppBarHeader(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
         ) {
             // Interactive Search Bar (Primary action occupying maximum available space)
             Surface(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(AppRadius.md),
                 color = DarkSurfaceVariant,
-                border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder)),
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
                 modifier = Modifier
                     .weight(1f)
-                    .height(36.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .height(38.dp)
+                    .clip(RoundedCornerShape(AppRadius.md))
                     .clickable { onSearchClick() }
                     .testTag("open_search_button")
             ) {
@@ -203,7 +206,7 @@ fun TopAppBarHeader(
                     )
                     Text(
                         text = strings.searchPlaceholder,
-                        fontSize = 12.sp,
+                        style = AppTypography.bodySmall,
                         color = TextMuted,
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -214,12 +217,12 @@ fun TopAppBarHeader(
             // Quick App Language Switcher
             Box {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(AppRadius.md),
                     color = DarkSurfaceVariant,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder)),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
                     modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(AppRadius.md))
                         .clickable { showLanguageDropdown = true }
                         .testTag("app_language_toggle_btn")
                 ) {
@@ -239,8 +242,7 @@ fun TopAppBarHeader(
                 ) {
                     Text(
                         text = strings.selectLanguage,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = AppTypography.badge,
                         color = TextMuted,
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                     )
@@ -258,12 +260,12 @@ fun TopAppBarHeader(
                                             text = lang.displayName,
                                             color = if (lang == appLanguage) PrimaryIndigo else TextPrimary,
                                             fontWeight = if (lang == appLanguage) FontWeight.Bold else FontWeight.Normal,
-                                            fontSize = 13.sp
+                                            style = AppTypography.body
                                         )
                                         Text(
                                             text = lang.nativeName,
                                             color = TextMuted,
-                                            fontSize = 10.sp
+                                            style = AppTypography.caption
                                         )
                                     }
                                 }
@@ -280,12 +282,12 @@ fun TopAppBarHeader(
             // Theme Mode Selector Button & Dropdown
             Box {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(AppRadius.md),
                     color = DarkSurfaceVariant,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder)),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
                     modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(AppRadius.md))
                         .clickable { showThemeDropdown = true }
                         .testTag("theme_toggle_btn")
                 ) {
@@ -305,8 +307,7 @@ fun TopAppBarHeader(
                 ) {
                     Text(
                         text = strings.themeSettingTitle,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = AppTypography.badge,
                         color = TextMuted,
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                     )
@@ -324,12 +325,12 @@ fun TopAppBarHeader(
                                             text = mode.displayName,
                                             color = if (mode == currentThemeMode) PrimaryIndigo else TextPrimary,
                                             fontWeight = if (mode == currentThemeMode) FontWeight.Bold else FontWeight.Normal,
-                                            fontSize = 13.sp
+                                            style = AppTypography.body
                                         )
                                         Text(
                                             text = mode.description,
                                             color = TextMuted,
-                                            fontSize = 10.sp
+                                            style = AppTypography.caption
                                         )
                                     }
                                 }
@@ -359,9 +360,9 @@ fun TopAppBarHeader(
 
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(AppRadius.pill))
                         .background(bg)
-                        .border(1.dp, borderColor, RoundedCornerShape(20.dp))
+                        .border(1.dp, borderColor, RoundedCornerShape(AppRadius.pill))
                         .clickable { onLanguageSelected(lang.id) }
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .testTag("lang_chip_${lang.id}")
@@ -373,7 +374,7 @@ fun TopAppBarHeader(
                         Text(lang.iconEmoji, fontSize = 14.sp)
                         Text(
                             text = lang.name,
-                            fontSize = 12.sp,
+                            style = AppTypography.bodySmall,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = textColor
                         )
@@ -383,3 +384,4 @@ fun TopAppBarHeader(
         }
     }
 }
+
