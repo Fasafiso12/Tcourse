@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,18 +22,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.CourseLevel
+import com.example.model.ProgrammingLanguage
 import com.example.ui.theme.*
 
 /**
- * Modern High-Impact Primary Button with subtle glow and crisp tactile state
+ * Modern High-Impact Primary Button with clean minimal styling
  */
 @Composable
 fun PrimaryButton(
@@ -52,16 +57,18 @@ fun PrimaryButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = PrimaryIndigo,
             contentColor = Color.White,
-            disabledContainerColor = DarkSurfaceVariant,
+            disabledContainerColor = DarkSurfaceVariant.copy(alpha = 0.5f),
             disabledContentColor = TextMuted
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 0.dp
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp,
+            hoveredElevation = 0.dp,
+            focusedElevation = 0.dp
         ),
         contentPadding = PaddingValues(horizontal = AppSpacing.lg, vertical = AppSpacing.sm),
         modifier = modifier
-            .defaultMinSize(minHeight = 48.dp)
+            .defaultMinSize(minHeight = 46.dp)
             .testTag(testTag)
     ) {
         if (isLoading) {
@@ -87,7 +94,7 @@ fun PrimaryButton(
                 Text(
                     text = text,
                     style = AppTypography.title,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -118,7 +125,7 @@ fun SecondaryButton(
             disabledContentColor = TextMuted
         ),
         border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = SolidColor(DarkCardBorder)
+            brush = SolidColor(DarkCardBorder.copy(alpha = 0.6f))
         ),
         contentPadding = PaddingValues(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
         modifier = modifier
@@ -142,7 +149,7 @@ fun SecondaryButton(
             Text(
                 text = text,
                 style = AppTypography.body,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -814,3 +821,41 @@ fun LoadingSkeleton(
             .background(DarkSurfaceVariant.copy(alpha = alpha))
     )
 }
+
+/**
+ * Standardized Programming Language Logo Badge matching the official symbol style in CoursesScreen
+ */
+@Composable
+fun LanguageLogoBox(
+    language: ProgrammingLanguage,
+    modifier: Modifier = Modifier,
+    size: Dp = 32.dp,
+    shapeRadius: Dp = 8.dp,
+    padding: Dp = 4.dp,
+    fallbackEmojiSize: TextUnit = 16.sp
+) {
+    val brandColor = Color(language.colorHex)
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(RoundedCornerShape(shapeRadius))
+            .background(brandColor.copy(alpha = 0.15f))
+            .border(1.dp, brandColor.copy(alpha = 0.4f), RoundedCornerShape(shapeRadius)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (language.drawableRes != null) {
+            Image(
+                painter = painterResource(id = language.drawableRes),
+                contentDescription = "${language.name} logo",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .clip(RoundedCornerShape((shapeRadius - 2.dp).coerceAtLeast(2.dp))),
+                contentScale = ContentScale.Fit
+            )
+        } else {
+            Text(language.iconEmoji, fontSize = fallbackEmojiSize)
+        }
+    }
+}
+

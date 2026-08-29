@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,10 @@ fun SearchScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
     val strings = com.example.data.util.LocalAppStrings.current
+
+    BackHandler(enabled = true) {
+        onClose()
+    }
 
     Column(
         modifier = Modifier

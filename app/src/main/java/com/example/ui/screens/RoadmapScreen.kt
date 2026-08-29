@@ -81,16 +81,13 @@ fun RoadmapScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(PrimarySubtle)
-                        .border(1.dp, PrimarySubtleBorder, RoundedCornerShape(14.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(activeLang.iconEmoji, fontSize = 24.sp)
-                }
+                LanguageLogoBox(
+                    language = activeLang,
+                    size = 44.dp,
+                    shapeRadius = 14.dp,
+                    padding = 6.dp,
+                    fallbackEmojiSize = 24.sp
+                )
                 Column {
                     Text(
                         text = "${activeLang.name} Haritası",
@@ -122,11 +119,17 @@ fun RoadmapScreen(
                     modifier = Modifier.clickable { viewModel.selectLanguage(lang.id) }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(lang.iconEmoji, fontSize = 14.sp)
+                        LanguageLogoBox(
+                            language = lang,
+                            size = 20.dp,
+                            shapeRadius = 5.dp,
+                            padding = 2.dp,
+                            fallbackEmojiSize = 12.sp
+                        )
                         Text(
                             text = lang.name,
                             fontSize = 12.sp,

@@ -1,7 +1,11 @@
 package com.example.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,19 +43,18 @@ fun BottomNavBar(
             .fillMaxWidth()
             .navigationBarsPadding(),
         color = DarkSurface,
-        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder))
+        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder.copy(alpha = 0.5f)))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = AppSpacing.sm, vertical = 6.dp),
+                .padding(horizontal = AppSpacing.xs, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
             AppNavTab.values().forEach { tab ->
                 val isSelected = tab == currentTab
                 val icon = getTabIcon(tab, isSelected)
-                val color = if (isSelected) PrimaryIndigo else TextMuted
                 val tabTitle = when (tab) {
                     AppNavTab.HOME -> strings.tabHome
                     AppNavTab.COURSES -> strings.tabCourses
@@ -59,12 +63,27 @@ fun BottomNavBar(
                     AppNavTab.PROFILE -> strings.tabProfile
                 }
 
+                val animatedColor by animateColorAsState(
+                    targetValue = if (isSelected) PrimaryIndigoLight else TextMuted,
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                    label = "tab_color"
+                )
+
+                val animatedBg by animateColorAsState(
+                    targetValue = if (isSelected) PrimarySubtle else Color.Transparent,
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                    label = "tab_bg"
+                )
+
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(AppRadius.md))
-                        .background(if (isSelected) PrimarySubtle else Color.Transparent)
-                        .clickable { onTabSelected(tab) }
-                        .padding(horizontal = AppSpacing.sm, vertical = 6.dp)
+                        .background(animatedBg)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(bounded = true, color = PrimaryIndigo)
+                        ) { onTabSelected(tab) }
+                        .padding(horizontal = 14.dp, vertical = 7.dp)
                         .testTag("nav_tab_${tab.name.lowercase()}"),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -72,15 +91,15 @@ fun BottomNavBar(
                     Icon(
                         imageVector = icon,
                         contentDescription = tabTitle,
-                        tint = color,
-                        modifier = Modifier.size(22.dp)
+                        tint = animatedColor,
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.height(3.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = tabTitle,
                         style = AppTypography.badge,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = color
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = animatedColor
                     )
                 }
             }

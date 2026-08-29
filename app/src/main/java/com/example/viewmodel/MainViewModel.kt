@@ -600,6 +600,29 @@ class MainViewModel(private val repository: AppRepository) : ViewModel() {
         return result
     }
 
+    fun getExerciseAttempt(exerciseId: String): Flow<ExerciseAttemptEntity?> {
+        return repository.getExerciseAttemptFlow(exerciseId)
+    }
+
+    suspend fun saveExerciseProgress(
+        exercise: Exercise,
+        userCode: String,
+        output: String,
+        isCompleted: Boolean,
+        hintsUsed: Int = 0
+    ) {
+        repository.saveExerciseAttempt(
+            exerciseId = exercise.id,
+            lessonId = exercise.lessonId,
+            courseId = _selectedLanguageId.value,
+            code = userCode,
+            output = output,
+            isCompleted = isCompleted,
+            hintsUsed = hintsUsed
+        )
+    }
+
+
     // Playground
     fun updatePlaygroundCode(code: String) {
         _playgroundCode.value = code

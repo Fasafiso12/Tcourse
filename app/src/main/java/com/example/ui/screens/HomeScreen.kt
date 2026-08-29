@@ -177,10 +177,15 @@ fun HomeScreen(
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                             modifier = Modifier.weight(1f, fill = false)
                         ) {
-                            Text(activeLang.iconEmoji, fontSize = 22.sp)
+                            LanguageLogoBox(
+                                language = activeLang,
+                                size = 36.dp,
+                                shapeRadius = 10.dp,
+                                padding = 4.dp
+                            )
                             Text(
                                 text = "${activeLang.name} Kursu",
                                 style = AppTypography.heading3,
@@ -655,11 +660,17 @@ fun HomeScreen(
                                     .testTag("course_chip_${lang.id}")
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text(lang.iconEmoji, fontSize = 16.sp)
+                                    LanguageLogoBox(
+                                        language = lang,
+                                        size = 22.dp,
+                                        shapeRadius = 6.dp,
+                                        padding = 2.dp,
+                                        fallbackEmojiSize = 13.sp
+                                    )
                                     Text(
                                         text = lang.name,
                                         style = AppTypography.body,

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -87,6 +88,33 @@ fun AppRootContent(viewModel: MainViewModel, isDarkTheme: Boolean) {
 
     val languages = remember { CourseCatalog.languages }
 
+    // Intercept phone's physical or on-screen back button to prevent accidental exit
+    val isAnyOverlayActive = aiAssistantState.isOpen ||
+            showNoteDialog != null ||
+            showCertificateModal != null ||
+            showPremiumDialog ||
+            isSearchOpen ||
+            quizState.questions.isNotEmpty() ||
+            challengeState.challenge != null ||
+            activeLesson != null
+
+    BackHandler(enabled = isAnyOverlayActive || currentTab != AppNavTab.HOME) {
+        when {
+            aiAssistantState.isOpen -> viewModel.closeAiAssistant()
+            showNoteDialog != null -> viewModel.closeNoteDialog()
+            showCertificateModal != null -> viewModel.closeCertificate()
+            showPremiumDialog -> viewModel.closePremiumDialog()
+            isSearchOpen -> {
+                isSearchOpen = false
+                viewModel.setSearchQuery("")
+            }
+            quizState.questions.isNotEmpty() -> viewModel.closeQuiz()
+            challengeState.challenge != null -> viewModel.closeChallenge()
+            activeLesson != null -> viewModel.closeActiveLesson()
+            currentTab != AppNavTab.HOME -> viewModel.setTab(AppNavTab.HOME)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Main Tab Scaffold
         Scaffold(
@@ -125,16 +153,20 @@ fun AppRootContent(viewModel: MainViewModel, isDarkTheme: Boolean) {
                         onClick = { viewModel.openAiAssistant() },
                         containerColor = PrimaryIndigo,
                         contentColor = androidx.compose.ui.graphics.Color.White,
-                        shape = androidx.compose.foundation.shape.CircleShape,
+                        elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                            defaultElevation = 2.dp,
+                            pressedElevation = 0.dp
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(com.example.ui.theme.AppRadius.pill),
                         modifier = Modifier.testTag("global_ai_assistant_fab")
                     ) {
                         androidx.compose.foundation.layout.Row(
-                            modifier = Modifier.padding(horizontal = 12.dp),
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
                         ) {
-                            androidx.compose.material3.Text("🤖", fontSize = 20.sp)
-                            androidx.compose.material3.Text("AI Asistan", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 13.sp)
+                            androidx.compose.material3.Text("✨", fontSize = 16.sp)
+                            androidx.compose.material3.Text("AI Asistan", fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, fontSize = 13.sp)
                         }
                     }
                 }

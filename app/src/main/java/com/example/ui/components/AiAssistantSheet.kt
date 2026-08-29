@@ -1,6 +1,8 @@
 package com.example.ui.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.*
@@ -49,6 +53,11 @@ fun AiAssistantSheet(
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
 
+    // Intercept hardware/system back button to smoothly close AI Assistant
+    BackHandler(enabled = true) {
+        onClose()
+    }
+
     // Auto-scroll to bottom on new messages
     LaunchedEffect(state.messages.size, state.isLoading) {
         if (state.messages.isNotEmpty()) {
@@ -68,47 +77,72 @@ fun AiAssistantSheet(
                 .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
-            // 1. Header with Title & Context Pill
+            // 1. Header with Back Button, Title & Controls
             Surface(
                 color = DarkSurface,
                 border = CardDefaults.outlinedCardBorder().copy(
-                    brush = Brush.horizontalGradient(listOf(PrimaryIndigo.copy(alpha = 0.4f), DarkCardBorder))
+                    brush = Brush.horizontalGradient(listOf(PrimaryIndigo.copy(alpha = 0.5f), DarkCardBorder))
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Left: Back button & Title info
                     Row(
+                        modifier = Modifier.weight(1f, fill = false),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // Prominent, high-contrast Back Button
+                        Surface(
+                            shape = CircleShape,
+                            color = PrimarySubtle,
+                            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(PrimaryIndigo.copy(alpha = 0.6f))),
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .clickable { onClose() }
+                                .testTag("ai_back_btn")
+                        ) {
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Geri",
+                                    tint = PrimaryIndigoLight,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(36.dp)
                                 .clip(CircleShape)
                                 .background(
                                     Brush.linearGradient(listOf(PrimaryIndigo, PrimaryIndigoLight))
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🤖", fontSize = 20.sp)
+                            Text("🤖", fontSize = 18.sp)
                         }
 
-                        Column {
+                        Column(modifier = Modifier.weight(1f, fill = false)) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
                                 Text(
                                     text = "Yapay Zeka Eğitmeni",
-                                    fontSize = 16.sp,
+                                    fontSize = 15.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
+                                    color = TextPrimary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Surface(
                                     shape = RoundedCornerShape(6.dp),
@@ -116,10 +150,10 @@ fun AiAssistantSheet(
                                 ) {
                                     Text(
                                         text = "Gemini AI",
-                                        fontSize = 10.sp,
+                                        fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = PrimaryIndigo,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                     )
                                 }
                             }
@@ -131,38 +165,59 @@ fun AiAssistantSheet(
                             }
                             Text(
                                 text = contextLabel,
-                                fontSize = 12.sp,
+                                fontSize = 11.sp,
                                 color = TextSecondary,
-                                maxLines = 1
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    // Right: Actions (Clear & Close)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         if (state.messages.isNotEmpty()) {
-                            IconButton(
-                                onClick = onClearChat,
-                                modifier = Modifier.size(36.dp).testTag("ai_clear_chat_btn")
+                            Surface(
+                                shape = CircleShape,
+                                color = DarkSurfaceVariant,
+                                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .clickable { onClearChat() }
+                                    .testTag("ai_clear_chat_btn")
                             ) {
-                                Icon(
-                                    Icons.Outlined.DeleteSweep,
-                                    contentDescription = "Sohbeti Temizle",
-                                    tint = TextMuted,
-                                    modifier = Modifier.size(20.dp)
-                                )
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                    Icon(
+                                        Icons.Outlined.DeleteSweep,
+                                        contentDescription = "Sohbeti Temizle",
+                                        tint = TextMuted,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
 
-                        IconButton(
-                            onClick = onClose,
-                            modifier = Modifier.size(36.dp).testTag("ai_close_btn")
+                        Surface(
+                            shape = CircleShape,
+                            color = DarkSurfaceVariant,
+                            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .clickable { onClose() }
+                                .testTag("ai_close_btn")
                         ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Kapat",
-                                tint = TextPrimary,
-                                modifier = Modifier.size(22.dp)
-                            )
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Kapat",
+                                    tint = TextPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         }
                     }
                 }

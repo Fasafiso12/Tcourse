@@ -55,11 +55,11 @@ fun TopAppBarHeader(
             .statusBarsPadding()
             .border(
                 1.dp,
-                DarkCardBorder.copy(alpha = 0.8f),
-                RoundedCornerShape(bottomStart = AppRadius.lg, bottomEnd = AppRadius.lg)
+                DarkCardBorder.copy(alpha = 0.5f),
+                RoundedCornerShape(bottomStart = AppRadius.md, bottomEnd = AppRadius.md)
             )
-            .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+            .padding(horizontal = AppSpacing.md, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Tier 1: User Profile Header & Dynamic FlowRow Gamification Chips
         Row(
@@ -279,22 +279,27 @@ fun TopAppBarHeader(
                 }
             }
 
-            // Theme Mode Selector Button & Dropdown
+            // Theme Mode Selector Button & Dropdown (Clean, recognizable palette button)
             Box {
                 Surface(
                     shape = RoundedCornerShape(AppRadius.md),
-                    color = DarkSurfaceVariant,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                    color = PrimarySubtle,
+                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(PrimaryIndigo.copy(alpha = 0.5f))),
                     modifier = Modifier
                         .size(38.dp)
                         .clip(RoundedCornerShape(AppRadius.md))
                         .clickable { showThemeDropdown = true }
                         .testTag("theme_toggle_btn")
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            text = currentThemeMode.iconEmoji,
-                            fontSize = 15.sp
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = strings.themeSettingTitle,
+                            tint = PrimaryIndigoLight,
+                            modifier = Modifier.size(19.dp)
                         )
                     }
                 }
@@ -303,34 +308,80 @@ fun TopAppBarHeader(
                     expanded = showThemeDropdown,
                     onDismissRequest = { showThemeDropdown = false },
                     properties = androidx.compose.ui.window.PopupProperties(focusable = true),
-                    modifier = Modifier.background(DarkSurfaceVariant)
+                    modifier = Modifier
+                        .background(DarkSurfaceVariant)
+                        .border(1.dp, PrimaryIndigo.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                 ) {
-                    Text(
-                        text = strings.themeSettingTitle,
-                        style = AppTypography.badge,
-                        color = TextMuted,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = PrimaryIndigoLight,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = strings.themeSettingTitle,
+                            style = AppTypography.badge,
+                            color = PrimaryIndigoLight,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Divider(color = DarkCardBorder, thickness = 1.dp)
 
                     AppThemeMode.values().forEach { mode ->
+                        val isCurrent = mode == currentThemeMode
                         DropdownMenuItem(
                             text = {
                                 Row(
+                                    modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(mode.iconEmoji, fontSize = 14.sp)
-                                    Column {
-                                        Text(
-                                            text = mode.displayName,
-                                            color = if (mode == currentThemeMode) PrimaryIndigo else TextPrimary,
-                                            fontWeight = if (mode == currentThemeMode) FontWeight.Bold else FontWeight.Normal,
-                                            style = AppTypography.body
-                                        )
-                                        Text(
-                                            text = mode.description,
-                                            color = TextMuted,
-                                            style = AppTypography.caption
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = if (isCurrent) PrimaryIndigo.copy(alpha = 0.2f) else DarkBg,
+                                            border = CardDefaults.outlinedCardBorder().copy(
+                                                brush = SolidColor(if (isCurrent) PrimaryIndigo else DarkCardBorder)
+                                            ),
+                                            modifier = Modifier.size(28.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                                Text(mode.iconEmoji, fontSize = 14.sp)
+                                            }
+                                        }
+
+                                        Column {
+                                            Text(
+                                                text = mode.displayName,
+                                                color = if (isCurrent) PrimaryIndigoLight else TextPrimary,
+                                                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Medium,
+                                                style = AppTypography.body
+                                            )
+                                            Text(
+                                                text = mode.description,
+                                                color = TextMuted,
+                                                style = AppTypography.caption
+                                            )
+                                        }
+                                    }
+
+                                    if (isCurrent) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Seçili",
+                                            tint = PrimaryIndigoLight,
+                                            modifier = Modifier.size(18.dp)
                                         )
                                     }
                                 }
@@ -339,44 +390,6 @@ fun TopAppBarHeader(
                                 onSelectThemeMode(mode)
                                 showThemeDropdown = false
                             }
-                        )
-                    }
-                }
-            }
-        }
-
-        // Tier 3: Horizontal Scrollable Language Pills Selector
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            languages.forEach { lang ->
-                val isSelected = lang.id == selectedLanguageId
-                val bg = if (isSelected) PrimaryIndigo else DarkSurfaceVariant
-                val textColor = if (isSelected) Color.White else TextSecondary
-                val borderColor = if (isSelected) PrimaryIndigo else DarkCardBorder
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(AppRadius.pill))
-                        .background(bg)
-                        .border(1.dp, borderColor, RoundedCornerShape(AppRadius.pill))
-                        .clickable { onLanguageSelected(lang.id) }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                        .testTag("lang_chip_${lang.id}")
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(lang.iconEmoji, fontSize = 14.sp)
-                        Text(
-                            text = lang.name,
-                            style = AppTypography.bodySmall,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            color = textColor
                         )
                     }
                 }

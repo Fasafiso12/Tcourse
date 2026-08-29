@@ -95,3 +95,25 @@ interface AchievementDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun unlock(achievement: UnlockedAchievementEntity)
 }
+
+@Dao
+interface ExerciseAttemptDao {
+    @Query("SELECT * FROM exercise_attempts WHERE exerciseId = :exerciseId LIMIT 1")
+    fun getAttemptFlow(exerciseId: String): Flow<ExerciseAttemptEntity?>
+
+    @Query("SELECT * FROM exercise_attempts WHERE exerciseId = :exerciseId LIMIT 1")
+    suspend fun getAttempt(exerciseId: String): ExerciseAttemptEntity?
+
+    @Query("SELECT * FROM exercise_attempts WHERE lessonId = :lessonId")
+    fun getAttemptsForLessonFlow(lessonId: String): Flow<List<ExerciseAttemptEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAttempt(attempt: ExerciseAttemptEntity)
+
+    @Query("UPDATE exercise_attempts SET isCompleted = 1, updatedAt = :timestamp WHERE exerciseId = :exerciseId")
+    suspend fun markCompleted(exerciseId: String, timestamp: Long = System.currentTimeMillis())
+
+    @Query("UPDATE exercise_attempts SET savedCode = :code, lastOutput = :output, updatedAt = :timestamp WHERE exerciseId = :exerciseId")
+    suspend fun updateCodeAndOutput(exerciseId: String, code: String, output: String, timestamp: Long = System.currentTimeMillis())
+}
+

@@ -12,7 +12,8 @@ import androidx.room.RoomDatabase
         UserNoteEntity::class,
         FavoriteEntity::class,
         MistakeEntity::class,
-        UnlockedAchievementEntity::class
+        UnlockedAchievementEntity::class,
+        ExerciseAttemptEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -24,6 +25,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun favoritesDao(): FavoritesDao
     abstract fun mistakeDao(): MistakeDao
     abstract fun achievementDao(): AchievementDao
+    abstract fun exerciseAttemptDao(): ExerciseAttemptDao
+
 
     companion object {
         @Volatile

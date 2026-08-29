@@ -47,9 +47,11 @@ class AppRepository(
     private val favoritesDao = database.favoritesDao()
     private val mistakeDao = database.mistakeDao()
     private val achievementDao = database.achievementDao()
+    private val exerciseAttemptDao = database.exerciseAttemptDao()
 
     // ----------------------------------------------------
     // Shared Event Flows for Real-time Micro-Animations
+
     // ----------------------------------------------------
     private val _xpGainEvent = MutableSharedFlow<XpGainEvent>(
         replay = 0,
@@ -297,6 +299,50 @@ class AppRepository(
         val lastDone = prefs?.getString("pref_daily_challenge_done_date", "")
         return lastDone == GamificationService.getTodayDateString()
     }
+
+    // ----------------------------------------------------
+    // Exercise & Coding Practice Persistence
+    // ----------------------------------------------------
+    fun getExerciseAttemptFlow(exerciseId: String): Flow<ExerciseAttemptEntity?> {
+        return exerciseAttemptDao.getAttemptFlow(exerciseId)
+    }
+
+    suspend fun getExerciseAttempt(exerciseId: String): ExerciseAttemptEntity? {
+        return exerciseAttemptDao.getAttempt(exerciseId)
+    }
+
+    suspend fun saveExerciseAttempt(
+        exerciseId: String,
+        lessonId: String,
+        courseId: String,
+        code: String,
+        output: String,
+        isCompleted: Boolean,
+        hintsUsed: Int = 0
+    ) {
+        val existing = exerciseAttemptDao.getAttempt(exerciseId)
+        val attemptCount = (existing?.attemptsCount ?: 0) + 1
+        val wasAlreadyCompleted = existing?.isCompleted == true
+
+        exerciseAttemptDao.upsertAttempt(
+            ExerciseAttemptEntity(
+                exerciseId = exerciseId,
+                lessonId = lessonId,
+                courseId = courseId,
+                savedCode = code,
+                lastOutput = output,
+                isCompleted = isCompleted || wasAlreadyCompleted,
+                attemptsCount = attemptCount,
+                hintsUsedCount = hintsUsed,
+                updatedAt = System.currentTimeMillis()
+            )
+        )
+
+        if (isCompleted && !wasAlreadyCompleted) {
+            recordCodingChallengeFinished(lessonId, courseId)
+        }
+    }
+
 
     suspend fun setPremium(isPremium: Boolean) {
         prefs?.edit()?.putBoolean("pref_is_premium", isPremium)?.apply()

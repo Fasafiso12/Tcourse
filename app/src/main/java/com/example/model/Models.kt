@@ -53,6 +53,13 @@ data class CourseSection(
     val learningObjectives: List<String> = emptyList()
 )
 
+data class CommunityInsight(
+    val source: String, // e.g. "StackOverflow #1 Soru", "Reddit r/learnprogramming İpucu", "GitHub Best Practice"
+    val topic: String, // e.g. "Neden var yerine val?", "NullPointerException Neden Olur?"
+    val insight: String, // Sade ve anlaşılır dille püf noktası + mantığı
+    val commonMistake: String? = null // Toplulukta acemilerin en çok düştüğü hata
+)
+
 data class Lesson(
     val id: String,
     val courseId: String,
@@ -75,6 +82,7 @@ data class Lesson(
     val codingChallenge: CodingChallenge? = null,
     val quizQuestions: List<QuizQuestion> = emptyList(),
     val qaItems: List<TopicQAItem> = emptyList(),
+    val communityInsights: List<CommunityInsight> = emptyList(),
     val completionCriteria: List<String> = emptyList(),
     val miniProject: ProjectItem? = null
 )
@@ -196,3 +204,48 @@ data class CourseProgressInfo(
     val lastCompletedLessonTitle: String? = null,
     val nextLessonId: String? = null
 )
+
+/**
+ * Bir dersin içerisinde veya sonunda yer alan uygulamalı kodlama görevi.
+ */
+data class Exercise(
+    val id: String,
+    val lessonId: String,
+    val title: String,
+    val description: String,
+    val starterCode: String,
+    val solutionCode: String = "",
+    val expectedOutput: String = "",
+    val language: String = "cpp",
+    val difficulty: String = "EASY",
+    val hints: List<String> = emptyList(),
+    val testCases: List<ExerciseTestCase> = emptyList(),
+    val xpReward: Int = 20
+)
+
+/**
+ * Görev doğrulama için kullanılan test vakası.
+ */
+data class ExerciseTestCase(
+    val input: String = "",
+    val expectedOutput: String,
+    val isHidden: Boolean = false,
+    val description: String = ""
+)
+
+/**
+ * Kullanıcının her bir kod çalıştırma veya teslim denemesi.
+ */
+data class ExerciseAttempt(
+    val exerciseId: String,
+    val lessonId: String,
+    val courseId: String = "",
+    val userCode: String,
+    val output: String,
+    val isPassed: Boolean,
+    val attemptCount: Int = 1,
+    val hintsUsedCount: Int = 0,
+    val errorMessage: String? = null,
+    val lastAttemptedAt: Long = System.currentTimeMillis()
+)
+

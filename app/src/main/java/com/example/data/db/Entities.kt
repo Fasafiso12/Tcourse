@@ -74,3 +74,18 @@ data class UnlockedAchievementEntity(
     val achievementId: String,
     val unlockedAt: Long = System.currentTimeMillis()
 )
+
+@Entity(tableName = "exercise_attempts")
+data class ExerciseAttemptEntity(
+    @PrimaryKey
+    val exerciseId: String,
+    val lessonId: String,
+    val courseId: String = "",
+    val savedCode: String,
+    val lastOutput: String = "",
+    val isCompleted: Boolean = false,
+    val attemptsCount: Int = 1,
+    val hintsUsedCount: Int = 0,
+    val updatedAt: Long = System.currentTimeMillis()
+)
+

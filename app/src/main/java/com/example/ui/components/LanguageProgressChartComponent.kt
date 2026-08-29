@@ -331,10 +331,15 @@ fun LanguageProgressChartComponent(
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text(slice.language.iconEmoji, fontSize = 20.sp)
+                                LanguageLogoBox(
+                                    language = slice.language,
+                                    size = 36.dp,
+                                    shapeRadius = 10.dp,
+                                    padding = 4.dp
+                                )
                                 Column {
                                     Text(
                                         text = "${slice.language.name} Kursuna Git",
@@ -614,7 +619,13 @@ private fun RadialProgressBarsView(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
                 ) {
-                    Text(slice.language.iconEmoji, fontSize = 16.sp)
+                    LanguageLogoBox(
+                        language = slice.language,
+                        size = 26.dp,
+                        shapeRadius = 7.dp,
+                        padding = 3.dp,
+                        fallbackEmojiSize = 14.sp
+                    )
                     Text(
                         text = slice.language.name,
                         style = AppTypography.body,
@@ -689,17 +700,18 @@ private fun LanguageCompletionRow(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(slice.color)
+                    LanguageLogoBox(
+                        language = slice.language,
+                        size = 32.dp,
+                        shapeRadius = 9.dp,
+                        padding = 4.dp,
+                        fallbackEmojiSize = 16.sp
                     )
                     Text(
-                        text = "${slice.language.iconEmoji} ${slice.language.name}",
+                        text = slice.language.name,
                         style = AppTypography.body,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                         color = TextPrimary,
@@ -775,7 +787,13 @@ private fun DonutTelemetryCenter(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(slice.language.iconEmoji, fontSize = 22.sp)
+                LanguageLogoBox(
+                    language = slice.language,
+                    size = 28.dp,
+                    shapeRadius = 7.dp,
+                    padding = 3.dp,
+                    fallbackEmojiSize = 16.sp
+                )
                 Text(
                     text = slice.language.name,
                     style = AppTypography.bodySmall,
@@ -923,17 +941,18 @@ private fun LanguageCompletionCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f, fill = false)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(slice.color)
+                    LanguageLogoBox(
+                        language = slice.language,
+                        size = 24.dp,
+                        shapeRadius = 6.dp,
+                        padding = 2.dp,
+                        fallbackEmojiSize = 13.sp
                     )
                     Text(
-                        text = "${slice.language.iconEmoji} ${slice.language.name}",
+                        text = slice.language.name,
                         style = AppTypography.bodySmall,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                         color = TextPrimary,

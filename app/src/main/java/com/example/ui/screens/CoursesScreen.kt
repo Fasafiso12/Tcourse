@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.catalog.CourseCatalog
 import com.example.data.util.AppStrings
 import com.example.model.*
+import com.example.ui.components.LanguageLogoBox
 import com.example.ui.theme.*
 import com.example.viewmodel.MainViewModel
 
@@ -142,6 +144,11 @@ fun CoursesScreen(
     ) {
         val isWideScreen = maxWidth >= 840.dp
 
+        // If on mobile and in lesson list mode, back press should return to languages menu
+        BackHandler(enabled = !isWideScreen && screenMode == CoursesScreenMode.LESSON_LIST) {
+            screenMode = CoursesScreenMode.LANGUAGES_MENU
+        }
+
         if (isWideScreen) {
             // =========================================================================
             // TABLET / WIDE SCREEN: MASTER-DETAIL SIDE-BY-SIDE CANONICAL LAYOUT
@@ -213,51 +220,44 @@ fun CoursesScreen(
             ) {
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Top View Switcher Header (Diller Menüsü vs Ders Listesi)
+                // Top View Switcher Header (Sadece Diller Ana Menüsü)
                 Surface(
                     shape = RoundedCornerShape(14.dp),
                     color = DarkSurface,
                     border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        modifier = Modifier.padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (screenMode == CoursesScreenMode.LANGUAGES_MENU) PrimaryIndigo else PrimarySubtle)
+                            .clickable { screenMode = CoursesScreenMode.LANGUAGES_MENU }
+                            .padding(vertical = 10.dp)
+                            .testTag("languages_main_menu_btn"),
+                        contentAlignment = Alignment.Center
                     ) {
-                        CoursesScreenMode.values().forEach { mode ->
-                            val isSelected = screenMode == mode
-                            val label = if (mode == CoursesScreenMode.LANGUAGES_MENU) {
-                                if (isTr) "Diller Ana Menüsü (${languages.size})" else "Languages Menu (${languages.size})"
-                            } else {
-                                if (isTr) "${activeLanguage.name} Dersleri (${activeLessons.size})" else "${activeLanguage.name} Lessons (${activeLessons.size})"
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(if (isSelected) PrimaryIndigo else Color.Transparent)
-                                    .clickable { screenMode = mode }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Text(
-                                        text = if (mode == CoursesScreenMode.LANGUAGES_MENU) mode.icon else activeLanguage.iconEmoji,
-                                        fontSize = 14.sp
-                                    )
-                                    Text(
-                                        text = label,
-                                        fontSize = 12.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                        color = if (isSelected) Color.White else TextSecondary,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "🏛️",
+                                fontSize = 15.sp
+                            )
+                            Text(
+                                text = if (isTr) "Diller Ana Menüsü (${languages.size})" else "Languages Menu (${languages.size})",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (screenMode == CoursesScreenMode.LANGUAGES_MENU) Color.White else PrimaryIndigoLight
+                            )
+                            if (screenMode == CoursesScreenMode.LESSON_LIST) {
+                                Text(
+                                    text = if (isTr) "• Kataloğa Dön" else "• Back to Catalog",
+                                    fontSize = 11.sp,
+                                    color = TextMuted
+                                )
                             }
                         }
                     }
@@ -294,6 +294,7 @@ fun CoursesScreen(
                                 onSearchQueryChanged = { searchQuery = it },
                                 onSelectLanguage = { langId ->
                                     viewModel.selectLanguage(langId)
+                                    screenMode = CoursesScreenMode.LESSON_LIST
                                 },
                                 onViewLessonList = { langId ->
                                     viewModel.selectLanguage(langId)
@@ -573,7 +574,7 @@ private fun LanguageMenuCard(
                 if (isActive) PrimaryIndigo else DarkCardBorder,
                 RoundedCornerShape(20.dp)
             )
-            .clickable { onSelect() }
+            .clickable { onViewLessons() }
             .testTag("language_card_${language.id}"),
         colors = CardDefaults.cardColors(
             containerColor = if (isActive) DarkSurfaceVariant else DarkSurface
@@ -588,31 +589,16 @@ private fun LanguageMenuCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(brandColor.copy(alpha = 0.15f))
-                            .border(1.dp, brandColor.copy(alpha = 0.4f), RoundedCornerShape(14.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (language.drawableRes != null) {
-                            Image(
-                                painter = painterResource(id = language.drawableRes),
-                                contentDescription = "${language.name} logo",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(6.dp)
-                                    .clip(RoundedCornerShape(10.dp)),
-                                contentScale = ContentScale.Fit
-                            )
-                        } else {
-                            Text(language.iconEmoji, fontSize = 26.sp)
-                        }
-                    }
+                    LanguageLogoBox(
+                        language = language,
+                        size = 50.dp,
+                        shapeRadius = 14.dp,
+                        padding = 6.dp,
+                        fallbackEmojiSize = 26.sp
+                    )
 
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -812,79 +798,29 @@ private fun SelectableLessonListContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(bottom = 36.dp)
     ) {
-        // --- 1. Top Quick Language Switcher Strip ---
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // --- 1. Navigation Breadcrumb if viewing lessons ---
+        if (onBackToMenu != null) {
+            item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onBackToMenu() }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text(
-                        text = if (isTr) "Programlama Dili Değiştir:" else "Switch Language Track:",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextSecondary
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = PrimaryIndigoLight,
+                        modifier = Modifier.size(16.dp)
                     )
-
-                    if (onBackToMenu != null) {
-                        TextButton(
-                            onClick = onBackToMenu,
-                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = if (isTr) "← Diller Menüsü" else "← Languages Menu",
-                                fontSize = 11.sp,
-                                color = PrimaryIndigoLight,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-
-                // Horizontal Strip of all 7 Languages
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(allLanguages) { lang ->
-                        val isSelected = lang.id == language.id
-                        val langProgress = allProgressMap[lang.id]
-                        val langCompleted = langProgress?.completedLessonsCount ?: 0
-                        val langColor = Color(lang.colorHex)
-
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (isSelected) PrimarySubtle else DarkSurface,
-                            border = CardDefaults.outlinedCardBorder().copy(
-                                brush = SolidColor(if (isSelected) PrimaryIndigo else DarkCardBorder)
-                            ),
-                            modifier = Modifier
-                                .clickable { onSelectLanguage(lang.id) }
-                                .testTag("strip_lang_chip_${lang.id}")
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Text(lang.iconEmoji, fontSize = 14.sp)
-                                Text(
-                                    text = lang.name,
-                                    fontSize = 12.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) PrimaryIndigoLight else TextPrimary
-                                )
-                                if (langCompleted > 0) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(6.dp)
-                                            .clip(CircleShape)
-                                            .background(AccentEmerald)
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    Text(
+                        text = if (isTr) "Diller Ana Menüsüne Dön" else "Back to Languages Menu",
+                        fontSize = 12.sp,
+                        color = PrimaryIndigoLight,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -910,27 +846,13 @@ private fun SelectableLessonListContent(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.weight(1f, fill = false)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(46.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(brandColor.copy(alpha = 0.2f))
-                                    .border(1.dp, brandColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (language.drawableRes != null) {
-                                    Image(
-                                        painter = painterResource(id = language.drawableRes),
-                                        contentDescription = "${language.name} logo",
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(5.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                } else {
-                                    Text(language.iconEmoji, fontSize = 24.sp)
-                                }
-                            }
+                            LanguageLogoBox(
+                                language = language,
+                                size = 46.dp,
+                                shapeRadius = 12.dp,
+                                padding = 5.dp,
+                                fallbackEmojiSize = 24.sp
+                            )
 
                             Column(modifier = Modifier.weight(1f, fill = false)) {
                                 Text(

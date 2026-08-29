@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,6 +39,10 @@ fun QuizScreen(
     val totalCount = quizState.questions.size
     val currentNumber = quizState.currentIndex + 1
     val scrollState = rememberScrollState()
+
+    BackHandler(enabled = true) {
+        onClose()
+    }
 
     androidx.compose.runtime.LaunchedEffect(quizState.currentIndex) {
         scrollState.scrollTo(0)

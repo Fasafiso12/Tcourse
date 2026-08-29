@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +38,10 @@ fun CodingChallengeScreen(
 ) {
     val challenge = challengeState.challenge ?: return
     val selectedLangId by viewModel.selectedLanguageId.collectAsState()
+
+    BackHandler(enabled = true) {
+        onClose()
+    }
 
     Scaffold(
         topBar = {
