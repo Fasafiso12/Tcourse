@@ -1,22 +1,18 @@
 package com.example.ui.screens
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -27,28 +23,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.catalog.CourseCatalog
-import com.example.data.engine.CodeExecutionEngine
 import com.example.model.*
+import com.example.ui.components.CodeBlock
 import com.example.ui.components.CodeEditorComponent
-import com.example.ui.components.SyntaxHighlightedCode
 import com.example.ui.theme.*
 import com.example.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
 /**
- * Coddy-Inspired Modern Interactive Single-Flow Lesson Experience
- * Cycle: Read -> View Code -> Understand Logic -> Mini Check -> Hands-On Code -> Console Output -> Reinforce
+ * Modern, Bite-Sized, Interactive Mobile Lesson Learning Experience
+ * Replaces long PDF/document scrolling with focused, digestible step-by-step screens.
  */
 @Composable
 fun LessonDetailScreen(
@@ -65,11 +60,18 @@ fun LessonDetailScreen(
     val userProfile by viewModel.userProfile.collectAsState()
     val appLanguage by viewModel.appLanguage.collectAsState()
     val isTr = appLanguage == AppLanguage.TR
+    val appColors = LocalAppColors.current
 
     val isInitiallyCompleted = remember(lesson.id, allProgress) {
         allProgress.any { it.lessonId == lesson.id && it.status == LessonStatus.COMPLETED.name }
     }
     var isLessonCompleted by remember(lesson.id, isInitiallyCompleted) { mutableStateOf(isInitiallyCompleted) }
+
+    // Step-by-Step Flow Construction
+    val lessonSteps = remember(lesson.id, isTr) {
+        buildLessonSteps(lesson, isTr)
+    }
+    var currentStepIndex by remember(lesson.id) { mutableIntStateOf(0) }
 
     // Mini Question state
     var miniQuestionSelectedOption by remember(lesson.id) { mutableStateOf<Int?>(null) }
@@ -87,12 +89,12 @@ fun LessonDetailScreen(
     var practicalTaskCode by remember(lesson.id) { mutableStateOf(defaultTaskCode) }
     var practicalTaskResult by remember(lesson.id) { mutableStateOf<ExecutionResult?>(null) }
     var isPracticalTaskRunning by remember(lesson.id) { mutableStateOf(false) }
-    var isPracticalTaskPassed by remember(lesson.id, allProgress) {
-        mutableStateOf(allProgress.any { it.lessonId == lesson.id && it.codingChallengeCompleted })
+    var isPracticalTaskPassed by remember(lesson.id) {
+        mutableStateOf(savedAttempt?.isCompleted == true)
     }
 
     // Aşamalı İpucu Sistemi (Progressive Hints)
-    var currentHintStage by remember(lesson.id) { mutableStateOf(0) }
+    var currentHintStage by remember(lesson.id) { mutableIntStateOf(0) }
     var isSolutionRevealed by remember(lesson.id) { mutableStateOf(false) }
 
     // Load saved attempt code if exists
@@ -107,61 +109,68 @@ fun LessonDetailScreen(
         }
     }
 
-    val listState = rememberLazyListState()
-
     LaunchedEffect(lesson.id) {
+        currentStepIndex = 0
         miniQuestionSelectedOption = null
         isMiniQuestionChecked = false
         currentHintStage = 0
         isSolutionRevealed = false
         practicalTaskResult = null
         isPracticalTaskRunning = false
-        listState.scrollToItem(0)
+        isPracticalTaskPassed = savedAttempt?.isCompleted == true
     }
 
     val allLessons = remember(lesson.courseId) { CourseCatalog.getLessonsForCourse(lesson.courseId) }
-    val currentIdx = remember(lesson, allLessons) { allLessons.indexOfFirst { it.id == lesson.id } }
-    val prevLesson = remember(currentIdx, allLessons) {
-        if (currentIdx > 0) allLessons[currentIdx - 1] else null
+    val currentLessonIdx = remember(lesson, allLessons) { allLessons.indexOfFirst { it.id == lesson.id } }
+    val prevLesson = remember(currentLessonIdx, allLessons) {
+        if (currentLessonIdx > 0) allLessons[currentLessonIdx - 1] else null
     }
-    val nextLesson = remember(currentIdx, allLessons) {
-        if (currentIdx != -1 && currentIdx < allLessons.size - 1) allLessons[currentIdx + 1] else null
-    }
-
-    val courseProgressPercent = remember(allLessons, allProgress) {
-        if (allLessons.isEmpty()) 0 else {
-            val completedCount = allLessons.count { l ->
-                allProgress.any { it.lessonId == l.id && it.status == LessonStatus.COMPLETED.name }
-            }
-            (completedCount * 100) / allLessons.size
-        }
+    val nextLesson = remember(currentLessonIdx, allLessons) {
+        if (currentLessonIdx != -1 && currentLessonIdx < allLessons.size - 1) allLessons[currentLessonIdx + 1] else null
     }
 
     val isLocked = lesson.isPremium && !userProfile.isPremium
 
-    // Expected Output derivation for the lesson's practical task
     val expectedOutputSnippet = remember(lesson.id, lesson.courseId) {
         deriveExpectedOutput(lesson.title, lesson.practicalTask ?: "", lesson.courseId)
     }
 
+    val currentStep = lessonSteps.getOrNull(currentStepIndex) ?: lessonSteps.firstOrNull()
+    val totalSteps = lessonSteps.size
+    val isLastStep = currentStepIndex == totalSteps - 1
+
     Scaffold(
         topBar = {
             Surface(
-                color = DarkBg,
+                color = appColors.bg,
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
             ) {
                 Column {
+                    // Header Bar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = onBack, modifier = Modifier.testTag("back_button")) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri", tint = TextPrimary)
+                        IconButton(
+                            onClick = {
+                                if (currentStepIndex > 0) {
+                                    currentStepIndex--
+                                } else {
+                                    onBack()
+                                }
+                            },
+                            modifier = Modifier.testTag("back_button")
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = if (isTr) "Geri" else "Back",
+                                tint = appColors.textPrimary
+                            )
                         }
 
                         Column(
@@ -171,32 +180,37 @@ fun LessonDetailScreen(
                                 .padding(horizontal = 8.dp)
                         ) {
                             Text(
-                                text = "${lesson.courseId.uppercase()} • ${currentIdx + 1}/${allLessons.size}",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PrimaryIndigoLight
+                                text = "${lesson.courseId.uppercase()} • ${currentLessonIdx + 1}/${allLessons.size}",
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = appColors.primaryIndigoLight,
+                                letterSpacing = 0.8.sp
                             )
                             Text(
                                 text = lesson.title,
-                                fontSize = 14.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
+                                color = appColors.textPrimary,
+                                letterSpacing = (-0.2).sp,
                                 maxLines = 1
                             )
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             IconButton(
                                 onClick = { viewModel.openAiAssistant(lesson = lesson) },
                                 modifier = Modifier.testTag("lesson_open_ai_btn")
                             ) {
                                 Surface(
                                     shape = CircleShape,
-                                    color = PrimarySubtle,
-                                    modifier = Modifier.size(32.dp)
+                                    color = appColors.primaryIndigo.copy(alpha = 0.12f),
+                                    modifier = Modifier.size(34.dp)
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Text("🤖", fontSize = 15.sp)
+                                        Text("🤖", fontSize = 16.sp)
                                     }
                                 }
                             }
@@ -205,27 +219,53 @@ fun LessonDetailScreen(
                                 onClick = { viewModel.openNoteDialog(lesson) },
                                 modifier = Modifier.testTag("add_note_btn")
                             ) {
-                                Icon(Icons.Default.EditNote, contentDescription = "Not Ekle", tint = PrimaryIndigoLight)
+                                Icon(
+                                    Icons.Default.EditNote,
+                                    contentDescription = if (isTr) "Not Ekle" else "Add Note",
+                                    tint = appColors.primaryIndigoLight,
+                                    modifier = Modifier.size(24.dp)
+                                )
                             }
                         }
                     }
 
-                    // Thin Top Progress Bar
-                    LinearProgressIndicator(
-                        progress = { (courseProgressPercent / 100f).coerceIn(0f, 1f) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.5.dp),
-                        color = PrimaryIndigo,
-                        trackColor = DarkCardBorder
-                    )
+                    // Modern Segmented Step Indicator
+                    if (totalSteps > 1) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            for (stepIdx in 0 until totalSteps) {
+                                val isPassed = stepIdx < currentStepIndex
+                                val isCurrent = stepIdx == currentStepIndex
+
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(4.dp)
+                                        .clip(RoundedCornerShape(2.dp))
+                                        .background(
+                                            when {
+                                                isCurrent -> appColors.primaryIndigo
+                                                isPassed -> appColors.accentEmerald.copy(alpha = 0.85f)
+                                                else -> appColors.cardBorder
+                                            }
+                                        )
+                                        .clickable { currentStepIndex = stepIdx }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         },
         bottomBar = {
             Surface(
-                color = DarkSurface,
-                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                color = appColors.surface,
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
@@ -233,49 +273,103 @@ fun LessonDetailScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (prevLesson != null) {
+                    // Back / Previous Button
+                    if (currentStepIndex > 0) {
+                        OutlinedButton(
+                            onClick = { currentStepIndex-- },
+                            modifier = Modifier
+                                .weight(0.9f)
+                                .height(46.dp)
+                                .testTag("bottom_prev_lesson_btn"),
+                            shape = RoundedCornerShape(12.dp),
+                            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder))
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp),
+                                tint = appColors.textSecondary
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isTr) "Geri" else "Back",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = appColors.textPrimary
+                            )
+                        }
+                    } else if (prevLesson != null) {
                         OutlinedButton(
                             onClick = { onNextLesson(prevLesson) },
                             modifier = Modifier
-                                .weight(1f)
-                                .height(44.dp)
+                                .weight(0.9f)
+                                .height(46.dp)
                                 .testTag("bottom_prev_lesson_btn"),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder))
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp),
+                                tint = appColors.textSecondary
+                            )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(if (isTr) "Önceki" else "Previous", fontSize = 12.sp, color = TextPrimary)
+                            Text(
+                                text = if (isTr) "Önceki Ders" else "Prev Lesson",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = appColors.textPrimary
+                            )
                         }
                     }
 
+                    // Forward / Action Button
+                    val isQuestionStep = currentStep is LessonStep.MiniQuestionStep
+                    val isActionRequired = isQuestionStep && !isMiniQuestionChecked
+
                     Button(
                         onClick = {
-                            isLessonCompleted = true
-                            viewModel.markLessonComplete(lesson)
-                            if (nextLesson != null) {
-                                onNextLesson(nextLesson)
+                            if (isActionRequired) {
+                                isMiniQuestionChecked = true
+                            } else if (!isLastStep) {
+                                currentStepIndex++
+                            } else {
+                                isLessonCompleted = true
+                                viewModel.markLessonComplete(lesson)
+                                if (nextLesson != null) {
+                                    onNextLesson(nextLesson)
+                                } else {
+                                    onBack()
+                                }
                             }
                         },
                         modifier = Modifier
-                            .weight(if (prevLesson != null) 1.4f else 1f)
-                            .height(44.dp)
+                            .weight(if (currentStepIndex > 0 || prevLesson != null) 1.5f else 1f)
+                            .height(46.dp)
                             .testTag("bottom_complete_next_btn"),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isLessonCompleted) AccentEmerald else PrimaryIndigo
+                            containerColor = when {
+                                isActionRequired -> appColors.primaryIndigo
+                                isLastStep -> appColors.accentEmerald
+                                else -> appColors.primaryIndigo
+                            }
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = !(isActionRequired && miniQuestionSelectedOption == null)
                     ) {
                         Text(
-                            text = if (nextLesson != null) {
-                                if (isTr) "Tamamla & Sonraki →" else "Complete & Next →"
-                            } else {
-                                if (isTr) "Dersi Bitir ✓" else "Finish Lesson ✓"
+                            text = when {
+                                isActionRequired -> if (isTr) "Cevabı Kontrol Et" else "Check Answer"
+                                !isLastStep -> if (isTr) "Devam Et →" else "Continue →"
+                                nextLesson != null -> if (isTr) "Tamamla & Sonraki →" else "Complete & Next →"
+                                else -> if (isTr) "Dersi Bitir ✓" else "Finish Lesson ✓"
                             },
-                            fontSize = 13.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -283,7 +377,7 @@ fun LessonDetailScreen(
                 }
             }
         },
-        containerColor = DarkBg
+        containerColor = appColors.bg
     ) { innerPadding ->
         BoxWithConstraints(
             modifier = Modifier
@@ -291,182 +385,188 @@ fun LessonDetailScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Responsive width container for tablet and mobile
             val contentWidth = if (maxWidth > 680.dp) 640.dp else maxWidth
 
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .width(contentWidth)
-                    .fillMaxHeight()
-                    .padding(horizontal = 14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                contentPadding = PaddingValues(top = 12.dp, bottom = 32.dp)
-            ) {
-                // 1. DERS BAŞLIĞI & KISA GİRİŞ
-                item {
-                    LessonHeaderCard(
-                        lesson = lesson,
+            if (isLocked) {
+                Box(
+                    modifier = Modifier
+                        .width(contentWidth)
+                        .fillMaxSize()
+                        .padding(20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LockedContentCard(
+                        onUnlock = { viewModel.activatePremiumPlan() },
                         isTr = isTr,
-                        isLocked = isLocked,
-                        userIsPremium = userProfile.isPremium
+                        appColors = appColors
                     )
                 }
-
-                // 2. KİLİTLİ PRO İÇERİK BANNERI (Eğer Kilitliyse)
-                if (isLocked) {
-                    item {
-                        LockedContentCard(
-                            onUnlock = { viewModel.activatePremiumPlan() },
-                            isTr = isTr
-                        )
-                    }
-                } else {
-                    // 3. KAVRAMLAR & ADIM ADIM AKIŞ (Konu Anlatımı -> Küçük Kod -> Açıklama -> İpucu)
-                    items(lesson.detailedExplanation.size) { idx ->
-                        val block = lesson.detailedExplanation[idx]
-                        ConceptBlockCard(
-                            blockIndex = idx + 1,
-                            totalBlocks = lesson.detailedExplanation.size,
-                            block = block,
-                            courseId = lesson.courseId,
-                            isTr = isTr,
-                            onAskAi = { sentence ->
-                                viewModel.openAiAssistant(
-                                    lesson = lesson,
-                                    initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
-                                    targetSentence = sentence
-                                )
-                            }
-                        )
-                    }
-
-                    // 4. "NASIL ÇALIŞIYOR?" / MANTIK GÖRSELLEŞTİRMESİ
-                    item {
-                        HowItWorksCard(
-                            lesson = lesson,
-                            isTr = isTr
-                        )
-                    }
-
-                    // 5. MİNİ KONTROL SORUSU (Ders Ortası Hızlı Pekiştirme)
-                    if (lesson.miniQuestion != null) {
-                        item {
-                            MiniCheckQuestionCard(
-                                miniQ = lesson.miniQuestion,
-                                courseId = lesson.courseId,
-                                isTr = isTr,
-                                selectedOption = miniQuestionSelectedOption,
-                                isChecked = isMiniQuestionChecked,
-                                onSelectOption = { miniQuestionSelectedOption = it },
-                                onCheckAnswer = { isMiniQuestionChecked = true }
-                            )
+            } else if (currentStep != null) {
+                AnimatedContent(
+                    targetState = currentStepIndex,
+                    transitionSpec = {
+                        if (targetState > initialState) {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> (fullWidth * 0.35f).toInt() },
+                                animationSpec = tween(220)
+                            ) + fadeIn(animationSpec = tween(220)) togetherWith
+                                    slideOutHorizontally(
+                                        targetOffsetX = { fullWidth -> -(fullWidth * 0.35f).toInt() },
+                                        animationSpec = tween(220)
+                                    ) + fadeOut(animationSpec = tween(220))
+                        } else {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> -(fullWidth * 0.35f).toInt() },
+                                animationSpec = tween(220)
+                            ) + fadeIn(animationSpec = tween(220)) togetherWith
+                                    slideOutHorizontally(
+                                        targetOffsetX = { fullWidth -> (fullWidth * 0.35f).toInt() },
+                                        animationSpec = tween(220)
+                                    ) + fadeOut(animationSpec = tween(220))
                         }
-                    }
+                    },
+                    modifier = Modifier
+                        .width(contentWidth)
+                        .fillMaxSize(),
+                    label = "LessonStepTransition"
+                ) { stepIndex ->
+                    val activeStep = lessonSteps.getOrNull(stepIndex) ?: lessonSteps.first()
+                    val scrollState = rememberScrollState()
 
-                    // 6. UYGULAMALI GÖREV & ENTEGRE KOD EDİTÖRÜ & CONSOLE
-                    if (!lesson.practicalTask.isNullOrBlank()) {
-                        item {
-                            InteractiveExerciseCard(
-                                lesson = lesson,
-                                practicalTaskCode = practicalTaskCode,
-                                onCodeChange = { newCode ->
-                                    practicalTaskCode = newCode
-                                    if (practicalTaskResult != null) practicalTaskResult = null
-                                },
-                                expectedOutput = expectedOutputSnippet,
-                                practicalTaskResult = practicalTaskResult,
-                                isRunning = isPracticalTaskRunning,
-                                isPassed = isPracticalTaskPassed,
-                                currentHintStage = currentHintStage,
-                                isSolutionRevealed = isSolutionRevealed,
-                                isTr = isTr,
-                                onRunCode = {
-                                    coroutineScope.launch {
-                                        isPracticalTaskRunning = true
-                                        val res = viewModel.verifyAndSubmitPracticalTask(
-                                            lessonId = lesson.id,
-                                            courseId = lesson.courseId,
-                                            lessonTitle = lesson.title,
-                                            taskDescription = lesson.practicalTask ?: "",
-                                            userCode = practicalTaskCode
-                                        )
-                                        isPracticalTaskRunning = false
-                                        practicalTaskResult = res
-                                        isPracticalTaskPassed = res.isSuccess
-
-                                        // Persist to Room ExerciseAttempt
-                                        val exercise = Exercise(
-                                            id = exerciseId,
-                                            lessonId = lesson.id,
-                                            title = lesson.title,
-                                            description = lesson.practicalTask ?: "",
-                                            starterCode = defaultTaskCode,
-                                            expectedOutput = expectedOutputSnippet,
-                                            language = lesson.courseId
-                                        )
-                                        viewModel.saveExerciseProgress(
-                                            exercise = exercise,
-                                            userCode = practicalTaskCode,
-                                            output = res.output,
-                                            isCompleted = res.isSuccess,
-                                            hintsUsed = currentHintStage
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .padding(horizontal = 16.dp, vertical = 20.dp)
+                    ) {
+                        when (activeStep) {
+                            is LessonStep.ConceptStep -> {
+                                ConceptStepView(
+                                    lesson = lesson,
+                                    step = activeStep,
+                                    courseId = lesson.courseId,
+                                    isTr = isTr,
+                                    appColors = appColors,
+                                    onAskAi = { sentence ->
+                                        viewModel.openAiAssistant(
+                                            lesson = lesson,
+                                            initialShortcut = AiShortcut.EXPLAIN_SENTENCE,
+                                            targetSentence = sentence
                                         )
                                     }
-                                },
-                                onResetCode = {
-                                    practicalTaskCode = defaultTaskCode
-                                    practicalTaskResult = null
-                                },
-                                onNextHint = {
-                                    if (currentHintStage < 3) currentHintStage++
-                                },
-                                onRevealSolution = {
-                                    isSolutionRevealed = true
-                                },
-                                onAskAi = { code ->
-                                    viewModel.openAiAssistant(
-                                        lesson = lesson,
-                                        initialShortcut = AiShortcut.CHECK_CODE,
-                                        targetSentence = if (isTr) {
-                                            "Uygulamalı Görev: ${lesson.practicalTask}\nYazdığım Kod:\n```${lesson.courseId}\n$code\n```\nLütfen yazdığım kodu kontrol et. Doğrudan tam cevabı vermeden hatamı anlamam için ipucu ver."
-                                        } else {
-                                            "Practical Task: ${lesson.practicalTask}\nMy Code:\n```${lesson.courseId}\n$code\n```\nPlease check my code and provide guidance without giving the direct answer."
+                                )
+                            }
+                            is LessonStep.AnalogyStep -> {
+                                AnalogyStepView(
+                                    analogy = activeStep.analogy,
+                                    isTr = isTr,
+                                    appColors = appColors,
+                                    onAskAi = {
+                                        viewModel.openAiAssistant(
+                                            lesson = lesson,
+                                            initialShortcut = AiShortcut.ANALOGY_EXAMPLE,
+                                            targetSentence = "${activeStep.analogy.headline}: ${activeStep.analogy.story}"
+                                        )
+                                    }
+                                )
+                            }
+                            is LessonStep.CodeExampleStep -> {
+                                CodeSummaryStepView(
+                                    lesson = lesson,
+                                    code = activeStep.code,
+                                    explanation = activeStep.explanation,
+                                    isTr = isTr,
+                                    appColors = appColors
+                                )
+                            }
+                            is LessonStep.MiniQuestionStep -> {
+                                MiniQuestionStepView(
+                                    miniQ = activeStep.question,
+                                    courseId = lesson.courseId,
+                                    isTr = isTr,
+                                    appColors = appColors,
+                                    selectedOption = miniQuestionSelectedOption,
+                                    isChecked = isMiniQuestionChecked,
+                                    onSelectOption = { miniQuestionSelectedOption = it }
+                                )
+                            }
+                            is LessonStep.PracticalTaskStep -> {
+                                PracticalExerciseStepView(
+                                    lesson = lesson,
+                                    taskDescription = activeStep.taskDescription,
+                                    practicalTaskCode = practicalTaskCode,
+                                    onCodeChange = { newCode ->
+                                        practicalTaskCode = newCode
+                                        if (practicalTaskResult != null) practicalTaskResult = null
+                                    },
+                                    expectedOutput = expectedOutputSnippet,
+                                    practicalTaskResult = practicalTaskResult,
+                                    isRunning = isPracticalTaskRunning,
+                                    isPassed = isPracticalTaskPassed,
+                                    currentHintStage = currentHintStage,
+                                    isSolutionRevealed = isSolutionRevealed,
+                                    isTr = isTr,
+                                    appColors = appColors,
+                                    onRunCode = {
+                                        coroutineScope.launch {
+                                            isPracticalTaskRunning = true
+                                            val res = viewModel.verifyAndSubmitPracticalTask(
+                                                lessonId = lesson.id,
+                                                courseId = lesson.courseId,
+                                                lessonTitle = lesson.title,
+                                                taskDescription = lesson.practicalTask ?: "",
+                                                userCode = practicalTaskCode
+                                            )
+                                            isPracticalTaskRunning = false
+                                            practicalTaskResult = res
+                                            isPracticalTaskPassed = res.isSuccess
+
+                                            val exercise = Exercise(
+                                                id = exerciseId,
+                                                lessonId = lesson.id,
+                                                title = lesson.title,
+                                                description = lesson.practicalTask ?: "",
+                                                starterCode = defaultTaskCode,
+                                                expectedOutput = expectedOutputSnippet,
+                                                language = lesson.courseId
+                                            )
+                                            viewModel.saveExerciseProgress(
+                                                exercise = exercise,
+                                                userCode = practicalTaskCode,
+                                                output = res.output,
+                                                isCompleted = res.isSuccess,
+                                                hintsUsed = currentHintStage
+                                            )
                                         }
-                                    )
-                                }
-                            )
+                                    },
+                                    onResetCode = {
+                                        practicalTaskCode = defaultTaskCode
+                                        practicalTaskResult = null
+                                        isPracticalTaskPassed = false
+                                    },
+                                    onNextHint = {
+                                        if (currentHintStage < 3) currentHintStage++
+                                    },
+                                    onRevealSolution = {
+                                        isSolutionRevealed = true
+                                    },
+                                    onAskAi = { code ->
+                                        viewModel.openAiAssistant(
+                                            lesson = lesson,
+                                            initialShortcut = AiShortcut.CHECK_CODE,
+                                            targetSentence = if (isTr) {
+                                                "Uygulamalı Görev: ${lesson.practicalTask}\nYazdığım Kod:\n```${lesson.courseId}\n$code\n```\nLütfen yazdığım kodu kontrol et. Küçük bir çocuğa anlatır gibi samimi ve sade bir dille ipucu ver."
+                                            } else {
+                                                "Practical Task: ${lesson.practicalTask}\nMy Code:\n```${lesson.courseId}\n$code\n```\nPlease check my code and explain like I'm 5 with simple guidance."
+                                            }
+                                        )
+                                    }
+                                )
+                            }
                         }
-                    }
 
-                    // 7. GERÇEK DÜNYA & MİMARİ NOTLARI (Opsiyonel Bilgi)
-                    if (!lesson.realWorldExample.isNullOrBlank()) {
-                        item {
-                            RealWorldArchitectureCard(
-                                example = lesson.realWorldExample,
-                                isTr = isTr
-                            )
-                        }
-                    }
-
-                    // 8. DERSİ TAMAMLA & SIRADAKİ ADIMLAR KARTI
-                    item {
-                        LessonCompletionSummaryCard(
-                            lesson = lesson,
-                            isCompleted = isLessonCompleted,
-                            isTr = isTr,
-                            onCompleteLesson = {
-                                isLessonCompleted = true
-                                viewModel.markLessonComplete(lesson)
-                                Toast.makeText(
-                                    context,
-                                    if (isTr) "Tebrikler! Ders tamamlandı (+20 XP)" else "Lesson completed (+20 XP)",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            nextLesson = nextLesson,
-                            onNextLesson = onNextLesson
-                        )
+                        // Extra bottom breathing room inside scroll
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }
@@ -475,542 +575,595 @@ fun LessonDetailScreen(
 }
 
 // -------------------------------------------------------------------------------------------------
-// UI KOMPONENTLERİ: ŞIK, MODER VE AKICI DERS ELEMANLARI
+// STEP SELECTION & BUILDER DATA STRUCTURE
+// -------------------------------------------------------------------------------------------------
+
+sealed class LessonStep {
+    data class ConceptStep(
+        val blockIndex: Int,
+        val totalBlocks: Int,
+        val block: LessonContentBlock,
+        val isFirst: Boolean
+    ) : LessonStep()
+
+    data class AnalogyStep(
+        val analogy: AnalogyInfo
+    ) : LessonStep()
+
+    data class CodeExampleStep(
+        val code: String,
+        val explanation: String
+    ) : LessonStep()
+
+    data class MiniQuestionStep(
+        val question: MiniQuestion
+    ) : LessonStep()
+
+    data class PracticalTaskStep(
+        val taskDescription: String
+    ) : LessonStep()
+}
+
+private fun buildLessonSteps(lesson: Lesson, isTr: Boolean): List<LessonStep> {
+    val steps = mutableListOf<LessonStep>()
+
+    // 1. Concept / Explanation Blocks (Bite-sized screens)
+    if (lesson.detailedExplanation.isNotEmpty()) {
+        lesson.detailedExplanation.forEachIndexed { idx, block ->
+            steps.add(
+                LessonStep.ConceptStep(
+                    blockIndex = idx + 1,
+                    totalBlocks = lesson.detailedExplanation.size,
+                    block = block,
+                    isFirst = idx == 0
+                )
+            )
+        }
+    } else {
+        // Fallback single block from shortDesc
+        steps.add(
+            LessonStep.ConceptStep(
+                blockIndex = 1,
+                totalBlocks = 1,
+                block = LessonContentBlock(
+                    subtitle = lesson.title,
+                    body = lesson.shortDesc
+                ),
+                isFirst = true
+            )
+        )
+    }
+
+    // 2. "Explain Like I'm 5" / Real-life Analogy Step
+    val analogy = getChildFriendlyAnalogy(lesson.title, lesson.courseId, isTr)
+    steps.add(LessonStep.AnalogyStep(analogy))
+
+    // 3. Mini Check Question Step
+    if (lesson.miniQuestion != null) {
+        steps.add(LessonStep.MiniQuestionStep(lesson.miniQuestion))
+    }
+
+    // 4. Topic Summary Code Step
+    if (lesson.codeExample.isNotBlank()) {
+        steps.add(LessonStep.CodeExampleStep(lesson.codeExample, lesson.codeExplanation))
+    }
+
+    // 5. Practical Task Step
+    if (!lesson.practicalTask.isNullOrBlank()) {
+        steps.add(LessonStep.PracticalTaskStep(lesson.practicalTask))
+    }
+
+    return steps
+}
+
+// -------------------------------------------------------------------------------------------------
+// STEP 1: FOCUSED CONCEPT SCREEN (Bite-Sized Reading with High Hierarchy & Generous Whitespace)
 // -------------------------------------------------------------------------------------------------
 
 @Composable
-private fun LessonHeaderCard(
+private fun ConceptStepView(
     lesson: Lesson,
-    isTr: Boolean,
-    isLocked: Boolean,
-    userIsPremium: Boolean
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PrimaryIndigo.copy(alpha = 0.18f)
-                ) {
-                    Text(
-                        text = lesson.level.displayName,
-                        color = PrimaryIndigoLight,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "⏱ 6-8 dk",
-                        fontSize = 11.sp,
-                        color = TextMuted,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    if (isLocked) {
-                        Surface(shape = RoundedCornerShape(6.dp), color = AccentAmberSubtle) {
-                            Text(
-                                text = "🔒 PRO",
-                                color = AccentAmber,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    } else {
-                        Surface(shape = RoundedCornerShape(6.dp), color = AccentEmeraldSubtle) {
-                            Text(
-                                text = "✓ Aktif",
-                                color = AccentEmeraldLight,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = lesson.title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = lesson.shortDesc,
-                fontSize = 13.sp,
-                color = TextSecondary,
-                lineHeight = 19.sp
-            )
-        }
-    }
-}
-
-@Composable
-private fun ConceptBlockCard(
-    blockIndex: Int,
-    totalBlocks: Int,
-    block: LessonContentBlock,
+    step: LessonStep.ConceptStep,
     courseId: String,
     isTr: Boolean,
+    appColors: AppColors,
     onAskAi: (String) -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Başlık & AI Açıkla Butonu
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        // Tag / Stage Badge Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.primaryIndigo.copy(alpha = 0.12f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(22.dp)
-                            .clip(CircleShape)
-                            .background(PrimaryIndigo.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "$blockIndex",
-                            color = PrimaryIndigoLight,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Text(
-                        text = block.subtitle,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PrimarySubtle,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onAskAi("${block.subtitle}: ${block.body}") }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
-                    ) {
-                        Text("🤖", fontSize = 11.sp)
-                        Text(
-                            text = if (isTr) "AI Açıkla" else "Explain",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryIndigoLight
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Kısa, öz ve anlaşılır konu anlatımı
-            Text(
-                text = block.body,
-                fontSize = 13.sp,
-                color = TextSecondary,
-                lineHeight = 20.sp
-            )
-
-            // Küçük Kod Parçası (Varsa)
-            if (block.codeSnippet != null && block.codeSnippet.isNotBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                SyntaxHighlightedCode(
-                    code = block.codeSnippet,
-                    language = courseId,
-                    showLineNumbers = block.codeSnippet.lines().size > 1
-                )
-
-                // Otomatik Satır / Kod Çözümlemesi
-                CodeBreakdownHelper(code = block.codeSnippet, courseId = courseId, isTr = isTr)
-            }
-
-            // Görsel Bilgi / İpucu Kutusu
-            if (block.tip != null && block.tip.isNotBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = AccentAmberSubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentAmberBorder)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(10.dp),
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text("💡", fontSize = 14.sp)
-                        Text(
-                            text = block.tip,
-                            fontSize = 12.sp,
-                            color = AccentAmber,
-                            lineHeight = 17.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Kod satırının kritik kısımlarını gösteren sade açıklama kartı
- */
-@Composable
-private fun CodeBreakdownHelper(code: String, courseId: String, isTr: Boolean) {
-    val firstLine = code.lines().firstOrNull { it.trim().isNotEmpty() && !it.trim().startsWith("//") && !it.trim().startsWith("#") } ?: return
-    val breakdown = parseCodeLineBreakdown(firstLine, courseId, isTr) ?: return
-
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = DarkSurfaceVariant,
-        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 6.dp)
-    ) {
-        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(
-                text = if (isTr) "🔍 Kod Çözümlemesi:" else "🔍 Code Breakdown:",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = PrimaryIndigoLight
-            )
-            breakdown.forEach { (keyword, desc) ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = keyword,
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        color = AccentEmeraldLight
-                    )
-                    Text("→", fontSize = 11.sp, color = TextMuted)
-                    Text(
-                        text = desc,
-                        fontSize = 11.sp,
-                        color = TextSecondary
-                    )
-                }
-            }
-        }
-    }
-}
-
-private fun parseCodeLineBreakdown(line: String, lang: String, isTr: Boolean): List<Pair<String, String>>? {
-    val clean = line.trim()
-    return when {
-        clean.startsWith("int ") || clean.startsWith("val ") || clean.startsWith("let ") || clean.startsWith("var ") -> {
-            val parts = clean.split("=", " ", ";").filter { it.isNotBlank() }
-            if (parts.size >= 2) {
-                listOf(
-                    parts[0] to if (isTr) "Tür / Değişken anahtarı" else "Type / Declaration keyword",
-                    parts[1] to if (isTr) "Değişken ismi" else "Variable identifier",
-                    if (parts.size > 2) parts.last() to if (isTr) "Atanan başlangıç değeri" else "Assigned value" else "" to ""
-                ).filter { it.first.isNotBlank() }
-            } else null
-        }
-        clean.contains("cout") || clean.contains("println") || clean.contains("print") || clean.contains("console.log") -> {
-            listOf(
-                (if (clean.contains("cout")) "cout" else "print") to if (isTr) "Ekrana yazdırma komutu" else "Output print command",
-                "<<" to if (isTr) "Veri akış operatörü" else "Stream redirection operator"
-            )
-        }
-        else -> null
-    }
-}
-
-@Composable
-private fun HowItWorksCard(lesson: Lesson, isTr: Boolean) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("🧩", fontSize = 16.sp)
                 Text(
-                    text = if (isTr) "Nasıl Çalışıyor? (Mantık & Bellek)" else "How It Works? (Memory & Flow)",
-                    fontSize = 14.sp,
+                    text = if (step.isFirst) {
+                        "${lesson.level.displayName.uppercase()} • ${if (isTr) "GİRİŞ" else "INTRO"}"
+                    } else {
+                        if (isTr) "ADIM ${step.blockIndex}/${step.totalBlocks}" else "STEP ${step.blockIndex}/${step.totalBlocks}"
+                    },
+                    color = appColors.primaryIndigoLight,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    letterSpacing = 0.5.sp,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
                 )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = DarkBg,
-                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.surfaceVariant,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onAskAi("${step.block.subtitle}: ${step.block.body}") }
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text("🤖", fontSize = 12.sp)
+                    Text(
+                        text = if (isTr) "AI Açıkla" else "Explain",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = appColors.primaryIndigoLight
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Subtitle / Heading
+        Text(
+            text = step.block.subtitle,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = appColors.textPrimary,
+            lineHeight = 30.sp,
+            letterSpacing = (-0.3).sp
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Clear, readable, well-spaced paragraphs without boxing
+        val paragraphs = remember(step.block.body) {
+            step.block.body.split("\n\n").filter { it.isNotBlank() }
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            paragraphs.forEachIndexed { index, paragraph ->
+                if (index > 0) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                Text(
+                    text = paragraph.trim(),
+                    fontSize = 16.sp,
+                    color = appColors.textSecondary,
+                    lineHeight = 26.sp,
+                    letterSpacing = 0.15.sp
+                )
+            }
+        }
+
+        // Inline Code Snippet (if available)
+        if (step.block.codeSnippet != null && step.block.codeSnippet.isNotBlank()) {
+            Spacer(modifier = Modifier.height(20.dp))
+            CodeBlock(
+                code = step.block.codeSnippet,
+                language = courseId,
+                showLineNumbers = step.block.codeSnippet.lines().size > 1,
+                title = step.block.subtitle
+            )
+        }
+
+        // Child-friendly / Gentle Tip Banner
+        if (step.block.tip != null && step.block.tip.isNotBlank()) {
+            Spacer(modifier = Modifier.height(20.dp))
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = appColors.accentAmberSubtle,
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.accentAmberBorder)),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("💡", fontSize = 20.sp)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = if (isTr) "Püf Noktası:" else "Key Idea:",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = appColors.accentAmber
+                        )
+                        Text(
+                            text = step.block.tip,
+                            fontSize = 14.5.sp,
+                            color = appColors.textPrimary,
+                            lineHeight = 22.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// STEP 2: ANALOGY SCREEN (Explain Like I'm 5 with Metaphors)
+// -------------------------------------------------------------------------------------------------
+
+@Composable
+private fun AnalogyStepView(
+    analogy: AnalogyInfo,
+    isTr: Boolean,
+    appColors: AppColors,
+    onAskAi: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Tag Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.accentEmerald.copy(alpha = 0.12f)
+            ) {
                 Text(
-                    text = generateMemoryVisualizer(lesson.title, lesson.courseId, isTr),
-                    fontFamily = FontFamily.Monospace,
+                    text = if (isTr) "GÜNLÜK HAYATTAN BENZETME" else "REAL-LIFE ANALOGY",
+                    color = appColors.accentEmeraldLight,
                     fontSize = 11.sp,
-                    color = TextPrimary,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.padding(12.dp)
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.surfaceVariant,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onAskAi)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text("🤖", fontSize = 12.sp)
+                    Text(
+                        text = if (isTr) "Farklı Benzetme İste" else "More Analogies",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = appColors.primaryIndigoLight
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Metaphor Headline
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(analogy.emoji, fontSize = 30.sp)
+            Text(
+                text = analogy.headline,
+                fontSize = 21.sp,
+                fontWeight = FontWeight.Bold,
+                color = appColors.textPrimary,
+                lineHeight = 29.sp,
+                letterSpacing = (-0.2).sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Story Card
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = appColors.surfaceVariant,
+            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(18.dp)
+            ) {
+                val storyParagraphs = remember(analogy.story) {
+                    analogy.story.split("\n\n").filter { it.isNotBlank() }
+                }
+
+                storyParagraphs.forEachIndexed { index, p ->
+                    if (index > 0) {
+                        Spacer(modifier = Modifier.height(14.dp))
+                    }
+                    Text(
+                        text = p.trim(),
+                        fontSize = 16.sp,
+                        color = appColors.textPrimary,
+                        lineHeight = 26.sp,
+                        letterSpacing = 0.15.sp
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Takeaway Pill
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = appColors.accentEmeraldSubtle,
+            border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.accentEmeraldBorder)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("✨", fontSize = 18.sp)
+                Text(
+                    text = analogy.takeaway,
+                    fontSize = 14.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = appColors.accentEmeraldLight,
+                    lineHeight = 22.sp
                 )
             }
         }
     }
 }
 
-private fun generateMemoryVisualizer(title: String, courseId: String, isTr: Boolean): String {
-    val lowTitle = title.lowercase()
-    return when {
-        lowTitle.contains("pointer") || lowTitle.contains("işaretçi") || lowTitle.contains("adres") -> {
-            """
-            sayi (Bellek Bloğu)
-             ↓
-            [  10  ]  ← 0x7ffd9a (Adres)
+// -------------------------------------------------------------------------------------------------
+// STEP 3: CONSOLIDATED CODE SUMMARY SCREEN
+// -------------------------------------------------------------------------------------------------
 
-            ptr (İşaretçi Değişkeni)
-             ↓
-            [ 0x7ffd9a ] ──→ sayi'nin değerini okur (*ptr)
-            """.trimIndent()
+@Composable
+private fun CodeSummaryStepView(
+    lesson: Lesson,
+    code: String,
+    explanation: String,
+    isTr: Boolean,
+    appColors: AppColors
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Tag
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = appColors.primaryIndigo.copy(alpha = 0.12f)
+        ) {
+            Text(
+                text = if (isTr) "KOD ÖRNEĞİ & ÖZET" else "CODE EXAMPLE & SUMMARY",
+                color = appColors.primaryIndigoLight,
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.6.sp,
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
+            )
         }
-        lowTitle.contains("değişken") || lowTitle.contains("variable") || lowTitle.contains("veri") -> {
-            """
-            RAM (Bellek)
-            ┌──────────────┬──────────────┐
-            │ İsim: yas    │ Değer: 25    │
-            │ Tür: int (4B)│ Adres: 0x10A │
-            └──────────────┴──────────────┘
-            → Kod 'yas' dediğinde doğrudan 25 okunur.
-            """.trimIndent()
-        }
-        lowTitle.contains("döngü") || lowTitle.contains("loop") || lowTitle.contains("for") || lowTitle.contains("while") -> {
-            """
-            Başlangıç (i = 0)
-                   │
-                   ▼
-            [ Koşul: i < 5 ? ] ──(Hayır)──→ [ Döngüden Çık ]
-                   │ (Evet)
-                   ▼
-            [ Gövdeyi Çalıştır ] ──→ [ i++ ] ──→ Tekrar Kontrol Et
-            """.trimIndent()
-        }
-        lowTitle.contains("koşul") || lowTitle.contains("if") || lowTitle.contains("karar") -> {
-            """
-            Giriş Değeri
-                 │
-                 ▼
-            < Şart Doğru mu? >
-             ├─ (DOĞRU)  ──→ [ if Bloğu Çalışır ]
-             └─ (YANLIŞ) ──→ [ else Bloğu Çalışır ]
-            """.trimIndent()
-        }
-        else -> {
-            """
-            Girdi / Kod
-               │
-               ▼
-            [ 1. Satır: Tanımlama ]
-               │
-               ▼
-            [ 2. Satır: İşlem & Mantık ]
-               │
-               ▼
-            [ 3. Satır: Çıktı / Terminal ]
-            """.trimIndent()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = if (isTr) "Konunun Örnek Kodu" else "Consolidated Code Example",
+            fontSize = 21.sp,
+            fontWeight = FontWeight.Bold,
+            color = appColors.textPrimary,
+            lineHeight = 29.sp,
+            letterSpacing = (-0.2).sp
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Code Block
+        CodeBlock(
+            code = code,
+            language = lesson.courseId,
+            showLineNumbers = code.lines().size > 1,
+            title = lesson.title
+        )
+
+        // Explanation (if present)
+        if (explanation.isNotBlank()) {
+            Spacer(modifier = Modifier.height(18.dp))
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = appColors.surfaceVariant,
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("📝", fontSize = 18.sp)
+                    Text(
+                        text = explanation,
+                        fontSize = 15.sp,
+                        color = appColors.textSecondary,
+                        lineHeight = 24.sp,
+                        letterSpacing = 0.1.sp
+                    )
+                }
+            }
         }
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+// STEP 4: MINI CHECK QUESTION SCREEN (Focused & Interactive)
+// -------------------------------------------------------------------------------------------------
+
 @Composable
-private fun MiniCheckQuestionCard(
+private fun MiniQuestionStepView(
     miniQ: MiniQuestion,
     courseId: String,
     isTr: Boolean,
+    appColors: AppColors,
     selectedOption: Int?,
     isChecked: Boolean,
-    onSelectOption: (Int) -> Unit,
-    onCheckAnswer: () -> Unit
+    onSelectOption: (Int) -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, PrimarySubtleBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("🎯", fontSize = 16.sp)
-                Text(
-                    text = if (isTr) "Mini Kontrol Sorusu" else "Quick Check",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryIndigoLight
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = appColors.primaryIndigo.copy(alpha = 0.12f)
+        ) {
             Text(
-                text = miniQ.question,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextPrimary,
-                lineHeight = 18.sp
+                text = if (isTr) "HIZLI KONTROL" else "QUICK CHECK",
+                color = appColors.primaryIndigoLight,
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.6.sp,
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
             )
+        }
 
-            if (miniQ.codeSnippet != null && miniQ.codeSnippet.isNotBlank()) {
-                Spacer(modifier = Modifier.height(6.dp))
-                SyntaxHighlightedCode(
-                    code = miniQ.codeSnippet,
-                    language = courseId,
-                    showLineNumbers = false
-                )
-            }
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = miniQ.question,
+            fontSize = 18.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = appColors.textPrimary,
+            lineHeight = 27.sp,
+            letterSpacing = (-0.1).sp
+        )
 
+        if (miniQ.codeSnippet != null && miniQ.codeSnippet.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            CodeBlock(
+                code = miniQ.codeSnippet,
+                language = courseId,
+                showLineNumbers = miniQ.codeSnippet.lines().size > 1,
+                showWindowDots = false
+            )
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             miniQ.options.forEachIndexed { optIdx, optText ->
                 val isSelected = selectedOption == optIdx
                 val isCorrect = optIdx == miniQ.correctIndex
 
                 val borderColor = when {
-                    !isChecked -> if (isSelected) PrimaryIndigo else DarkCardBorder
-                    isCorrect -> AccentEmerald
-                    isSelected -> AccentRose
-                    else -> DarkCardBorder
+                    !isChecked -> if (isSelected) appColors.primaryIndigo else appColors.cardBorder
+                    isCorrect -> appColors.accentEmerald
+                    isSelected -> appColors.accentRose
+                    else -> appColors.cardBorder
                 }
 
                 val bgColor = when {
-                    !isChecked -> if (isSelected) PrimarySubtle else DarkSurfaceVariant
-                    isCorrect -> AccentEmeraldSubtle
-                    isSelected -> AccentRoseSubtle
-                    else -> DarkSurfaceVariant
+                    !isChecked -> if (isSelected) appColors.primarySubtle else appColors.surfaceVariant
+                    isCorrect -> appColors.accentEmeraldSubtle
+                    isSelected -> appColors.accentRoseSubtle
+                    else -> appColors.surfaceVariant
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 3.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(bgColor)
-                        .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                        .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
                         .clickable(enabled = !isChecked) { onSelectOption(optIdx) }
-                        .padding(10.dp),
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = optText,
-                        fontSize = 12.sp,
-                        color = TextPrimary
+                        fontSize = 15.sp,
+                        color = appColors.textPrimary,
+                        lineHeight = 22.sp,
+                        modifier = Modifier.weight(1f)
                     )
 
                     if (isChecked) {
                         if (isCorrect) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AccentEmerald, modifier = Modifier.size(16.dp))
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = appColors.accentEmerald,
+                                modifier = Modifier.size(20.dp)
+                            )
                         } else if (isSelected) {
-                            Icon(Icons.Default.Cancel, contentDescription = null, tint = AccentRose, modifier = Modifier.size(16.dp))
+                            Icon(
+                                Icons.Default.Cancel,
+                                contentDescription = null,
+                                tint = appColors.accentRose,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
                     }
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (!isChecked) {
-                Button(
-                    onClick = onCheckAnswer,
-                    enabled = selectedOption != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp)
-                        .testTag("check_mini_q_btn"),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text(if (isTr) "Cevabı Kontrol Et" else "Check Answer", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
-            } else {
-                val isCorrect = selectedOption == miniQ.correctIndex
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isCorrect) AccentEmeraldSubtle else AccentRoseSubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(
-                        brush = SolidColor(if (isCorrect) AccentEmeraldBorder else AccentRoseBorder)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (isCorrect) {
-                            "✓ ${if (isTr) "Harika! Doğru anladın." else "Great! You got it right."} ${miniQ.explanation}"
-                        } else {
-                            "💡 ${miniQ.explanation}"
-                        },
-                        color = if (isCorrect) AccentEmeraldLight else AccentRose,
-                        fontSize = 11.sp,
-                        lineHeight = 16.sp,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
+        if (isChecked) {
+            val isCorrect = selectedOption == miniQ.correctIndex
+            Spacer(modifier = Modifier.height(18.dp))
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (isCorrect) appColors.accentEmeraldSubtle else appColors.accentRoseSubtle,
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = SolidColor(if (isCorrect) appColors.accentEmeraldBorder else appColors.accentRoseBorder)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isCorrect) {
+                        "✓ ${if (isTr) "Harika! Doğru anladın." else "Great! You got it right."} ${miniQ.explanation}"
+                    } else {
+                        "💡 ${miniQ.explanation}"
+                    },
+                    color = if (isCorrect) appColors.accentEmeraldLight else appColors.accentRose,
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                    modifier = Modifier.padding(14.dp)
+                )
             }
         }
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+// STEP 5: HANDS-ON PRACTICAL TASK SCREEN (Interactive Coding & Console)
+// -------------------------------------------------------------------------------------------------
+
 @Composable
-private fun InteractiveExerciseCard(
+private fun PracticalExerciseStepView(
     lesson: Lesson,
+    taskDescription: String,
     practicalTaskCode: String,
     onCodeChange: (String) -> Unit,
     expectedOutput: String,
@@ -1020,348 +1173,398 @@ private fun InteractiveExerciseCard(
     currentHintStage: Int,
     isSolutionRevealed: Boolean,
     isTr: Boolean,
+    appColors: AppColors,
     onRunCode: () -> Unit,
     onResetCode: () -> Unit,
     onNextHint: () -> Unit,
     onRevealSolution: () -> Unit,
     onAskAi: (String) -> Unit
 ) {
-    val hintsList = remember(lesson.id, lesson.practicalTask) {
-        generateProgressiveHints(lesson.practicalTask ?: "", lesson.courseId, isTr)
+    val hintsList = remember(lesson.id, taskDescription) {
+        generateProgressiveHints(taskDescription, lesson.courseId, isTr)
     }
 
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                1.dp,
-                if (isPassed) AccentEmerald.copy(alpha = 0.8f) else DarkCardBorder,
-                RoundedCornerShape(16.dp)
-            )
-            .testTag("lesson_practical_task_card"),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
+            .testTag("lesson_practical_task_card")
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+        // Tag & XP Badge
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Başlık & XP Rozeti
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.accentEmerald.copy(alpha = 0.12f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("🛠️", fontSize = 18.sp)
-                    Column {
-                        Text(
-                            text = if (isTr) "Uygulamalı Görev" else "Hands-On Exercise",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AccentEmeraldLight
-                        )
-                        Text(
-                            text = if (isTr) "Kodu yaz, çalıştır ve çıktısını gör" else "Write code, run and see output",
-                            fontSize = 11.sp,
-                            color = TextMuted
-                        )
-                    }
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isPassed) AccentEmerald.copy(alpha = 0.2f) else AccentAmber.copy(alpha = 0.2f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        if (isPassed) {
-                            Text("✓ Tamamlandı", color = AccentEmerald, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        } else {
-                            Text("+20 XP", color = AccentAmber, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
+                Text(
+                    text = if (isTr) "UYGULAMALI GÖREV" else "HANDS-ON TASK",
+                    color = appColors.accentEmeraldLight,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.6.sp,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
+                )
             }
 
-            // Görev Yönergesi Kutusu
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (isPassed) appColors.accentEmerald.copy(alpha = 0.15f) else appColors.accentAmber.copy(alpha = 0.15f)
+            ) {
+                Text(
+                    text = if (isPassed) "✓ Tamamlandı" else "+20 XP",
+                    color = if (isPassed) appColors.accentEmerald else appColors.accentAmber,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Task Prompt
+        Text(
+            text = taskDescription,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = appColors.textPrimary,
+            lineHeight = 25.sp,
+            letterSpacing = 0.1.sp
+        )
+
+        // Expected Output Pill
+        if (expectedOutput.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = DarkSurfaceVariant,
-                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
+                color = appColors.surfaceVariant,
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.cardBorder)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = if (isTr) "GÖREV:" else "TASK:",
-                        fontSize = 10.sp,
+                        text = if (isTr) "🎯 Beklenen Çıktı:" else "🎯 Expected Output:",
+                        fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryIndigoLight,
-                        letterSpacing = 0.5.sp
+                        color = appColors.textMuted
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = lesson.practicalTask ?: "",
+                        text = expectedOutput,
+                        fontFamily = FontFamily.Monospace,
                         fontSize = 13.sp,
-                        color = TextPrimary,
-                        lineHeight = 19.sp
+                        fontWeight = FontWeight.Bold,
+                        color = appColors.accentEmeraldLight
                     )
                 }
             }
+        }
 
-            // Beklenen Çıktı Kutusu (Expected Output)
-            if (expectedOutput.isNotBlank()) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = DarkBg,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(DarkCardBorder)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // Embedded Code Editor
+        CodeEditorComponent(
+            code = practicalTaskCode,
+            onCodeChange = onCodeChange,
+            language = lesson.courseId,
+            title = lesson.title,
+            minEditorHeight = 140,
+            showSymbolsToolbar = true,
+            showRunButton = false,
+            showOutputTerminal = false,
+            onResetCode = onResetCode,
+            onAskAi = onAskAi,
+            testTagPrefix = "lesson_practical_task"
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Run Code Button
+        Button(
+            onClick = onRunCode,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp)
+                .testTag("verify_practical_task_btn"),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isPassed) appColors.accentEmerald else appColors.primaryIndigo,
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(10.dp),
+            enabled = !isRunning
+        ) {
+            if (isRunning) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(if (isTr) "Kod Çalıştırılıyor..." else "Running...", fontSize = 13.sp)
+            } else {
+                Text(if (isPassed) "✓" else "▶", fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = if (isPassed) {
+                        if (isTr) "Tekrar Test Et & Çalıştır" else "Run & Test Again"
+                    } else {
+                        if (isTr) "Kodu Çalıştır & Çıktıyı Gör" else "Run Code & View Output"
+                    },
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // Console Output
+        if (practicalTaskResult != null) {
+            val res = practicalTaskResult
+            Spacer(modifier = Modifier.height(16.dp))
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = appColors.surfaceVariant,
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = SolidColor(if (res.isSuccess) appColors.accentEmeraldBorder else appColors.accentRoseBorder)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Text("🎯", fontSize = 12.sp)
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(if (res.isSuccess) appColors.accentEmerald else appColors.accentRose)
+                            )
                             Text(
-                                text = if (isTr) "Beklenen Çıktı:" else "Expected Output:",
+                                text = if (res.isSuccess) "KONSOL ÇIKTISI" else "ÇALIŞTIRMA / DERLEME HATASI",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TextMuted
+                                color = if (res.isSuccess) appColors.accentEmeraldLight else appColors.accentRose
                             )
                         }
+
+                        if (res.executionTimeMs > 0) {
+                            Text(
+                                text = "${res.executionTimeMs} ms",
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = appColors.textMuted
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = res.output,
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily.Monospace,
+                        color = if (res.isSuccess) appColors.textPrimary else appColors.accentRose,
+                        lineHeight = 17.sp
+                    )
+
+                    if (!res.isSuccess && res.error != null && res.error != res.output) {
                         Text(
-                            text = expectedOutput,
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AccentEmeraldLight
+                            text = "💡 ${res.error}",
+                            fontSize = 11.sp,
+                            color = appColors.accentAmber,
+                            lineHeight = 15.sp
                         )
                     }
                 }
             }
+        }
 
-            // Gömülü Kod Editörü
-            CodeEditorComponent(
-                code = practicalTaskCode,
-                onCodeChange = onCodeChange,
-                language = lesson.courseId,
-                title = lesson.title,
-                minEditorHeight = 140,
-                showSymbolsToolbar = true,
-                showRunButton = false,
-                showOutputTerminal = false,
-                onResetCode = onResetCode,
-                onAskAi = onAskAi,
-                testTagPrefix = "lesson_practical_task"
-            )
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // ▶ Çalıştır & Test Et Butonu
-            Button(
-                onClick = onRunCode,
+        // Hint & AI Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedButton(
+                onClick = onNextHint,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp)
-                    .testTag("verify_practical_task_btn"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isPassed) AccentEmerald else PrimaryIndigo,
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(10.dp),
-                enabled = !isRunning
+                    .weight(1f)
+                    .height(36.dp),
+                shape = RoundedCornerShape(8.dp),
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.primarySubtleBorder))
             ) {
-                if (isRunning) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (isTr) "Kod Çalıştırılıyor..." else "Running...", fontSize = 13.sp)
-                } else {
-                    Text(if (isPassed) "✓" else "▶", fontSize = 14.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (isPassed) {
-                            if (isTr) "Tekrar Test Et & Çalıştır" else "Run & Test Again"
-                        } else {
-                            if (isTr) "Kodu Çalıştır & Çıktıyı Gör" else "Run Code & View Output"
-                        },
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text("💡", fontSize = 11.sp)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = if (currentHintStage == 0) {
+                        if (isTr) "İpucu Al" else "Get Hint"
+                    } else {
+                        if (isTr) "Sıradaki İpucu ($currentHintStage/3)" else "Next Hint ($currentHintStage/3)"
+                    },
+                    fontSize = 11.sp,
+                    color = appColors.primaryIndigoLight
+                )
             }
 
-            // Terminal / Console Çıktısı
-            if (practicalTaskResult != null) {
-                val res = practicalTaskResult
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = DarkBg,
-                    border = CardDefaults.outlinedCardBorder().copy(
-                        brush = SolidColor(if (res.isSuccess) AccentEmeraldBorder else AccentRoseBorder)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(if (res.isSuccess) AccentEmerald else AccentRose)
-                                )
-                                Text(
-                                    text = if (res.isSuccess) "KONSOL ÇIKTISI" else "ÇALIŞTIRMA / DERLEME HATASI",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (res.isSuccess) AccentEmeraldLight else AccentRose
-                                )
-                            }
-
-                            if (res.executionTimeMs > 0) {
-                                Text(
-                                    text = "${res.executionTimeMs} ms",
-                                    fontSize = 10.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = TextMuted
-                                )
-                            }
-                        }
-
-                        Text(
-                            text = res.output,
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily.Monospace,
-                            color = if (res.isSuccess) TextPrimary else AccentRose,
-                            lineHeight = 17.sp
-                        )
-
-                        if (!res.isSuccess && res.error != null && res.error != res.output) {
-                            Text(
-                                text = "💡 ${res.error}",
-                                fontSize = 11.sp,
-                                color = AccentAmber,
-                                lineHeight = 15.sp
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Başarılı Görev İnline Kartı
-            if (isPassed) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = AccentEmeraldSubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentEmeraldBorder)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AccentEmerald, modifier = Modifier.size(20.dp))
-                        Column {
-                            Text(
-                                text = if (isTr) "Tebrikler! Görev tamamlandı." else "Congratulations! Task completed.",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AccentEmeraldLight
-                            )
-                            Text(
-                                text = if (isTr) "Doğru çıktıyı başarıyla elde ettin." else "You successfully produced the right output.",
-                                fontSize = 11.sp,
-                                color = TextSecondary
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Aşamalı İpucu ve Çözüm Butonları
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            OutlinedButton(
+                onClick = { onAskAi(practicalTaskCode) },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(36.dp),
+                shape = RoundedCornerShape(8.dp),
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.accentEmerald.copy(alpha = 0.4f)))
             ) {
-                OutlinedButton(
-                    onClick = onNextHint,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(PrimarySubtleBorder))
-                ) {
-                    Text("💡", fontSize = 11.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
+                Text("🤖", fontSize = 11.sp)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(if (isTr) "AI Desteği" else "AI Help", fontSize = 11.sp, color = appColors.accentEmeraldLight)
+            }
+        }
+
+        // Active Hint Reveal
+        if (currentHintStage > 0 && hintsList.isNotEmpty()) {
+            val activeHint = hintsList.getOrNull(currentHintStage - 1) ?: hintsList.last()
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = appColors.accentAmberSubtle,
+                border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(appColors.accentAmberBorder)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
                     Text(
-                        text = if (currentHintStage == 0) {
-                            if (isTr) "İpucu Al" else "Get Hint"
-                        } else {
-                            if (isTr) "Sıradaki İpucu ($currentHintStage/3)" else "Next Hint ($currentHintStage/3)"
-                        },
+                        text = "💡 İpucu $currentHintStage:",
                         fontSize = 11.sp,
-                        color = PrimaryIndigoLight
+                        fontWeight = FontWeight.Bold,
+                        color = appColors.accentAmber
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = activeHint,
+                        fontSize = 11.5.sp,
+                        color = appColors.textPrimary,
+                        lineHeight = 16.sp
                     )
                 }
-
-                OutlinedButton(
-                    onClick = { onAskAi(practicalTaskCode) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentEmerald.copy(alpha = 0.4f)))
-                ) {
-                    Text("🤖", fontSize = 11.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (isTr) "AI Desteği" else "AI Help", fontSize = 11.sp, color = AccentEmeraldLight)
-                }
             }
+        }
+    }
+}
 
-            // Aşamalı İpucu Gösterimi
-            if (currentHintStage > 0 && hintsList.isNotEmpty()) {
-                val activeHint = hintsList.getOrNull(currentHintStage - 1) ?: hintsList.last()
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = AccentAmberSubtle,
-                    border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(AccentAmberBorder)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
-                        Text(
-                            text = "💡 İpucu $currentHintStage:",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AccentAmber
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = activeHint,
-                            fontSize = 11.sp,
-                            color = TextPrimary,
-                            lineHeight = 16.sp
-                        )
-                    }
-                }
-            }
+// -------------------------------------------------------------------------------------------------
+// METAPHOR DATA GENERATOR
+// -------------------------------------------------------------------------------------------------
+
+data class AnalogyInfo(
+    val emoji: String,
+    val headline: String,
+    val story: String,
+    val takeaway: String
+)
+
+private fun getChildFriendlyAnalogy(title: String, courseId: String, isTr: Boolean): AnalogyInfo {
+    val low = title.lowercase()
+    return when {
+        low.contains("pointer") || low.contains("işaretçi") || low.contains("adres") || low.contains("bellek") -> {
+            AnalogyInfo(
+                emoji = "🗺️",
+                headline = if (isTr) "Hazine Haritası ve Ev Adresi Benzetmesi" else "Treasure Map Metaphor",
+                story = if (isTr) {
+                    "Arkadaşına koca bir oyuncak dolabını sırtında taşıyıp götürmezsin değil mi? Sadece evinin adresini bir kağıda yazar verirsin. Arkadaşın o adrese gidip dolabın içindeki oyuncağı bulur.\n\nİşte 'İşaretçi (Pointer)' tam olarak budur: Verinin kendisini değil, bilgisayarın hafızasındaki adresini tutan küçük bir pusuladır."
+                } else {
+                    "Instead of carrying a giant toy box to your friend's house, you give them a piece of paper with your home address. They go there and find the toys.\nA pointer is just that: a small note containing the address in memory!"
+                },
+                takeaway = if (isTr) "Sonuç: Veriyi taşımak yerine adresini fısıldarız!" else "Takeaway: Share the address, not the heavy payload!"
+            )
+        }
+        low.contains("değişken") || low.contains("variable") || low.contains("val") || low.contains("var") -> {
+            AnalogyInfo(
+                emoji = "📦",
+                headline = if (isTr) "Etiketli Oyuncak Kutuları Benzetmesi" else "Labeled Toy Boxes Metaphor",
+                story = if (isTr) {
+                    "Odanı toplarken legolarını bir kutunun içine koyup üzerine 'Legolar' etiketi yapıştırdığını hayal et.\n\n• 'val' kutusu kilitli kumbaradır: İçine ne koyduysan hep öyle kalır, kimse değiştiremez.\n• 'var' kutusu ise kapağı açık kutudur: İstediğin zaman içindeki arabayı çıkarıp yerine top koyabilirsin."
+                } else {
+                    "Imagine putting toys in a box and sticking a name tag on it.\n• 'val' is a locked piggy bank: once placed, you cannot swap it.\n• 'var' is an open basket: you can replace the toy inside anytime!"
+                },
+                takeaway = if (isTr) "Sonuç: Kutunun içine ne koyarsan bilgisayar onu hatırlar!" else "Takeaway: Label your boxes and keep your room tidy!"
+            )
+        }
+        low.contains("null") || low.contains("güvenlik") -> {
+            AnalogyInfo(
+                emoji = "🎁",
+                headline = if (isTr) "Boş Hediye Paketi Benzetmesi" else "Empty Gift Box Metaphor",
+                story = if (isTr) {
+                    "Doğum gününde sana harika bir hediye kutusu geldiğini ama kapağını açtığında içinin bomboş olduğunu düşün. Elini daldırınca hiçbir şey bulamayıp şaşırırsın!\n\nProgramlamada 'null', bu boş kutudur. Kotlin, kutunun üzerine '?' işareti koyarak sana 'Dikkat et, bu kutunun içi boş olabilir!' uyarısı yapar."
+                } else {
+                    "Imagine receiving a shiny wrapped gift box, opening it, and finding nothing inside. That is 'null'.\nThe '?' symbol warns you before you reach inside!"
+                },
+                takeaway = if (isTr) "Sonuç: Boş kutulara önceden hazırlıklı oluruz, sürpriz yaşamayız!" else "Takeaway: Handle empty boxes safely before opening!"
+            )
+        }
+        low.contains("koşul") || low.contains("if") || low.contains("else") || low.contains("karar") -> {
+            AnalogyInfo(
+                emoji = "🚦",
+                headline = if (isTr) "Trafik Lambası ve Şemsiye Kuralı" else "Traffic Light & Umbrella Rule",
+                story = if (isTr) {
+                    "Sabah pencereden dışarı bakarsın: 'Eğer (if) hava yağmurluysa şemsiyemi alırım, yoksa (else) güneş gözlüğümü takarım.'\n\nBilgisayarlar da tıpkı senin gibi kararlar verir. Şart doğruysa bir yolu, yanlışsa diğer yolu seçer."
+                } else {
+                    "Look outside in the morning: 'If it rains, take an umbrella; else, wear sunglasses.'\nComputers make decisions the exact same way!"
+                },
+                takeaway = if (isTr) "Sonuç: Bilgisayar şartlara göre doğru yolu seçen akıllı bir yol ayrımıdır." else "Takeaway: Conditions guide the program down the right path."
+            )
+        }
+        low.contains("döngü") || low.contains("loop") || low.contains("for") || low.contains("while") -> {
+            AnalogyInfo(
+                emoji = "🔁",
+                headline = if (isTr) "Beden Dersinde Zıplama Sayacı Benzetmesi" else "Jumping Jacks Metaphor",
+                story = if (isTr) {
+                    "Öğretmenin sana '10 kere zıpla' dediğinde, her zıplayışında içinden 1, 2, 3... diye sayarsın ve 10 olunca durursun.\n\n'Döngüler' bilgisayarın zıplama sayacıdır. 'Şu işi 100 kere yap' dediğinde hiç sıkılmadan, yorulmadan ışık hızında 100 kere tekrarlar."
+                } else {
+                    "When asked to do 10 jumping jacks, you count 1, 2, 3... until 10.\nA loop does repetitive work at lightning speed without ever getting tired!"
+                },
+                takeaway = if (isTr) "Sonuç: Tekrar eden işleri tek komutla bilgisayara devrederiz!" else "Takeaway: Let the computer repeat boring chores instantly!"
+            )
+        }
+        low.contains("fonksiyon") || low.contains("function") || low.contains("metot") -> {
+            AnalogyInfo(
+                emoji = "🍹",
+                headline = if (isTr) "Sihirli Meyve Suyu Makinesi Benzetmesi" else "Magic Juice Blender Metaphor",
+                story = if (isTr) {
+                    "Mutfaktaki meyve sıkacağını düşün: İçine portakal atarsın (Girdi / Parametre), düğmesine basarsın (Çalıştırma) ve sana taptaze portakal suyu verir (Çıktı / Return).\n\nFonksiyonlar, istediğin zaman tekrar tekrar çalıştırabileceğin sihirli küçük makinelerdir."
+                } else {
+                    "Think of a juice blender: You put oranges in (Input), press the button, and delicious fresh juice comes out (Output).\nA function is a reusable magic machine!"
+                },
+                takeaway = if (isTr) "Sonuç: Bir kere tanımla, istediğin zaman düğmesine basıp çalıştır!" else "Takeaway: Define the recipe once, run it whenever you need!"
+            )
+        }
+        low.contains("sınıf") || low.contains("class") || low.contains("nesne") || low.contains("object") -> {
+            AnalogyInfo(
+                emoji = "🍪",
+                headline = if (isTr) "Kurabiye Kalıbı ve Kurabiyeler Benzetmesi" else "Cookie Cutter Metaphor",
+                story = if (isTr) {
+                    "Kurabiye kalıbını (Class) eline alırsın: Kalıp hamur değildir ama nasıl bir kurabiye çıkacağını belirler. O kalıbı hamura her bastığında yepyeni, lezzetli bir kurabiye (Object / Nesne) elde edersin.\n\nTek bir kalıpla istediğin kadar nesne üretebilirsin!"
+                } else {
+                    "A cookie cutter (Class) defines the shape. Every time you press it on the dough, you get an actual delicious cookie (Object)!"
+                },
+                takeaway = if (isTr) "Sonuç: Sınıf taslaktır, nesne ise o taslaktan doğan gerçek varlıktır." else "Takeaway: Class is the blueprint, object is the real thing."
+            )
+        }
+        else -> {
+            AnalogyInfo(
+                emoji = "🧩",
+                headline = if (isTr) "Lego Parçalarıyla İnşa Etme Mantığı" else "Building with Lego Bricks",
+                story = if (isTr) {
+                    "Büyük bir Lego kalesi yaparken her parçayı rastgele koymazsın. Önce sağlam temeli atar, sonra duvarları örer, en son bayrağı dikersin.\n\nProgramlama da böyledir: Her küçük kural, devasa harika uygulamaların birer Lego tuğlasıdır."
+                } else {
+                    "Building software is like building with Lego bricks: Step by step, pieces snap together to create wonderful creations!"
+                },
+                takeaway = if (isTr) "Sonuç: Adım adım ilerleyerek her şeyi kolayca yapabilirsin!" else "Takeaway: Every big app starts with simple small blocks!"
+            )
         }
     }
 }
@@ -1370,13 +1573,11 @@ private fun deriveExpectedOutput(title: String, task: String, lang: String): Str
     val lowTask = task.lowercase()
     val lowTitle = title.lowercase()
     return when {
-        lowTask.contains("merhaba") || lowTask.contains("hello") -> "Merhaba Dünya"
-        lowTask.contains("25") || lowTitle.contains("değişken") -> "25"
+        lowTask.contains("merhaba dünya") || lowTask.contains("hello world") -> "Merhaba Dünya"
         lowTask.contains("1'den 5'e") || lowTask.contains("1 2 3 4 5") -> "1\n2\n3\n4\n5"
         lowTask.contains("çift sayılar") -> "2\n4\n6\n8\n10"
-        lowTask.contains("toplam") || lowTask.contains("sum") -> "15"
-        lowTask.contains("kare") -> "100"
-        else -> "Başarılı Çıktı"
+        lowTask.contains("tek sayılar") -> "1\n3\n5\n7\n9"
+        else -> ""
     }
 }
 
@@ -1392,126 +1593,24 @@ private fun generateProgressiveHints(task: String, lang: String, isTr: Boolean):
 }
 
 @Composable
-private fun RealWorldArchitectureCard(example: String, isTr: Boolean) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text("🌍", fontSize = 16.sp)
-                Text(
-                    text = if (isTr) "Gerçek Dünya Mimarisi & Kullanım Alanı" else "Real-World Architecture & Use Case",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = example,
-                fontSize = 12.sp,
-                color = TextSecondary,
-                lineHeight = 18.sp
-            )
-        }
-    }
-}
-
-@Composable
-private fun LessonCompletionSummaryCard(
-    lesson: Lesson,
-    isCompleted: Boolean,
+private fun LockedContentCard(
+    onUnlock: () -> Unit,
     isTr: Boolean,
-    onCompleteLesson: () -> Unit,
-    nextLesson: Lesson?,
-    onNextLesson: (Lesson) -> Unit
+    appColors: AppColors
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                text = if (isTr) "Ders Tamamlama & İlerleme" else "Lesson Completion & Progress",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-
-            Button(
-                onClick = onCompleteLesson,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp)
-                    .testTag("complete_lesson_btn"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isCompleted) AccentEmerald else PrimaryIndigo
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Icon(
-                    imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = if (isCompleted) {
-                        if (isTr) "Ders Tamamlandı (+20 XP)" else "Lesson Completed (+20 XP)"
-                    } else {
-                        if (isTr) "Konuyu Tamamla Olarak İşaretle" else "Mark Topic as Completed"
-                    },
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
-                    color = Color.White
-                )
-            }
-
-            if (nextLesson != null) {
-                OutlinedButton(
-                    onClick = { onNextLesson(nextLesson) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                        .testTag("next_lesson_btn"),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text(
-                        text = if (isTr) "Sonraki Konu: ${nextLesson.title} →" else "Next Topic: ${nextLesson.title} →",
-                        fontSize = 12.sp,
-                        color = PrimaryIndigoLight
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LockedContentCard(onUnlock: () -> Unit, isTr: Boolean) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .border(
                 1.dp,
-                androidx.compose.ui.graphics.Brush.horizontalGradient(
-                    listOf(AccentAmber.copy(alpha = 0.6f), PrimaryIndigo.copy(alpha = 0.6f))
+                Brush.horizontalGradient(
+                    listOf(appColors.accentAmber.copy(alpha = 0.6f), appColors.primaryIndigo.copy(alpha = 0.6f))
                 ),
                 RoundedCornerShape(16.dp)
             )
             .testTag("premium_lock_card"),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface)
+        colors = CardDefaults.cardColors(containerColor = appColors.surface)
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -1520,11 +1619,11 @@ private fun LockedContentCard(onUnlock: () -> Unit, isTr: Boolean) {
         ) {
             Surface(
                 shape = CircleShape,
-                color = AccentAmberSubtle,
+                color = appColors.accentAmberSubtle,
                 modifier = Modifier.size(48.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Outlined.Lock, contentDescription = null, tint = AccentAmber, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Outlined.Lock, contentDescription = null, tint = appColors.accentAmber, modifier = Modifier.size(24.dp))
                 }
             }
 
@@ -1532,7 +1631,7 @@ private fun LockedContentCard(onUnlock: () -> Unit, isTr: Boolean) {
                 text = if (isTr) "İleri Düzey PRO Konu" else "Advanced PRO Topic",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary
+                color = appColors.textPrimary
             )
 
             Text(
@@ -1542,21 +1641,21 @@ private fun LockedContentCard(onUnlock: () -> Unit, isTr: Boolean) {
                     "This topic contains in-depth step-by-step guides, live sandbox, and practical exercises."
                 },
                 fontSize = 12.sp,
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 lineHeight = 17.sp,
                 textAlign = TextAlign.Center
             )
 
             Button(
                 onClick = onUnlock,
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                colors = ButtonDefaults.buttonColors(containerColor = appColors.primaryIndigo),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(42.dp)
                     .testTag("unlock_premium_btn")
             ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = AccentAmber, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Star, contentDescription = null, tint = appColors.accentAmber, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(if (isTr) "PRO Üyeliğe Geç" else "Upgrade to PRO", fontWeight = FontWeight.Bold, fontSize = 12.sp)
             }

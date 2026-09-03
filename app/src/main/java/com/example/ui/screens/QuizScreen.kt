@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.QuestionType
+import com.example.ui.components.CodeBlock
 import com.example.ui.components.SyntaxHighlightedCode
 import com.example.ui.theme.*
 import com.example.viewmodel.MainViewModel
@@ -150,10 +151,10 @@ fun QuizScreen(
 
                 // Optional Code Snippet for question
                 if (currentQuestion.codeSnippet != null) {
-                    SyntaxHighlightedCode(
+                    CodeBlock(
                         code = currentQuestion.codeSnippet,
                         language = quizState.lesson?.courseId ?: "code",
-                        showLineNumbers = true
+                        showLineNumbers = currentQuestion.codeSnippet.lines().size > 1
                     )
                 }
 

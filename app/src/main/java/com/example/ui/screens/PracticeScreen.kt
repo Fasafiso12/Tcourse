@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.catalog.CourseCatalog
 import com.example.model.CodingChallenge
 import com.example.model.ProjectItem
+import com.example.ui.components.CodeBlock
 import com.example.ui.components.CodeEditorComponent
 import com.example.ui.components.SyntaxHighlightedCode
 import com.example.ui.theme.*
@@ -95,6 +96,11 @@ fun PracticeScreen(
                 else -> "mesaj = \"Elixir & BEAM\"\nIO.puts(\"Merhaba #{mesaj}!\")\n\nsonuc = [1, 2, 3, 4]\n|> Enum.map(fn x -> x * 10 end)\n|> Enum.sum()\n\nIO.puts(\"Pipeline Toplami: #{sonuc}\")"
             }
             "flutter" -> "import 'package:flutter/material.dart';\n\nvoid main() {\n  runApp(\n    MaterialApp(\n      home: Scaffold(\n        body: Center(\n          child: Text('Merhaba Kod Akademi Flutter!'),\n        ),\n      ),\n    ),\n  );\n}"
+            "ai" -> when (type) {
+                "loop" -> "for epoch in range(1, 4):\n    loss = 1.0 / epoch\n    print(f\"[Epoch {epoch}/3] Loss: {loss:.3f}\")\nprint(\"Model eğitimi tamamlandı!\")"
+                "func" -> "def ai_tahmin(x, w=15, b=5):\n    return (x * w) + b\n\nprint(\"Girdi: 3 -> Model Çıktısı:\", ai_tahmin(3))"
+                else -> "class BasitModel:\n    def __init__(self):\n        self.agirlik = 2.5\n    def forward(self, x):\n        return x * self.agirlik\n\nmodel = BasitModel()\nprint(\"Yapay Zeka Modeli Aktif!\")\nprint(\"Tahmin (x=10):\", model.forward(10))"
+            }
             else -> "void main() {\n  print('Kod Akademi Canlı Sandbox');\n}"
         }
     }
@@ -284,28 +290,6 @@ fun PracticeScreen(
                             testTagPrefix = "sandbox"
                         )
                     }
-
-                    // Feature Guide Card
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(14.dp))
-                                .border(1.dp, DarkCardBorder, RoundedCornerShape(14.dp)),
-                            colors = CardDefaults.cardColors(containerColor = DarkSurface)
-                        ) {
-                            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Text("💡", fontSize = 14.sp)
-                                    Text("Editör Özellikleri", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                                }
-                                Text("• Canlı Sözdizimi Vurgulama (Keywords, Types, Strings, Comments, Numbers)", fontSize = 11.sp, color = TextSecondary)
-                                Text("• Satır Numaralandırma & Otomatik Kaydırma", fontSize = 11.sp, color = TextSecondary)
-                                Text("• Hızlı Sembol Çubuğu ile mobil klavyede zor yazılan parantez ve noktalı virgülleri tek dokunuşla ekleme", fontSize = 11.sp, color = TextSecondary)
-                                Text("• Çift tırnak, parantez veya noktalı virgül hatalarında akıllı teşhis ve hata ayıklama mesajları", fontSize = 11.sp, color = TextSecondary)
-                            }
-                        }
-                    }
                 }
             }
 
@@ -441,44 +425,30 @@ private fun ProjectCardItem(project: ProjectItem) {
 
             Text(
                 text = project.description,
-                fontSize = 13.sp,
+                fontSize = 14.5.sp,
                 color = TextSecondary,
-                lineHeight = 18.sp
+                lineHeight = 21.sp
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Proje Kazanımları:",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-
-            for (req in project.learningObjectives) {
-                Text(
-                    text = "• $req",
-                    fontSize = 11.sp,
-                    color = TextMuted,
-                    modifier = Modifier.padding(vertical = 1.dp)
+            if (isExpanded) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Başlangıç İskeleti:", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PrimaryIndigoLight)
+                Spacer(modifier = Modifier.height(6.dp))
+                CodeBlock(
+                    code = project.starterCode,
+                    language = project.courseId,
+                    title = "${project.courseId}_starter"
                 )
             }
 
-            if (isExpanded) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Text("Başlangıç İskeleti:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PrimaryIndigo)
-                Spacer(modifier = Modifier.height(4.dp))
-                SyntaxHighlightedCode(code = project.starterCode, language = project.courseId)
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedButton(
                 onClick = { isExpanded = !isExpanded },
-                modifier = Modifier.fillMaxWidth().height(42.dp),
-                shape = RoundedCornerShape(10.dp)
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(if (isExpanded) "Projeyi Daralt ▲" else "Proje Kodunu ve İskeletini Gör ▼", fontSize = 12.sp, color = PrimaryIndigo)
+                Text(if (isExpanded) "Projeyi Daralt ▲" else "Proje Kodunu ve İskeletini Gör ▼", fontSize = 13.5.sp, color = PrimaryIndigoLight)
             }
         }
     }

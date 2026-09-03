@@ -152,6 +152,19 @@ object CourseCatalog {
             totalLessonsCount = 12,
             isPopular = true,
             drawableRes = R.drawable.img_lang_elixir_1787781329115
+        ),
+        ProgrammingLanguage(
+            id = "ai",
+            name = "Yapay Zeka (AI)",
+            tag = "Neural Networks & Deep Learning",
+            iconEmoji = "🧠",
+            colorHex = 0xFF6366F1,
+            shortDescription = "Sıfırdan kendi yapay zeka ve derin öğrenme modelinizi adım adım geliştirin; nöronlar, tensörler, PyTorch ve LLM.",
+            targetAudience = "Kendi yapay zeka modelini sıfırdan geliştirmek isteyen tüm meraklılar",
+            popularUses = listOf("Kendi Modelini Eğitme", "PyTorch & Tensörler", "LLM & Transformer"),
+            totalLessonsCount = 12,
+            isPopular = true,
+            drawableRes = R.drawable.img_lang_ai_art_1788415768160
         )
     )
 
@@ -213,6 +226,7 @@ object CourseCatalog {
             "lua" -> LuaCurriculum.getSections()
             "go" -> GoCurriculum.getSections()
             "elixir" -> ElixirCurriculum.getSections()
+            "ai" -> AiCurriculum.getSections()
             else -> DartCurriculum.getSections()
         }
     }
@@ -230,6 +244,7 @@ object CourseCatalog {
             "lua" -> LuaCurriculum.getLessons()
             "go" -> GoCurriculum.getLessons()
             "elixir" -> ElixirCurriculum.getLessons()
+            "ai" -> AiCurriculum.getLessons()
             else -> DartCurriculum.getLessons()
         }
     }
@@ -347,6 +362,16 @@ object CourseCatalog {
             learningObjectives = listOf("Web Workers Parallel Processing", "SharedArrayBuffer", "Float32Array TypedArrays", "Proxy Reactive UI Binding"),
             starterCode = "class SignalEngine {\n  // Mimariyi kurun\n}",
             solutionCode = "class SignalEngine {\n  constructor() {\n    this.buffer = new Float32Array(10000);\n  }\n  process() {\n    return this.buffer.map(x => Math.sin(x));\n  }\n}"
+        ),
+        ProjectItem(
+            id = "proj_ai_mini_gpt_transformer",
+            courseId = "ai",
+            title = "Sıfırdan Kendi Dil Modelini (Mini-GPT / Transformer) Geliştirme",
+            level = CourseLevel.EXPERT,
+            description = "PyTorch, Multi-Head Self-Attention, Positional Encoding ve Feed-Forward katmanları ile sıfırdan çalışan mini bir metin üretim modeli.",
+            learningObjectives = listOf("Self-Attention Mechanism", "Transformer Block Mimarisi", "Next-Token Prediction Training", "Model Weights Export"),
+            starterCode = "class MiniTransformerBlock:\n  # Dikkat ve ileri besleme bloklarını kodlayın\n  pass",
+            solutionCode = "class MiniTransformerBlock:\n    def __init__(self, emb_dim=64):\n        self.emb_dim = emb_dim\n    def forward(self, x):\n        # Self-attention ve feed-forward adımı\n        return x\n\nmodel = MiniTransformerBlock()\nprint('Mini Transformer Modeli Hazır!')"
         )
     )
 

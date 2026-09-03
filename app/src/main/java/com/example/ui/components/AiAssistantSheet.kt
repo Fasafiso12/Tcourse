@@ -698,7 +698,11 @@ private fun RenderAiResponseContent(text: String, defaultLanguage: String) {
             val lang = match.groupValues[1].ifBlank { defaultLanguage }
             val code = match.groupValues[2].trimEnd()
 
-            SyntaxHighlightedCode(code = code, language = lang)
+            CodeBlock(
+                code = code,
+                language = lang,
+                showLineNumbers = code.lines().size > 1
+            )
 
             lastIndex = match.range.last + 1
         }

@@ -97,7 +97,7 @@ fun CoursesScreen(
             val matchesCategory = when (selectedCategory) {
                 CourseCategoryFilter.ALL -> true
                 CourseCategoryFilter.MOBILE -> lang.id in listOf("dart", "flutter", "kotlin")
-                CourseCategoryFilter.AI_DATA -> lang.id in listOf("python")
+                CourseCategoryFilter.AI_DATA -> lang.id in listOf("python", "ai")
                 CourseCategoryFilter.SYSTEMS -> lang.id in listOf("c", "cpp", "rust", "go")
                 CourseCategoryFilter.WEB -> lang.id in listOf("javascript", "lua", "elixir", "go")
             }

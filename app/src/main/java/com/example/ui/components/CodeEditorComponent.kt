@@ -603,6 +603,7 @@ fun CodeEditorComponent(
                         "go" -> listOf("fmt.Println()", "func", "package main", ":=", "go", "chan", "defer", "{}", "()", "[]", "if err != nil")
                         "elixir" -> listOf("IO.puts()", "|>", "defmodule", "def", "do..end", "fn -> end", "%{}", "[]", "{}", "->", ":ok")
                         "flutter" -> listOf("Widget build", "return Scaffold(", "Text('')", "Center(", "Column(", "Row(", ";", "{}")
+                        "ai" -> listOf("print()", "import torch", "nn.Module", "forward()", "loss.backward()", "optimizer.step()", "ReLU()", "Linear()", "epoch", "loss", "[]", "{}")
                         else -> listOf("print()", "void main()", "var", ";", "{}", "()", "[]", "=>", "==", "!=", "+", "-")
                     }
 

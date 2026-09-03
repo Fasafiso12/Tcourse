@@ -1039,7 +1039,8 @@ private fun buildAllLanguageSlices(
         "javascript" to Color(0xFFFBBF24),
         "lua" to Color(0xFF5C7CFA),
         "go" to Color(0xFF00ADD8),
-        "elixir" to Color(0xFF9B59B6)
+        "elixir" to Color(0xFF9B59B6),
+        "ai" to Color(0xFF6366F1)
     )
 
     val rawValues = languages.map { lang ->

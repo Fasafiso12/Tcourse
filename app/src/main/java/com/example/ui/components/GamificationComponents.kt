@@ -391,9 +391,10 @@ fun DailyChallengeModal(
                 )
 
                 challenge.codeSnippet?.let { snippet ->
-                    SyntaxHighlightedCode(
+                    CodeBlock(
                         code = snippet,
                         language = challenge.courseId,
+                        showLineNumbers = snippet.lines().size > 1,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

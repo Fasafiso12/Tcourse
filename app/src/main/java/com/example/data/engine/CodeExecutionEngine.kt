@@ -435,6 +435,56 @@ object CodeExecutionEngine {
         )
     }
 
+    private fun isCodeEmptyOrBoilerplateOnly(code: String): Boolean {
+        // Strip comments
+        var stripped = code
+            .lines()
+            .map { line ->
+                val trimmed = line.trim()
+                if (trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("<!--") ||
+                    trimmed.startsWith("/*") || trimmed.startsWith("*") || trimmed.startsWith("*/") ||
+                    trimmed.startsWith("--")
+                ) {
+                    ""
+                } else {
+                    val idxSlash = trimmed.indexOf("//")
+                    val idxHash = trimmed.indexOf("#")
+                    var cleanLine = trimmed
+                    if (idxSlash != -1) cleanLine = cleanLine.substring(0, idxSlash).trim()
+                    if (idxHash != -1) cleanLine = cleanLine.substring(0, idxHash).trim()
+                    cleanLine
+                }
+            }
+            .filter { it.isNotEmpty() }
+            .joinToString("\n")
+
+        // Remove standard boilerplate
+        val boilerplatePatterns = listOf(
+            Regex("""#include\s*<[^>]+>"""),
+            Regex("""using\s+namespace\s+std;"""),
+            Regex("""package\s+main"""),
+            Regex("""import\s+["'][^"']+["']"""),
+            Regex("""import\s+[a-zA-Z0-9_.*]+"""),
+            Regex("""public\s+class\s+\w+"""),
+            Regex("""public\s+static\s+void\s+main\s*\(\s*String\s*\[\s*\]\s*\w+\s*\)"""),
+            Regex("""fun\s+main\s*\(\s*(?:args\s*:\s*Array<String>)?\s*\)"""),
+            Regex("""void\s+main\s*\(\s*\)"""),
+            Regex("""int\s+main\s*\(\s*\)"""),
+            Regex("""fn\s+main\s*\(\s*\)"""),
+            Regex("""func\s+main\s*\(\s*\)"""),
+            Regex("""<\?php"""),
+            Regex("""return\s+0;?""")
+        )
+
+        for (pattern in boilerplatePatterns) {
+            stripped = stripped.replace(pattern, "")
+        }
+
+        // Remove all whitespace and braces/semicolons
+        val remainingContent = stripped.replace(Regex("""[\s{};\(\)]"""), "")
+        return remainingContent.isEmpty()
+    }
+
     suspend fun verifyPracticalTask(
         code: String,
         taskDescription: String,
@@ -444,11 +494,11 @@ object CodeExecutionEngine {
         delay(160)
         val cleanCode = code.trim()
 
-        if (cleanCode.isEmpty() || cleanCode.lines().all { it.trim().startsWith("//") || it.trim().startsWith("#") || it.trim().isEmpty() }) {
+        if (cleanCode.isEmpty() || isCodeEmptyOrBoilerplateOnly(cleanCode)) {
             return ExecutionResult(
                 isSuccess = false,
-                output = "Editörde henüz geçerli bir kod bulunamadı.",
-                error = "Lütfen görevde istenen çözümü kod editörüne yazıp 'Görevi Kontrol Et' butonuna basınız."
+                output = "Editörde henüz bir çözüm kodu yazılmamış.",
+                error = "Lütfen görevde istenen çözümü kod editörüne yazıp 'Kodu Çalıştır' butonuna basınız."
             )
         }
 
@@ -468,7 +518,7 @@ object CodeExecutionEngine {
         val missingHints = mutableListOf<String>()
 
         // Check null-safety or optional checks
-        if ((lowerTask.contains("null") || lowerTask.contains("nil") || lowerTask.contains("option")) &&
+        if ((lowerTask.contains("null") || lowerTask.contains("nil") || lowerTask.contains("option") || lowerTask.contains("elvis")) &&
             !lowerCode.contains("?") && !lowerCode.contains("null") && !lowerCode.contains("nil") && !lowerCode.contains("is null") && !lowerCode.contains("== null") && !lowerCode.contains("!= null")) {
             missingHints.add("Null güvenliği / kontrolü yapısı (örneğin ?, ?:, != null veya nil kontrolü) tespit edilemedi.")
         }
@@ -477,6 +527,15 @@ object CodeExecutionEngine {
         if ((lowerTask.contains("döngü") || lowerTask.contains("1'den") || lowerTask.contains("sayıları") || lowerTask.contains("step") || lowerTask.contains("tek sayılar") || lowerTask.contains("çift sayılar") || lowerTask.contains("karelerini")) &&
             !lowerCode.contains("for") && !lowerCode.contains("while") && !lowerCode.contains("step") && !lowerCode.contains("loop") && !lowerCode.contains("map") && !lowerCode.contains("filter") && !lowerCode.contains("range") && !lowerCode.contains("until") && !lowerCode.contains("..")) {
             missingHints.add("Görevdeki döngü veya aralık yapısı (for, while, step, .. vb.) eksik görünüyor.")
+        }
+
+        // Check variables val/var
+        if (lowerTask.contains("val") && lowerTask.contains("var")) {
+            if (languageId.equals("kotlin", ignoreCase = true)) {
+                if (!cleanCode.contains("val ") || !cleanCode.contains("var ")) {
+                    missingHints.add("Görevde istenen 'val' ve 'var' değişken tanımları eksik.")
+                }
+            }
         }
 
         // Check functions or lambdas
@@ -498,27 +557,29 @@ object CodeExecutionEngine {
         }
 
         // Check print or output statements
-        if ((lowerTask.contains("yazdır") || lowerTask.contains("ekrana") || lowerTask.contains("printf") || lowerTask.contains("print")) &&
-            !lowerCode.contains("print") && !lowerCode.contains("printf") && !lowerCode.contains("println") && !lowerCode.contains("console.log") && !lowerCode.contains("cout") && !lowerCode.contains("io.write") && !lowerCode.contains("io.puts") && !lowerCode.contains("io.inspect") && !lowerCode.contains("fmt.")) {
-            missingHints.add("Sonucu ekrana yazdıran çıktı ifadesi (print / println / printf / fmt.Println / IO.puts vb.) eksik.")
+        val isDefaultRunMsg = runResult.output.startsWith("✓ Program başarıyla derlendi")
+        if ((lowerTask.contains("yazdır") || lowerTask.contains("ekrana") || lowerTask.contains("printf") || lowerTask.contains("print") || lowerTask.contains("formatında")) &&
+            (isDefaultRunMsg || runResult.output.isBlank() ||
+             (!lowerCode.contains("print") && !lowerCode.contains("printf") && !lowerCode.contains("println") && !lowerCode.contains("console.log") && !lowerCode.contains("cout") && !lowerCode.contains("io.write") && !lowerCode.contains("io.puts") && !lowerCode.contains("io.inspect") && !lowerCode.contains("fmt.")))) {
+            missingHints.add("Sonucu ekrana yazdıran çıktı ifadesi (println, print, cout, fmt.Println vb.) eksik veya çıktı üretilmedi.")
         }
 
         if (missingHints.isNotEmpty()) {
-            val outputStr = if (runResult.output.isNotBlank()) "\n\n🖥️ Konsol Çıktınız:\n${runResult.output.trim()}" else ""
+            val outputStr = if (runResult.output.isNotBlank() && !isDefaultRunMsg) "\n\n🖥️ Konsol Çıktınız:\n${runResult.output.trim()}" else ""
             return ExecutionResult(
                 isSuccess = false,
-                output = "Kodunuz derlendi ancak görev gereksinimleri tam karşılanmadı:\n" +
+                output = "Kodunuz derlendi ancak görev gereksinimleri henüz tam karşılanmadı:\n" +
                         missingHints.joinToString("\n") { "• $it" } +
                         outputStr,
                 error = "Lütfen görev yönergelerindeki eksik adımları tamamlayıp tekrar deneyiniz."
             )
         }
 
-        val outputSnippet = if (runResult.output.isNotBlank()) " Çıktı: ${runResult.output.trim()}" else ""
+        val outputSnippet = if (runResult.output.isNotBlank() && !isDefaultRunMsg) "\n\n🖥️ Konsol Çıktısı:\n${runResult.output.trim()}" else ""
 
         return ExecutionResult(
             isSuccess = true,
-            output = "Görev başarıyla tamamlandı.$outputSnippet",
+            output = "✓ Tebrikler! Kodunuz başarıyla çalıştı ve görevi tamamladınız.$outputSnippet",
             executionTimeMs = runResult.executionTimeMs ?: (30..70).random().toLong()
         )
     }

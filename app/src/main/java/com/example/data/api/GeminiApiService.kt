@@ -111,14 +111,13 @@ object GeminiApiClient {
 
         // Build Pedagogical System Prompt
         val systemPrompt = """
-            Sen 'Kod Akademi' uygulamasının uzman, samimi, teşvik edici ve son derece net Türkçe konuşan yapay zeka programlama eğitmenisin.
-            Amacın: Kullanıcının programlama dillerinde (Dart, Flutter, Python, C++, Rust, JavaScript, Kotlin) anlamadığı, kafasını karıştıran her türlü konuyu, cümleyi veya kodu sıfırdan ve anlaşılır şekilde izah etmektir.
-            Kurallar:
-            1. Yanıtlarını temiz, okunaklı Markdown formatında yaz.
-            2. Kod bloklarını ```dil_adi şeklinde belirt.
-            3. Açıklamalarında karmaşık jargonlardan kaçın, günlük hayattan somut benzetmeler ve basamaklı maddeler kullan.
-            4. Kullanıcı bir cümleyi veya kodu anlamadığında o cümlenin/kodun kelime kelime mantığını açıkla.
-            5. Motive edici ve arkadaş canlısı bir üslup kullan.
+            Sen 'Kod Akademi' uygulamasının dünyanın en tatlı, en samimi ve en anlaşılır Türkçe konuşan yapay zeka öğretmenisin.
+            Temel Pedagojik Amacın:
+            1. Konuyu küçük bir çocuğa anlatır gibi ('Explain Like I'm 5'), herkesin ilk okuyuşta anlayabileceği sadelikte ve derinlikte açıkla.
+            2. Günlük hayattan oyuncaklar, mutfak aletleri, trafik ışıkları, hediye kutuları ve sihirli makineler gibi somut, canlı ve eğlenceli benzetmeler kullan.
+            3. Açıklamalarını bol ve akıcı metin, samimi cümleler ve hikayeleştirme ile zenginleştir; okuyucuyu karmaşık teknik jargona boğma.
+            4. Metnin ortasını kalabalık kodlarla doldurma! Önce mantığı, hikayeyi ve 'neden'ini açıkla. Sadece gerekliyse en sonda 2-3 satırlık çok sade bir örnek kod ver.
+            5. Motive edici, sıcak ve dostça bir üslup kullan.
         """.trimIndent()
 
         // Build Contextual Prompt
@@ -201,140 +200,106 @@ object LocalIntelligentTutor {
 
     private fun buildStepByStepExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         return """
-            ### 🪜 Adım Adım Açıklama: $lesson
+            ### 🪜 Küçük Bir Çocuğa Anlatır Gibi: $lesson
 
-            Bu konuyu zihninde çok rahat oturtman için 3 basit adıma bölelim:
+            Bu konuyu zihninde çok rahat canlandırman için adım adım hikayeleştirelim:
 
-            **1. Adım: Temel Mantık ve Amaç**
-            Programlamada `$lesson` yapısı, bilgisayara tam olarak ne yapacağını adım adım tarif etmek için kullanılır. Tıpkı bir yemek tarifindeki sıralı talimatlar gibi, kod da yukarıdan aşağıya doğru satır satır işlenir.
+            **1. Adım: Ne İşe Yarar? (Büyük Resim)**
+            Düşün ki evinde sana yardım eden tatlı bir robot arkadaşın var. Ona sırayla yapacağı işleri söylüyorsun. `$lesson` konusu, robotumuza emirleri karışıklık olmadan vermenin en temel kuralıdır.
 
-            **2. Adım: Sözdizimi (Syntax) ve Kurallar**
-            $lang dilinde bu kuralı uygularken dikkat etmemiz gereken standart yapı şöyledir:
-            ```$lang
-            // $lang dilinde $lesson örneği
-            void main() {
-                var durum = "Öğreniyorum";
-                print("Adım 1: " + durum);
-            }
-            ```
+            **2. Adım: Günlük Hayattan Benzetme**
+            Tıpkı bir legoyu yerine oturtmak ya da kazağını giymek gibi, programlamada da her şey sıralı ve kurallıdır. $lang dili bu kural sayesinde hata yapmanı engeller ve uygulamanın pürüzsüz çalışmasını sağlar.
 
-            **3. Adım: Pratik İpucu & En Sık Yapılan Hata**
-            * Değişken ve tip uyumsuzluklarına dikkat et.
-            * Her komutun ne zaman tetiklendiğini zihninde simüle et.
-            * `$lang` derleyicisi bu kodu optimize ederken en kısa yoldan sonuç üretmeye çalışır.
-
-            ✨ **Özet:** Konuyu tek bir büyük problem olarak görmek yerine küçük parçalara ayırdığında `$lang` ile kod yazmak çok daha keyifli hale gelir!
+            **3. Adım: Aklında Bulunsun!**
+            * Asla korkma: Bilgisayar sadece senin ona söylediğin şeyleri yapar.
+            * Parçalara böl: Büyük bir kuleyi tek seferde değil, tuğla tuğla inşa ederiz.
+            * Kodun en sonundaki örneği inceleyerek ve pratik yaparak ustalaşabilirsin!
         """.trimIndent()
     }
 
     private fun buildDeepDiveExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         return """
-            ### 🔬 Derinlemesine Teknik İnceleme (Under the Hood)
-            
-            **Mimarisi & Çalışma Mekanizması:**
-            $lang dilinde `$lesson` konusu ele alınırken, arka planda (runtime/compiler seviyesinde) şu süreçler gerçekleşir:
-            
-            1. **Bellek Yerleşimi (Stack & Heap):**
-               * İlkel tipler ve yerel fonksiyon çerçeveleri doğrudan *Stack* bellekte saklanır ve kapsam (scope) dışına çıkıldığında anında temizlenir.
-               * Dinamik veri yapıları ve nesneler *Heap* üzerinde tahsis edilir ve referans sayımı veya Çöp Toplayıcı (Garbage Collector) tarafından takip edilir.
+            ### 🔬 Derinlemesine Ama Çok Sade: $lesson Mantığı
 
-            2. **Derleyici Optimizasyonu:**
-               * `$lang` derleyicisi, gereksiz yeniden hesaplamaları engellemek için kodunuzu optimize eder.
-               * Tip çıkarımı (Type Inference) sayesinde kodun güvenliği derleme aşamasında (Compile-time) garanti altına alınır.
+            **İşin Özü ve Mantığı:**
+            $lang dilinde `$lesson` konusunun arkasında yatan sihir aslında çok mantıklıdır:
 
-            3. **Performans ve Best Practice:**
-               * Mümkün olduğunda `const` veya değişmez (immutable) referanslar kullanmak bellek baskısını azaltır.
-               * Gereksiz döngü veya derin nesne klonlamalarından kaçınmak CPU döngülerini minimumda tutar.
+            1. **Bilgisayarın Hafızası (Kutular & Dolaplar):**
+               * Bilgisayarın beyninde devasa bir dolap ve içinde milyonlarca küçük çekmece vardır.
+               * Biz bir veri oluşturduğumuzda, bilgisayar bu dolaptan uygun bir çekmece açar, içine değerimizi koyar ve kapağına bir isim etiketi yapıştırır.
 
-            💡 **Pro İpucu:** $lang mimarisinde bu yaklaşımı kavramak, profesyonel projelerde bellek sızıntılarını (memory leaks) önlemenin ilk kuralıdır.
+            2. **Neden Böyle Tasarlanmış?**
+               * Eskiden programcılar kutuları karıştırıp hata yapabiliyordu. $lang dili, yanlış bir çekmeceye yanlış eşya koymanı baştan engellemek için bu kuralları koymuştur.
+
+            3. **Altın Kural:**
+               * Sade yaz, temiz düşün ve değişkenlerini mantıklı isimlendir!
         """.trimIndent()
     }
 
     private fun buildSummaryExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         return """
-            ### 📝 Hızlı Özet & Püf Noktaları (Cheat Sheet)
+            ### 📝 Hızlı Özet & Püf Noktaları
 
             **Ders:** $lesson ($lang)
 
-            📌 **Altın Kurallar:**
-            • **Temel Amaç:** Veriyi doğru işlemek, akışı kontrol etmek ve temiz kod üretmek.
-            • **Dikkat Edilecek Nokta:** Tip güvenliği ve kapsam (scope) sınırları.
-            • **Hızlı Kod Şablonu:**
-            ```$lang
-            // $lang Özet Şablon
-            final veri = "Temel Bilgi";
-            print("Özet: ${'$'}veri");
-            ```
-
-            ⚡ **Sınav & Mülakat İpucu:**
-            Bu konudan soru geldiğinde her zaman "Tip güvenliği", "Çalışma zamanı performansı" ve "Kodun okunabilirliği" kriterlerini hatırla!
+            👶 **3 Cümlede Bu Konu:**
+            1. **Amaç:** Bilgisayara tam olarak ne istediğimizi net ve şeffaf bir dille anlatmak.
+            2. **Mantık:** Veriyi güvenli kutularda saklayıp, adım adım işlemek.
+            3. **Püf Noktası:** Bol bol metinleri oku, zihninde hikayeyi canlandır ve en sondaki uygulamalı görevi çözerek pekiştir!
         """.trimIndent()
     }
 
     private fun buildSentenceExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         val targetText = if (query.isNotBlank() && query != "Anlamadığım cümleyi açıkla") query else (context.lessonContentSnippet ?: "Seçilen ifade")
         return """
-            ### 🔍 Cümle & Kavram Analizi
-            
-            **İncelenen Cümle/Kod:**
+            ### 🔍 Cümle & Anlam Çözümlemesi
+
+            **İncelenen Cümle / Parça:**
             > *"$targetText"*
 
-            **Sade Türkçe İle Anlamı:**
-            Bu cümlenin anlatmak istediği şey oldukça basittir:
-
+            **Sade Türkçe İle Çocuk Diliyle Açıklaması:**
             1. **Ne Demek İstiyor?**
-               Burada anlatılan işlem, bilgisayara verdiğin talimatın `$lang` dilindeki kurala göre nasıl yorumlanacağını ifade eder.
-            
-            2. **Neden Böyle İfade Edilmiş?**
-               Teknik terimler bazen karmaşık gelebilir; ancak temel fikir: *"Veriyi hazırla, kontrol et ve hedefe ulaştır"*.
+               Bu cümle teknik dille yazılmış olsa da aslında şunu söylüyor: *"Hey bilgisayar, bu veriyi al, güvenli bir yere koy ve gerektiğinde bana tam bu isimle geri ver!"*
 
-            3. **Somut Örnek:**
-               Tıpkı bir anahtarla doğru kilidi açmak gibi, bu kural da kodunun hatasız çalışmasını sağlayan bir anahtardır.
+            2. **Kelimelerin Anlamı:**
+               Teknik kelimeler seni korkutmasın! Her teknik terim, günlük hayatta kullandığımız basit bir hareketin (örneğin kutuyu açmak, kilitlemek veya kontrol etmek) kodlama dünyasındaki adıdır.
 
-            ❓ *Eğer bu cümlenin içindeki belirli bir kelimeyi (örn. async, static, mutable, pointer) hala merak ediyorsan hemen sorabilirsin!*
+            3. **Nasıl Düşünmelisin?**
+               Bir arkadaşına oyunun kuralını anlatır gibi bu adımı zihninde canlandırabilirsin.
         """.trimIndent()
     }
 
     private fun buildAnalogyExplanation(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         return """
-            ### 💡 Günlük Hayat Benzetmesi (Analoji)
+            ### 💡 Küçük Bir Çocuğa Anlatır Gibi: Günlük Hayat Benzetmesi
 
             **Konu:** $lesson ($lang)
 
-            🚗 **Benzetmemiz: Akıllı Trafik Işıkları Sistemi**
+            🌟 **Hikayemiz: Oyuncak Dolabı ve Akıllı Yardımcımız**
 
-            Düşün ki bir kavşaktasın:
-            * **Değişkenler:** Arabanın içindeki yolcular ve bagajdır (taşınan veri).
-            * **Fonksiyonlar:** Arabanın motoru veya direksiyonudur (bir işi yapan mekanizma).
-            * **Şart Blokları (if/else):** Trafik ışıklarıdır; yeşilse geçersin, kırmızıysa beklersin.
-            * **Döngüler:** Hedefe varana kadar dönen tekerleklerdir.
+            Odanı topladığını ve en sevdiğin oyuncakları düzenlediğini hayal et:
+            * **Değişkenler:** Üzerine 'Arabalarım', 'Legolarım' yazdığın etiketli kutulardır.
+            * **val / Sabitler:** Kapağını anahtarla kilitlediğin kumbarandır; içindekini kimse değiştiremez.
+            * **var / Değişkenler:** Kapağı açık kutudur; içindeki oyuncağı istediğin an yenisiyle değiştirebilirsin.
+            * **Fonksiyonlar:** Mutfaktaki meyve suyu makinesidir; içine portakal atarsın, sana taptaze meyve suyu verir.
+            * **Koşullar (If/Else):** "Hava yağmurluysa şemsiyeni al, güneşliyse şapkanı tak" kuralıdır.
 
-            $lang dilindeki `$lesson` konusu da tam olarak bu trafik akışını düzenleyen trafik polisi gibidir. Her şeyin kuralına uygun ve güvenli akmasını sağlar.
+            İşte `$lesson` konusu da bu eğlenceli ve düzenli odanın bir parçasıdır!
         """.trimIndent()
     }
 
     private fun buildGeneralTutorResponse(lang: String, lesson: String, query: String, context: AiAssistantContext): String {
         return """
-            ### 🤖 AI Asistanı Yanıtı
+            ### 🤖 Sevimli AI Öğretmenin Yanında!
 
-            **Soru/Konu:** $query
-            **İlgili Dil & Ders:** $lang - $lesson
+            **Sorun:** $query
+            **Konumuz:** $lang - $lesson
 
-            Harika bir soru! $lang programlama dilinde bu konuyu şu şekilde özetleyebiliriz:
+            Harika bir merak! Programlama dünyasına hoş geldin. Bu konuyu en sade şekilde şöyle özetleyebiliriz:
 
-            1. **Temel Yaklaşım:**
-               $lang ekosisteminde kod yazarken okunabilirlik ve tip doğruluğu esastır. Yazdığın kodun her parçası belirli bir amaca hizmet eder.
-
-            2. **Uygulama Örneği:**
-            ```$lang
-            // $lang Örnek Çözüm
-            void ornekFonksiyon() {
-                print("Başarıyla uygulandı!");
-            }
-            ```
-
-            3. **Nasıl İlerlemelisin?**
-               İstersen bu konuyu yukarıdaki kısayollardan **Adım Adım**, **Derinlemesine** veya **Benzetme ile** de açıklayabilirim!
+            * Bilgisayara adım adım talimat verirken, tıpkı arkadaşına bir oyun anlatır gibi açık ve net olmalıyız.
+            * $lang dili bizimle bilgisayar arasında harika bir köprüdür.
+            * Kafana takılan herhangi bir detayı bana çekinmeden sorabilirsin; istersen sana günlük hayattan daha fazla örnek ve hikaye anlatabilirim!
         """.trimIndent()
     }
 
